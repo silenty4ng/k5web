@@ -29,16 +29,16 @@ import localeUserSetting from '@/views/user/setting/locale/zh-CN';
 import localeSettings from './zh-CN/settings';
 
 export default {
-  'menu.dashboard': '仪表盘',
+  'menu.dashboard': '写频',
   'menu.server.dashboard': '仪表盘-服务端',
   'menu.server.workplace': '工作台-服务端',
   'menu.server.monitor': '实时监控-服务端',
-  'menu.list': '列表页',
+  'menu.list': '小工具',
   'menu.result': '结果页',
   'menu.exception': '异常页',
   'menu.form': '表单页',
   'menu.profile': '详情页',
-  'menu.visualization': '数据可视化',
+  'menu.visualization': '固件更新',
   'menu.user': '个人中心',
   'menu.arcoWebsite': 'Arco Design',
   'menu.faq': '常见问题',

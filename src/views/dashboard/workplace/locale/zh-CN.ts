@@ -1,5 +1,5 @@
 export default {
-  'menu.dashboard.workplace': '工作台',
+  'menu.dashboard.workplace': '基础信息',
   'workplace.welcome': '欢迎回来！',
   'workplace.balance': '余额（元）',
   'workplace.order.pending': '待支付',

@@ -1,5 +1,5 @@
 export default {
-  'menu.dashboard.monitor': '实时监控',
+  'menu.dashboard.monitor': '信道管理',
   'monitor.title.chatPanel': '聊天窗口',
   'monitor.title.quickOperation': '快捷操作',
   'monitor.title.studioInfo': '直播信息',
