@@ -1,10 +1,9 @@
 export default {
-  path: 'https://arco.design/vue/docs/pro/faq',
-  name: 'faq',
+  path: 'https://www.vicicode.com/',
+  name: '作者：BD8DFN',
   meta: {
-    locale: 'menu.faq',
-    icon: 'icon-question-circle',
+    locale: '作者：BD8DFN',
     requiresAuth: true,
-    order: 9,
+    order: 8,
   },
 };

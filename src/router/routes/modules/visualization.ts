@@ -19,7 +19,7 @@ const VISUALIZATION: AppRouteRecordRaw = {
       meta: {
         locale: 'menu.visualization.dataAnalysis',
         requiresAuth: true,
-        roles: ['admin'],
+        roles: ['*'],
       },
     },
     {
@@ -30,10 +30,10 @@ const VISUALIZATION: AppRouteRecordRaw = {
       meta: {
         locale: 'menu.visualization.multiDimensionDataAnalysis',
         requiresAuth: true,
-        roles: ['admin'],
+        roles: ['*'],
       },
     },
   ],
 };
 
-export default VISUALIZATION;
+// export default VISUALIZATION;

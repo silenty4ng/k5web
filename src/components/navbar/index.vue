@@ -24,42 +24,7 @@
     </div>
     <ul class="right-side">
       <li>
-        <a-tooltip :content="$t('settings.search')">
-          <a-button class="nav-btn" type="outline" :shape="'circle'">
-            <template #icon>
-              <icon-search />
-            </template>
-          </a-button>
-        </a-tooltip>
-      </li>
-      <li>
-        <a-tooltip :content="$t('settings.language')">
-          <a-button
-            class="nav-btn"
-            type="outline"
-            :shape="'circle'"
-            @click="setDropDownVisible"
-          >
-            <template #icon>
-              <icon-language />
-            </template>
-          </a-button>
-        </a-tooltip>
-        <a-dropdown trigger="click" @select="changeLocale as any">
-          <div ref="triggerBtn" class="trigger-btn"></div>
-          <template #content>
-            <a-doption
-              v-for="item in locales"
-              :key="item.value"
-              :value="item.value"
-            >
-              <template #icon>
-                <icon-check v-show="item.value === currentLocale" />
-              </template>
-              {{ item.label }}
-            </a-doption>
-          </template>
-        </a-dropdown>
+        <a-button type="primary" @click="connectIt">{{ appStore.connectState ? '断开' : '连接' }}</a-button>
       </li>
       <li>
         <a-tooltip
@@ -116,6 +81,7 @@
   import useLocale from '@/hooks/locale';
   import useUser from '@/hooks/user';
   import Menu from '@/components/menu/index.vue';
+  import { connect, disconnect, sendPacket, readPacket } from '@/utils/serial.js';
 
   const appStore = useAppStore();
   const userStore = useUserStore();
@@ -162,6 +128,32 @@
     Message.success(res as string);
   };
   const toggleDrawerMenu = inject('toggleDrawerMenu') as () => void;
+
+  const connectIt = async () => {
+    if(appStore.connectState == false){
+      const _connect = await connect();
+
+      if(!_connect){
+        alert('连接失败');
+        return;
+      }
+
+      const version = await eeprom_init(_connect);
+      appStore.updateSettings({ connectState: true, connectPort: _connect, firmwareVersion: version });
+    }else{
+      disconnect(appStore.connectPort);
+      appStore.updateSettings({ connectState: false, connectPort: null, firmwareVersion: "" });
+    }
+  }
+
+  const eeprom_init = async (port: any) => {
+    const packet = new Uint8Array([0x14, 0x05, 0x04, 0x00, 0xff, 0xff, 0xff, 0xff]);
+    await sendPacket(port, packet);
+    const response = await readPacket(port, 0x15);
+    const decoder = new TextDecoder();
+    const version = new Uint8Array(response.slice(4, 4+16));
+    return decoder.decode(version.slice(0, version.indexOf(0)));
+  }
 </script>
 
 <style scoped lang="less">

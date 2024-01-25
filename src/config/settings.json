@@ -13,5 +13,8 @@
   "device": "desktop",
   "tabBar": false,
   "menuFromServer": false,
-  "serverMenu": []
+  "serverMenu": [],
+  "connectState": false,
+  "firmwareVersion": "",
+  "connectPort": null
 }

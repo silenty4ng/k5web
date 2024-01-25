@@ -1,24 +1,21 @@
 <template>
   <a-col class="banner">
-    <a-col :span="8">
+    <a-col>
       <a-typography-title :heading="5" style="margin-top: 0">
-        欢迎你~
+        {{ appStore.connectState ? "欢迎你~，连接成功！" : "欢迎你~，点击右上角“连接”按钮连接手台。" }}
       </a-typography-title>
     </a-col>
     <a-divider class="panel-border" />
+    <a-card v-show="appStore.connectState" :style="{ width: '360px', marginTop: '2em', marginBottom: '2em' }" title="手台信息">
+        当前固件版本：{{ appStore.firmwareVersion }}
+    </a-card>
   </a-col>
 </template>
 
 <script lang="ts" setup>
-  import { computed } from 'vue';
-  import { useUserStore } from '@/store';
+  import { useAppStore } from '@/store';
 
-  const userStore = useUserStore();
-  const userInfo = computed(() => {
-    return {
-      name: userStore.name,
-    };
-  });
+  const appStore = useAppStore();
 </script>
 
 <style scoped lang="less">

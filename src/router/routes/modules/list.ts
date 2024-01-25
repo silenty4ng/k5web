@@ -35,4 +35,4 @@ const LIST: AppRouteRecordRaw = {
   ],
 };
 
-export default LIST;
+// export default LIST;

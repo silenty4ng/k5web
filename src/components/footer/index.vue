@@ -1,5 +1,7 @@
 <template>
-  <a-layout-footer class="footer">Arco Pro</a-layout-footer>
+  <a-layout-footer class="footer">
+    <a href="https://github.com/silenty4ng/k5web" target="_blank">K5Web</a>
+  </a-layout-footer>
 </template>
 
 <script lang="ts" setup></script>

@@ -19,7 +19,7 @@ const FORM: AppRouteRecordRaw = {
       meta: {
         locale: 'menu.form.step',
         requiresAuth: true,
-        roles: ['admin'],
+        roles: ['*'],
       },
     },
     {
@@ -29,10 +29,10 @@ const FORM: AppRouteRecordRaw = {
       meta: {
         locale: 'menu.form.group',
         requiresAuth: true,
-        roles: ['admin'],
+        roles: ['*'],
       },
     },
   ],
 };
 
-export default FORM;
+// export default FORM;
