@@ -131,6 +131,7 @@
   const toggleDrawerMenu = inject('toggleDrawerMenu') as () => void;
 
   const configuration_list : any = {
+    "LOSEHU.*P.*K" : "silenty4ngk.json",
     "LOSEHU.*P.*" : "silenty4ng.json",
     "LOSEHU.*K"   : "todo.json",
     "LOSEHU.*"    : "todo.json" 
