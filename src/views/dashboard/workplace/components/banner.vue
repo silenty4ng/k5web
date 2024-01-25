@@ -7,7 +7,8 @@
     </a-col>
     <a-divider class="panel-border" />
     <a-card v-show="appStore.connectState" :style="{ width: '360px', marginTop: '2em', marginBottom: '2em' }" title="手台信息">
-        当前固件版本：{{ appStore.firmwareVersion }}
+        当前固件版本：{{ appStore.firmwareVersion }} <br />
+        匹配写频配置：{{ appStore.configuration?.name }}
     </a-card>
   </a-col>
 </template>

@@ -16,5 +16,6 @@
   "serverMenu": [],
   "connectState": false,
   "firmwareVersion": "",
-  "connectPort": null
+  "connectPort": null,
+  "configuration": null
 }

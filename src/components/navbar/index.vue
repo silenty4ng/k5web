@@ -82,6 +82,7 @@
   import useUser from '@/hooks/user';
   import Menu from '@/components/menu/index.vue';
   import { connect, disconnect, sendPacket, readPacket } from '@/utils/serial.js';
+  const drivers = import.meta.glob('@/drivers/*.json', { eager: true });
 
   const appStore = useAppStore();
   const userStore = useUserStore();
@@ -129,6 +130,12 @@
   };
   const toggleDrawerMenu = inject('toggleDrawerMenu') as () => void;
 
+  const configuration_list : any = {
+    "LOSEHU.*P.*" : "silenty4ng.json",
+    "LOSEHU.*K"   : "todo.json",
+    "LOSEHU.*"    : "todo.json" 
+  }
+
   const connectIt = async () => {
     if(appStore.connectState == false){
       const _connect = await connect();
@@ -138,8 +145,23 @@
         return;
       }
 
+      const driversList : any = {};
+      Object.keys(drivers).forEach((key) => {
+        driversList[key.substring(key.lastIndexOf('/') + 1)] = drivers[key].default;
+      })
+
+      let _configuration = null;
+      
       const version = await eeprom_init(_connect);
-      appStore.updateSettings({ connectState: true, connectPort: _connect, firmwareVersion: version });
+      Object.keys(configuration_list).some(e=>{
+        const _re = new RegExp(e);
+        if(_re.test(version)){
+          _configuration = driversList[configuration_list[e]];
+          return true
+        }
+      })
+
+      appStore.updateSettings({ connectState: true, connectPort: _connect, firmwareVersion: version, configuration: _configuration });
     }else{
       disconnect(appStore.connectPort);
       appStore.updateSettings({ connectState: false, connectPort: null, firmwareVersion: "" });
