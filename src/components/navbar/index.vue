@@ -81,7 +81,7 @@
   import useLocale from '@/hooks/locale';
   import useUser from '@/hooks/user';
   import Menu from '@/components/menu/index.vue';
-  import { connect, disconnect, sendPacket, readPacket } from '@/utils/serial.js';
+  import { connect, disconnect, eeprom_init } from '@/utils/serial.js';
   const drivers = import.meta.glob('@/drivers/*.json', { eager: true });
 
   const appStore = useAppStore();
@@ -167,15 +167,6 @@
       disconnect(appStore.connectPort);
       appStore.updateSettings({ connectState: false, connectPort: null, firmwareVersion: "" });
     }
-  }
-
-  const eeprom_init = async (port: any) => {
-    const packet = new Uint8Array([0x14, 0x05, 0x04, 0x00, 0xff, 0xff, 0xff, 0xff]);
-    await sendPacket(port, packet);
-    const response = await readPacket(port, 0x15);
-    const decoder = new TextDecoder();
-    const version = new Uint8Array(response.slice(4, 4+16));
-    return decoder.decode(version.slice(0, version.indexOf(0)));
   }
 </script>
 

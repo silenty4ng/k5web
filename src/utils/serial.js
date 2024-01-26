@@ -240,4 +240,69 @@ function uint8ArrayToHexString(uint8Array) {
       .join('');
 }
 
-export { connect, disconnect, sendPacket, readPacket, uint8ArrayToHexString }
+
+async function eeprom_init(port) {
+    const packet = new Uint8Array([0x14, 0x05, 0x04, 0x00, 0xff, 0xff, 0xff, 0xff]);
+    await sendPacket(port, packet);
+    const response = await readPacket(port, 0x15);
+    const decoder = new TextDecoder();
+    const version = new Uint8Array(response.slice(4, 4+16));
+    return decoder.decode(version.slice(0, version.indexOf(0)));
+}
+
+async function eeprom_read(port, address, size = 0x80) {
+    // packet format: uint16 ID, uint16 length, uint16 address, uint8 size, uint8 padding, uint32 timestamp
+    // size can be up to 0x80 bytes
+    const address_msb = (address & 0xff00) >> 8;
+    const address_lsb = address & 0xff;
+
+    const address_msb_h = (address & 0xff000000) >> 24;
+    const address_lsb_h = (address & 0xff0000) >> 16;
+    
+    const packet = new Uint8Array([0x2b, 0x05, 0x08, 0x00, address_lsb_h, address_msb_h, 0x80, 0x00, 0xff, 0xff, 0xff, 0xff, address_lsb, address_msb]);
+
+    await sendPacket(port, packet);
+    const response = await readPacket(port, 0x1c);
+
+    // reply format: uint16 ID, uint16 length, uint16 offset, uint8 size, uint8 padding, uint8[128] data
+    // extract data from response using size
+    if (response[6] !== size) {
+        throw ('eeprom read reply has wrong size.');
+    }
+    const data = new Uint8Array(response.slice(8));
+    return data;
+}
+
+async function eeprom_write(port, address, input, size = 0x80){
+    // packet format: uint16 ID, uint16 length, uint16 address, uint8 size, uint8 padding, uint32 timestamp
+    // size can be up to 0x80 bytes
+    const address_msb = (address & 0xff00) >> 8;
+    const address_lsb = address & 0xff;
+
+    const address_msb_h = (address & 0xff000000) >> 24;
+    const address_lsb_h = (address & 0xff0000) >> 16;
+    
+    const packet = new Uint8Array([0x38, 0x05, 0x1c, 0x00, address_lsb_h, address_msb_h, 0x82, 0x00, 0xff, 0xff, 0xff, 0xff, address_lsb, address_msb]);
+    const mergedArray = new Uint8Array(packet.length + input.length);
+    mergedArray.set(packet);
+    mergedArray.set(input, packet.length);
+
+    await sendPacket(port, mergedArray);
+    const response = await readPacket(port, 0x1e);
+    
+    return true;
+}
+
+async function eeprom_reboot(port) {
+    // packet format: uint16 ID
+    const packet = new Uint8Array([0xdd, 0x05]);
+    await sendPacket(port, packet);
+    return true;
+} 
+
+async function check_eeprom(port){
+    alert('TODO')
+    return null;
+}
+
+export { connect, disconnect, sendPacket, readPacket, uint8ArrayToHexString, eeprom_init, eeprom_read, eeprom_reboot, check_eeprom, eeprom_write }

@@ -8,15 +8,25 @@
     <a-divider class="panel-border" />
     <a-card v-show="appStore.connectState" :style="{ width: '360px', marginTop: '2em', marginBottom: '2em' }" title="手台信息">
         当前固件版本：{{ appStore.firmwareVersion }} <br />
-        匹配写频配置：{{ appStore.configuration?.name }}
+        匹配写频配置：{{ appStore.configuration?.name }} <br />
+        存储大小：{{ state.eepromSize }} <a-button size="mini" type="primary" @click="checkEeprom">检测</a-button>
     </a-card>
   </a-col>
 </template>
 
 <script lang="ts" setup>
+  import { reactive } from 'vue';
   import { useAppStore } from '@/store';
+  import { eeprom_read } from '@/utils/serial.js';
 
   const appStore = useAppStore();
+
+  const state = reactive({
+    eepromSize: "点击检测按钮检测"
+  })
+
+  const checkEeprom = async () => {
+  }
 </script>
 
 <style scoped lang="less">
