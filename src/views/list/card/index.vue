@@ -36,10 +36,12 @@ const state = reactive({
 })
 
 const checkEeprom = async () => {
+  if(appStore.connectState != true){alert('请先连接手台！'); return;};
   await check_eeprom();
 }
 
 const backup = async() => {
+  if(appStore.connectState != true){alert('请先连接手台！'); return;};
   let _max = 0x2000;
   switch(state.eepromType){
     case "1":
@@ -85,6 +87,7 @@ const backup = async() => {
 }
 
 const restore = async() => {
+  if(appStore.connectState != true){alert('请先连接手台！'); return;};
   const input = document.createElement('input');
   input.type = 'file';
   input.onchange = async() => {

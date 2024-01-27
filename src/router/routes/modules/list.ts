@@ -2,7 +2,7 @@ import { DEFAULT_LAYOUT } from '../base';
 import { AppRouteRecordRaw } from '../types';
 
 const LIST: AppRouteRecordRaw = {
-  path: '/list',
+  path: '/tool',
   name: 'list',
   component: DEFAULT_LAYOUT,
   meta: {
@@ -23,7 +23,7 @@ const LIST: AppRouteRecordRaw = {
     //   },
     // },
     {
-      path: 'card',
+      path: 'backup',
       name: 'Card',
       component: () => import('@/views/list/card/index.vue'),
       meta: {
