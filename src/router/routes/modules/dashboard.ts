@@ -22,17 +22,16 @@ const DASHBOARD: AppRouteRecordRaw = {
         roles: ['*'],
       },
     },
-
-    // {
-    //   path: 'monitor',
-    //   name: 'Monitor',
-    //   component: () => import('@/views/dashboard/monitor/index.vue'),
-    //   meta: {
-    //     locale: 'menu.dashboard.monitor',
-    //     requiresAuth: true,
-    //     roles: ['*'],
-    //   },
-    // },
+    {
+      path: 'channel',
+      name: 'Channel',
+      component: () => import('@/views/list/search-table/index.vue'),
+      meta: {
+        locale: '信道管理',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    }
   ],
 };
 

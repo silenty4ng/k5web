@@ -12,16 +12,6 @@ const LIST: AppRouteRecordRaw = {
     order: 2,
   },
   children: [
-    // {
-    //   path: 'search-table', // The midline path complies with SEO specifications
-    //   name: 'SearchTable',
-    //   component: () => import('@/views/list/search-table/index.vue'),
-    //   meta: {
-    //     locale: 'menu.list.searchTable',
-    //     requiresAuth: true,
-    //     roles: ['*'],
-    //   },
-    // },
     {
       path: 'backup',
       name: 'Card',

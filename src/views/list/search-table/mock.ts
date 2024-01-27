@@ -11,6 +11,8 @@ const data = Mock.mock({
       'id|8': /[A-Z][a-z][-][0-9]/,
       'number|2-3': /[0-9]/,
       'name|4-8': /[A-Z]/,
+      'mode|1': ['FM', 'AM', 'LSB'],
+      'freq|1': ['438.500', '438.500', '438.500'],
       'contentType|1': ['img', 'horizontalVideo', 'verticalVideo'],
       'count|2-3': /[0-9]/,
       'status|1': ['online', 'offline'],
