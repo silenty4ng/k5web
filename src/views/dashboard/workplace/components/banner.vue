@@ -17,7 +17,6 @@
 <script lang="ts" setup>
   import { reactive } from 'vue';
   import { useAppStore } from '@/store';
-  import { eeprom_read } from '@/utils/serial.js';
 
   const appStore = useAppStore();
 
