@@ -1046,7 +1046,9 @@ function uint8ArrayToString(uint8Array){
             continue
         };
         if(last_byte != 0x00){
-            dataString += FONT_MAPPING_117[last_byte][uint8Array[i]]
+            try{
+                dataString += FONT_MAPPING_117[last_byte][uint8Array[i]]
+            }catch{}
             last_byte = 0x00
             continue
         }
