@@ -29,12 +29,18 @@
               </p>
               <p style="font-weight: bold; font-size: 1.2em;">三、购买扩容芯片</p>
               <p>芯片型号：<span style="color: #ff0000;">M24M02-DRMN6</span> 或其它 SOP-8 封装 I²C 总线 2Mbit EEPROM 芯片。考虑到芯片质量及操作失误可能导致的损坏，建议多买几片备用。</p>
+              <p>
+                该教程由 BH3RVG 火星人整理提供。 
+              </p>
             </div>
             <div v-show="state.kIt == 'no'">
               <p style="color: #ff0000; font-weight: bold;">声明：本方案及相应固件均为技术探索用途。对原机进行改造需要相应专业知识且可能存在安全和法律风险。使用本方案和固件代表您已认可风险并自行承担后果，包括且不限于财产损失、人员伤亡、违法犯罪等。</p>
               <p style="font-weight: bold; font-size: 1.2em;">一、所需工具</p>
               <p>
                 写频线。
+              </p>
+              <p>
+                该教程由 BH3RVG 火星人整理提供。 
               </p>
             </div>
           </div>
