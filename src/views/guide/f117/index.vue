@@ -50,12 +50,12 @@
                     <p>
                       <a-space>
                         <a-button type="primary" :disabled="state.backed" @click="backupIt">备份</a-button><span v-show="state.backed" style="color: #C9CDD4;">已备份✔</span>&nbsp;
-                        <a-button type="primary" :disabled="!state.backed" @click="state.flashStep[0] = 'two'">下一步</a-button>
+                        <a-button type="primary" :disabled="!state.backed" @click="state.kIt == 'yes' ? state.flashStep[0] = 'two' : state.flashStep[0] = 'three'">下一步</a-button>
                       </a-space>
                     </p>
                   </div>
                 </a-collapse-item>
-                <a-collapse-item header="拆机" key="two">
+                <a-collapse-item v-show="state.kIt == 'yes'" header="拆机" key="two">
                   <div style="text-align: left;">
                     <p>视频教程链接：
                       <a href="https://www.bilibili.com/video/BV1ib4y137Ah" target="_blank" rel="noopener noreferrer">https://www.bilibili.com/video/BV1ib4y137Ah</a>
@@ -96,12 +96,12 @@
                     <p>
                       <a-space>
                         <a-button type="primary" :disabled="state.flashIt" @click="iFlashIt">刷入固件</a-button>
-                        <a-button type="primary" :disabled="!state.flashIt" @click="state.flashStep[0] = 'four'">下一步</a-button>
+                        <a-button type="primary" :disabled="!state.flashIt" @click="state.kIt == 'yes' ? state.flashStep[0] = 'four' : finishIt()">下一步</a-button>
                       </a-space>
                     </p>
                   </div>
                 </a-collapse-item>
-                <a-collapse-item header="刷回原机数据" key="four">
+                <a-collapse-item v-show="state.kIt == 'yes'" header="刷回原机数据" key="four">
                   <div style="text-align: left;">
                     <p>正常开机，使设备处于开机状态，点击刷回备份数据。</p>
                     <p>
@@ -112,26 +112,26 @@
                     </p>
                   </div>
                 </a-collapse-item>
-                <a-collapse-item header="刷入字库" key="five">
+                <a-collapse-item v-show="state.kIt == 'yes'" header="刷入字库" key="five">
                   <div style="text-align: left;">
                     <p>正常开机，使设备处于开机状态，点击刷入字库。</p>
                     <p>
                       <a-space>
                         <a-button type="primary" :disabled="state.flashFontIt" @click="flashFont">刷入字库</a-button>
-                        <a-button type="primary" :disabled="!state.flashFontIt" @click="state.flashStep[0] = 'six'">下一步</a-button>
+                        <a-button type="primary" :disabled="!state.flashFontIt" @click="finishIt">下一步</a-button>
                       </a-space>
                     </p>
                   </div>
                 </a-collapse-item>
                 <a-collapse-item header="完全组装" key="six">
-                  <div style="text-align: left;">按拆解顺序进行焊接和组装。</div>
+                  <div style="text-align: left;">如果扩容，按拆解顺序进行焊接和组装。</div>
                 </a-collapse-item>
               </a-collapse>
             </a-spin>
           </div>
           <div v-show="state.step == 2" style="text-align: center;">
             <a-space>
-              <a-button :disabled="!state.kIt" @click="state.step = 1">上一步</a-button>
+              <a-button @click="state.step = 1">上一步</a-button>
               <a-button type="primary" :disabled="!state.finish" @click="state.step = 3">完成</a-button>
             </a-space>
           </div>
@@ -212,6 +212,11 @@ const restoreRange = async (start: any = 0, uint8Array: any) => {
   await eeprom_reboot(appStore.connectPort);
 }
 
+const finishIt = () => {
+  state.flashStep[0] = 'six'
+  state.finish = true
+}
+
 const backupIt = async () => {
   if(appStore.connectState != true){alert('点击右上角“连接”按钮连接手台。'); return;};
   state.loading = true
@@ -223,7 +228,7 @@ const backupIt = async () => {
 const iFlashIt = async () => {
   state.loading = true
   let fontPacket = undefined
-  if(state.kIt){
+  if(state.kIt == 'yes'){
     fontPacket = await fetch('/LOSEHU117P6K.bin')
   }else{
     fontPacket = await fetch('/LOSEHU117P6.bin')
