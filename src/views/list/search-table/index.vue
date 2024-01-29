@@ -310,6 +310,7 @@
     const _renderData = [];
     for (let i = 0; i < 0x0C80; i += 0x10) {
       const _channel = uint8ArrayToHexReverseString(rawEEPROM.subarray(i, i + 0x10))
+      console.log(_channel)
       const _channelData : any = {}
       _channelData.rx           = _channel.substr(24, 8) != "ffffffff" ? parseInt(_channel.substr(24, 8), 16) / 100000 : undefined
       if(_channelData.rx){
@@ -327,7 +328,7 @@
           _channelData.txCTCSS = state.CTCSSOption[parseInt(_channel.substr(12, 2), 16)]
         }
         if(_channelData.txTone == "2" || _channelData.txTone == "3"){
-          _channelData.txTone  = state.DCSOption[parseInt(_channel.substr(12, 2), 16)]
+          _channelData.txDCS   = state.DCSOption[parseInt(_channel.substr(12, 2), 16)]
         }
         if(_channelData.rxTone == "1"){
           _channelData.rxCTCSS = state.CTCSSOption[parseInt(_channel.substr(14, 2), 16)]
