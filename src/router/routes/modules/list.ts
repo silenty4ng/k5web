@@ -13,8 +13,18 @@ const LIST: AppRouteRecordRaw = {
   },
   children: [
     {
+      path: 'chi',
+      name: 'Chi',
+      component: () => import('@/views/list/chi/index.vue'),
+      meta: {
+        locale: '字库写入',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
+    {
       path: 'backup',
-      name: 'Card',
+      name: 'Backup',
       component: () => import('@/views/list/card/index.vue'),
       meta: {
         locale: '备份/还原',
