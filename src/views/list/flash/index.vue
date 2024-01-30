@@ -88,9 +88,7 @@ const flashIt = async () => {
     const textarea = document?.getElementById('statusArea');
     if(textarea)textarea.scrollTop = textarea?.scrollHeight;
   })
-  if(appStore.connectPort){
-    appStore.updateSettings({ connectPort: _connect });
-  }
+  appStore.updateSettings({ connectPort: _connect });
 }
 </script>
 

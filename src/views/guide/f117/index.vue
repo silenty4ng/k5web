@@ -259,9 +259,7 @@ const iFlashIt = async () => {
   await sendPacket(_connect, _data);
   await readPacket(_connect, 0x18)
   await flash_flashFirmware(_connect, unpack(binary))
-  if(appStore.connectPort){
-    appStore.updateSettings({ connectPort: _connect });
-  }
+  appStore.updateSettings({ connectPort: _connect });
   state.flashIt = true
   state.loading = false
 }
