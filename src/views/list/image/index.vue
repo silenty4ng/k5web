@@ -3,7 +3,7 @@
     <Breadcrumb :items="['小工具', '开机图片']" />
     <a-row :gutter="20" align="stretch">
       <a-col :span="24">
-        <a-spin :loading="state.loading" tip="写入中...">
+        <a-spin :loading="state.loading" tip="写入中..." style="width: 100%;">
           <a-card class="general-card" title="开机图片">
             <a-tabs :active-key="state.activeKey" @change="(e)=>{state.activeKey = e}">
               <a-tab-pane :key="1" title="LOSEHU 117"></a-tab-pane>
