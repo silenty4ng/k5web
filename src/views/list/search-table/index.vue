@@ -414,8 +414,8 @@
             _channelhex += "00"
         }
 
-        const _rx = parseInt((_channel.tx * 100000).toFixed(0)) - parseInt((_channel.rx * 100000).toFixed(0))
-        _channelhex += !Number.isNaN(_rx) ? _rx.toString(16).padStart(8, '0') : '00000000'
+        const _tx = Math.abs(parseInt((_channel.tx * 100000).toFixed(0)) - parseInt((_channel.rx * 100000).toFixed(0)))
+        _channelhex += !Number.isNaN(_tx) ? _tx.toString(16).padStart(8, '0') : '00000000'
         _channelhex += parseInt((_channel.rx * 100000).toFixed(0)).toString(16).padStart(8, '0')
 
         console.log(_channelhex)
