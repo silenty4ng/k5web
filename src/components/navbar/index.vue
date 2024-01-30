@@ -10,7 +10,7 @@
           :style="{ margin: 0, fontSize: '18px' }"
           :heading="5"
         >
-          K5Web 网页小工具
+          K5Web 工具箱
         </a-typography-title>
         <icon-menu-fold
           v-if="!topMenu && appStore.device === 'mobile'"
@@ -139,6 +139,9 @@
 
   const connectIt = async () => {
     if(appStore.connectState == false){
+      try{
+        if(appStore.connectPort)await disconnect(appStore.connectPort);
+      }catch{}
       const _connect = await connect();
 
       if(!_connect){

@@ -1252,6 +1252,7 @@ export {
     check_eeprom,
     eeprom_write,
     flash_flashFirmware,
+    flash_generateCommand,
     unpackVersion,
     unpack
 }
