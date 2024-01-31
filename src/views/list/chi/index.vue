@@ -63,52 +63,50 @@ const restore = async(type: any = 1) => {
   }
   state.status = state.status + "正在下载字库...<br />"
   let fontPacket = undefined
-  switch(type){
-    case 1:
-      fontPacket = await fetch('/old_font.bin')
-      const reader = fontPacket.body.getReader();
-      const chunks = [];
-      while(true) {
-        const {done, value} = await reader.read();
-        if (done) {
-          break;
-        }
-        chunks.push(...value)
+  if(type == 1){
+    fontPacket = await fetch('/old_font.bin')
+    const reader = fontPacket.body.getReader();
+    const chunks = [];
+    while(true) {
+      const {done, value} = await reader.read();
+      if (done) {
+        break;
       }
-      const binary = new Uint8Array(chunks)
-      await restoreRange(0x02000, binary)
-      break
-    case 2:
-      fontPacket = await fetch('/new_font_k.bin')
-      const reader = fontPacket.body.getReader();
-      const chunks = [];
-      while(true) {
-        const {done, value} = await reader.read();
-        if (done) {
-          break;
-        }
-        chunks.push(...value)
+      chunks.push(...value)
+    }
+    const binary = new Uint8Array(chunks)
+    await restoreRange(0x02000, binary)
+    return;
+  }
+  if(type == 2){
+    fontPacket = await fetch('/new_font_k.bin')
+    const reader = fontPacket.body.getReader();
+    const chunks = [];
+    while(true) {
+      const {done, value} = await reader.read();
+      if (done) {
+        break;
       }
-      const binary = new Uint8Array(chunks)
-      await restoreRange(0x02480, binary)
-      break
-    case 3:
-      fontPacket = await fetch('/new_font_h.bin')
-      const reader = fontPacket.body.getReader();
-      const chunks = [];
-      while(true) {
-        const {done, value} = await reader.read();
-        if (done) {
-          break;
-        }
-        chunks.push(...value)
+      chunks.push(...value)
+    }
+    const binary = new Uint8Array(chunks)
+    await restoreRange(0x02480, binary)
+    return;
+  }
+  if(type == 3){
+    fontPacket = await fetch('/new_font_h.bin')
+    const reader = fontPacket.body.getReader();
+    const chunks = [];
+    while(true) {
+      const {done, value} = await reader.read();
+      if (done) {
+        break;
       }
-      const binary = new Uint8Array(chunks)
-      await restoreRange(0x02480, binary)
-      break
-    default:
-      alert('TODO')
-      return
+      chunks.push(...value)
+    }
+    const binary = new Uint8Array(chunks)
+    await restoreRange(0x02480, binary)
+    return;
   }
 }
 </script>
