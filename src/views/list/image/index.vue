@@ -13,7 +13,7 @@
             <br>
             <a-space>
               <a-button @click="selectFile">选择图片</a-button>
-              <a-button type="primary" :disabled="!state.binaryFile" @click="flashIt">更新</a-button>
+              <a-button type="primary" :disabled="!state.binaryFile" @click="flashIt">写入</a-button>
             </a-space>
           </a-card>
         </a-spin>
@@ -46,7 +46,6 @@ const selectFile = () => {
     const blob = new Blob([input.files[0]], { type: 'application/octet-stream' });
     const file = URL.createObjectURL(blob);
     const canvas = document.createElement("canvas");
-    canvas.classList.add("mt-3", "mr-3", "border", "shadow-sm");
     canvas.width = 128;
     canvas.height = 64;
     const canvas2 = canvas.cloneNode();
