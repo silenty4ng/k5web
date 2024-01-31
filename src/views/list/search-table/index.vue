@@ -298,12 +298,12 @@
     setLoading(true)
     let rawEEPROM  = new Uint8Array(0x0C80);
     for (let i = 0; i < 0x0C80; i += 0x80) {
-      const _data = await eeprom_read(appStore.connectPort, i)
+      const _data = await eeprom_read(appStore.connectPort, i, 0x80, appStore.configuration?.uart)
       rawEEPROM.set(_data, i)
     }
     let rawEEPROM3 = new Uint8Array(0x0C80);
     for (let i = 0x0F50; i < 0x1BD0; i += 0x80) {
-      const _data = await eeprom_read(appStore.connectPort, i, 0x80)
+      const _data = await eeprom_read(appStore.connectPort, i, 0x80, appStore.configuration?.uart)
       rawEEPROM3.set(_data, i - 0x0F50)
     }
     let x = 0;
@@ -347,7 +347,7 @@
         _channelData.pttid     = state.pttidOption[(_channelData.pttid_dtmf >> 1) - 1]
         _channelData.dtmf      = _channelData.pttid_dtmf >> 0 & 0x01 ? true : false
         _channelData.mode      = parseInt(_channel.substr(8, 1), 16).toString()
-        _channelData.name      = uint8ArrayToString(rawEEPROM3.subarray(i, i + 0x10))
+        _channelData.name      = uint8ArrayToString(rawEEPROM3.subarray(i, i + 0x10), appStore.configuration?.charset)
       }
       _renderData.push(_channelData)
       x += 1;
@@ -423,7 +423,7 @@
         rawEEPROM2.set([0xC5], i >> 4)
 
         const mergedArray = new Uint8Array(0x10);
-        mergedArray.set(stringToUint8Array(_channel.name).subarray(0, 0x10), 0);
+        mergedArray.set(stringToUint8Array(_channel.name, appStore.configuration?.charset).subarray(0, 0x10), 0);
         rawEEPROM3.set(mergedArray, i)
       }else{
         rawEEPROM.set(hexReverseStringToUint8Array("ffffffffffffffffffffffffffffffff"), i)
@@ -433,11 +433,11 @@
       i += 0x10
     })
     for (let i = 0; i < 0x0C80; i += 0x80) {
-      await eeprom_write(appStore.connectPort, i, rawEEPROM.slice(i, i + 0x80));
+      await eeprom_write(appStore.connectPort, i, rawEEPROM.slice(i, i + 0x80), 0x80, appStore.configuration?.uart);
     }
     await eeprom_write(appStore.connectPort, 0x0D60, rawEEPROM2, 0x0C8);
     for (let i = 0x0F50; i < 0x1BD0; i += 0x80) {
-      await eeprom_write(appStore.connectPort, i, rawEEPROM3.slice(i - 0x0F50, i - 0x0F50 + 0x80));
+      await eeprom_write(appStore.connectPort, i, rawEEPROM3.slice(i - 0x0F50, i - 0x0F50 + 0x80), 0x80, appStore.configuration?.uart);
     }
     await eeprom_reboot(appStore.connectPort);
     setLoading(false)

@@ -56,7 +56,7 @@ const backupRange = async (start: any, end: any, name: any = new Date() + '_back
   await eeprom_init(appStore.connectPort);
   let rawEEPROM = new Uint8Array(end - start);
   for (let i = start; i < end; i += 0x80) {
-    const data = await eeprom_read(appStore.connectPort, i);
+    const data = await eeprom_read(appStore.connectPort, i, 0x80, appStore.configuration?.uart);
     rawEEPROM.set(data, i - start);
     state.status = state.status + "备份进度：" + (((i - start) / rawEEPROM.length) * 100).toFixed(1) + "%<br/>";
     nextTick(()=>{
@@ -89,7 +89,7 @@ const restoreRange = async (start: any = 0) => {
     const blob = new Blob([input.files[0]], {type: 'application/octet-stream' });
     const rawEEPROM = new Uint8Array(await blob.arrayBuffer());
     for (let i = start; i < input.files[0].size + start; i += 0x80) {
-      await eeprom_write(appStore.connectPort, i, rawEEPROM.slice(i - start, i - start + 0x80));
+      await eeprom_write(appStore.connectPort, i, rawEEPROM.slice(i - start, i - start + 0x80), 0x80, appStore.configuration?.uart);
       state.status = state.status + "恢复进度：" + (((i - start) / input.files[0].size) * 100).toFixed(1) + "%<br/>";
       nextTick(()=>{
         const textarea = document?.getElementById('statusArea');
@@ -138,6 +138,10 @@ const backup = async() => {
       break;
     default:
       _max = 0x2000;
+  }
+  if(appStore.configuration?.uart == "official" && _max >= 0x20000){
+    alert('该固件不支持备份扩容空间');
+    return;
   }
   await backupRange(0, _max)
 }

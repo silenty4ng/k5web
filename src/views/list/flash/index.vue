@@ -20,7 +20,7 @@
 <script lang="ts" setup>
 import { reactive, nextTick } from 'vue';
 import { useAppStore } from '@/store';
-import { eeprom_write, eeprom_reboot, eeprom_init, disconnect, connect, readPacket, sendPacket, unpackVersion, unpack, flash_generateCommand } from '@/utils/serial.js';
+import { disconnect, connect, readPacket, sendPacket, unpackVersion, unpack, flash_generateCommand } from '@/utils/serial.js';
 
 const appStore = useAppStore();
 
@@ -88,7 +88,8 @@ const flashIt = async () => {
     const textarea = document?.getElementById('statusArea');
     if(textarea)textarea.scrollTop = textarea?.scrollHeight;
   })
-  appStore.updateSettings({ connectPort: _connect });
+  disconnect(_connect);
+  appStore.updateSettings({ connectState: false });
 }
 </script>
 

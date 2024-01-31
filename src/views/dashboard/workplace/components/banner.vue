@@ -6,11 +6,13 @@
       </a-typography-title>
     </a-col>
     <a-divider class="panel-border" />
-    <a-card v-show="appStore.connectState" :style="{ width: '360px', marginTop: '2em', marginBottom: '2em' }" title="手台信息">
-        当前固件版本：{{ appStore.firmwareVersion }} <br />
-        匹配写频配置：{{ appStore.configuration?.name }} <br />
-        存储大小：{{ state.eepromSize }} <a-button size="mini" type="primary" @click="checkEeprom">检测</a-button>
-    </a-card>
+    <a-space>
+      <a-card v-show="appStore.connectState" :style="{ marginTop: '2em', marginBottom: '2em' }" title="手台信息">
+          当前固件版本：{{ appStore.firmwareVersion }} <br />
+          匹配写频配置：{{ appStore.configuration?.name }} <br />
+          存储大小：{{ state.eepromSize }} <a-button size="mini" type="primary" @click="checkEeprom">检测</a-button>
+      </a-card>
+    </a-space>
   </a-col>
 </template>
 
@@ -25,6 +27,7 @@
   })
 
   const checkEeprom = async () => {
+    alert('TODO');
   }
 </script>
 

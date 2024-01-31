@@ -32,7 +32,7 @@ const state = reactive({
 const restoreRange = async (start: any = 0, uint8Array: any) => {
   await eeprom_init(appStore.connectPort);
   for (let i = start; i < uint8Array.length + start; i += 0x80) {
-    await eeprom_write(appStore.connectPort, i, uint8Array.slice(i - start, i - start + 0x80));
+    await eeprom_write(appStore.connectPort, i, uint8Array.slice(i - start, i - start + 0x80), 0x80, appStore.configuration?.uart);
     state.status = state.status + "写入进度：" + (((i - start) / uint8Array.length) * 100).toFixed(1) + "%<br/>";
     nextTick(()=>{
       const textarea = document?.getElementById('statusArea');
@@ -45,6 +45,22 @@ const restoreRange = async (start: any = 0, uint8Array: any) => {
 
 const restore = async(type: any = 1) => {
   if(appStore.connectState != true){alert('请先连接手台！'); return;};
+  if(appStore.configuration?.uart == "official"){
+    alert('固件版本不匹配');
+    return;
+  }
+  if((type == 1 && appStore.configuration?.charset != "losehu") || (type == 1 && appStore.configuration?.K != true)){
+    alert('固件版本不匹配');
+    return;
+  }
+  if((type == 2 && appStore.configuration?.charset != "gb2312") || (type == 2 && appStore.configuration?.K != true)){
+    alert('固件版本不匹配');
+    return;
+  }
+  if((type == 3 && appStore.configuration?.charset != "gb2312") || (type == 3 && appStore.configuration?.H != true)){
+    alert('固件版本不匹配');
+    return;
+  }
   state.status = state.status + "正在下载字库...<br />"
   let fontPacket = undefined
   switch(type){

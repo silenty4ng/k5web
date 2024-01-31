@@ -131,10 +131,12 @@
   const toggleDrawerMenu = inject('toggleDrawerMenu') as () => void;
 
   const configuration_list : any = {
-    "LOSEHU.*P.*K" : "silenty4ngk.json",
-    "LOSEHU.*P.*" : "silenty4ng.json",
-    "LOSEHU.*K"   : "todo.json",
-    "LOSEHU.*"    : "todo.json" 
+    "LOSEHU.*P.*K"       : "ltsk.json",
+    "LOSEHU.*P.*"        : "lts.json",
+    "LOSEHU11[8-9].*H"   : "losehu118h.json",
+    "LOSEHU11[8-9].*K"   : "losehu118k.json",
+    "LOSEHU11[8-9].*"    : "losehu118.json",
+    ".*"                 : "todo.json"
   }
 
   const connectIt = async () => {
@@ -157,14 +159,23 @@
       let _configuration = null;
       
       const version = await eeprom_init(_connect);
+      const config = {
+        "name": "TODO",
+        "uart": "official",
+        "charset": "official",
+        "K": false,
+        "H": false
+      }
+
       Object.keys(configuration_list).some(e=>{
         const _re = new RegExp(e);
         if(_re.test(version)){
-          _configuration = driversList[configuration_list[e]];
+          _configuration = Object.assign(config, driversList[configuration_list[e]]);
           return true
         }
       })
 
+      console.log(_configuration);
       appStore.updateSettings({ connectState: true, connectPort: _connect, firmwareVersion: version, configuration: _configuration });
     }else{
       disconnect(appStore.connectPort);

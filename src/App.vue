@@ -11,7 +11,13 @@
   import GlobalSetting from '@/components/global-setting/index.vue';
   import useLocale from '@/hooks/locale';
   import Aegis from 'aegis-web-sdk';
-  
+  import { encodingIndexes } from "@zxing/text-encoding/es2015/encoding-indexes";
+  import { TextEncoder, TextDecoder } from "@zxing/text-encoding";
+
+  window.TextEncodingIndexes = { encodingIndexes: encodingIndexes };
+  window.TextEncoder = TextEncoder;
+  window.TextDecoder = TextDecoder;
+
   // 遥测
   if(location.hostname == 'k5.vicicode.com'){
     const aegis = new Aegis({

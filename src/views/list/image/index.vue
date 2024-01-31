@@ -103,13 +103,25 @@ const selectFile = () => {
 
 const flashIt = async () => {
   if(appStore.connectState != true){alert('请先连接手台！'); return;};
+  if(appStore.configuration?.uart == "official"){
+    alert('固件版本不匹配');
+    return;
+  }
+  if(state.activeKey == 2 && appStore.configuration?.charset != "gb2312"){
+    alert('固件版本不匹配');
+    return;
+  }
+  if(state.activeKey == 1 && appStore.configuration?.charset != "losehu"){
+    alert('固件版本不匹配');
+    return;
+  }
   state.loading = true
   let position = 0x1E350;
   if(state.activeKey == 2)position = 0x2080;
   await eeprom_init(appStore.connectPort);
   const rawEEPROM = state.binaryFile;
   for (let i = position; i < rawEEPROM.length + position; i += 0x80) {
-    await eeprom_write(appStore.connectPort, i, rawEEPROM.slice(i - position, i - position + 0x80));
+    await eeprom_write(appStore.connectPort, i, rawEEPROM.slice(i - position, i - position + 0x80), 0x80, appStore.configuration?.uart);
   }
   await eeprom_reboot(appStore.connectPort);
   state.loading = false
