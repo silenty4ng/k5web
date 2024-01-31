@@ -66,22 +66,50 @@ const restore = async(type: any = 1) => {
   switch(type){
     case 1:
       fontPacket = await fetch('/old_font.bin')
+      const reader = fontPacket.body.getReader();
+      const chunks = [];
+      while(true) {
+        const {done, value} = await reader.read();
+        if (done) {
+          break;
+        }
+        chunks.push(...value)
+      }
+      const binary = new Uint8Array(chunks)
+      await restoreRange(0x02000, binary)
+      break
+    case 2:
+      fontPacket = await fetch('/new_font_k.bin')
+      const reader = fontPacket.body.getReader();
+      const chunks = [];
+      while(true) {
+        const {done, value} = await reader.read();
+        if (done) {
+          break;
+        }
+        chunks.push(...value)
+      }
+      const binary = new Uint8Array(chunks)
+      await restoreRange(0x02480, binary)
+      break
+    case 3:
+      fontPacket = await fetch('/new_font_h.bin')
+      const reader = fontPacket.body.getReader();
+      const chunks = [];
+      while(true) {
+        const {done, value} = await reader.read();
+        if (done) {
+          break;
+        }
+        chunks.push(...value)
+      }
+      const binary = new Uint8Array(chunks)
+      await restoreRange(0x02480, binary)
       break
     default:
       alert('TODO')
       return
   }
-  const reader = fontPacket.body.getReader();
-  const chunks = [];
-  while(true) {
-    const {done, value} = await reader.read();
-    if (done) {
-      break;
-    }
-    chunks.push(...value)
-  }
-  const binary = new Uint8Array(chunks)
-  await restoreRange(0x02000, binary)
 }
 </script>
 
