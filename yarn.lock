@@ -1077,6 +1077,13 @@ acorn-walk@^8.1.1:
   resolved "https://registry.npmjs.org/acorn/-/acorn-8.11.3.tgz"
   integrity sha512-Y9rRfJG5jcKOE0CLisYbojUjIrIEE7AGMzA/Sm4BslANhbS+cDMpgBdcPT91oJ7OuJ9hYJBx59RjbhxVnrF8Xg==
 
+aegis-web-sdk@^1.39.1:
+  version "1.39.1"
+  resolved "https://registry.npmjs.org/aegis-web-sdk/-/aegis-web-sdk-1.39.1.tgz"
+  integrity sha512-PkMAzeekaLpo/PmfspXiHfmGwY6DfWf7xUl8hrlkmBajQti1HqKC6pHoO3gwVPDiA9Sio5abjFGDcPjxxVTcJg==
+  dependencies:
+    web-vitals "^3.4.0"
+
 ajv@^6.12.4:
   version "6.12.6"
   resolved "https://registry.npmjs.org/ajv/-/ajv-6.12.6.tgz"
@@ -5171,6 +5178,11 @@ vue-tsc@^1.0.14:
     "@vue/runtime-dom" "3.4.15"
     "@vue/server-renderer" "3.4.15"
     "@vue/shared" "3.4.15"
+
+web-vitals@^3.4.0:
+  version "3.5.2"
+  resolved "https://registry.npmjs.org/web-vitals/-/web-vitals-3.5.2.tgz"
+  integrity sha512-c0rhqNcHXRkY/ogGDJQxZ9Im9D19hDihbzSQJrsioex+KnFgmMzBiy57Z1EjkhX/+OjyBpclDCzz2ITtjokFmg==
 
 webpack-sources@^3.2.3:
   version "3.2.3"
