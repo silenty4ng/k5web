@@ -19,6 +19,16 @@
             </a-button>
           </a-space>
         </a-col>
+        <a-col :span="12" style="text-align: right;">
+          <a-space>
+            <a-button type="primary" @click="saveChannel">
+              保存
+            </a-button>
+            <a-button @click="restoreChannel">
+              读取
+            </a-button>
+          </a-space>
+        </a-col>
       </a-row>
       <a-table v-bind:loading="loading" :columns="columns" :data="state.renderData" style="margin-top: 20px" :pagination="{pageSize: 15, current: state.nowPage}" @page-change="(e)=>{state.nowPage = e}">
         <template #index="{ record, rowIndex }">
@@ -444,6 +454,28 @@
   }
   const clearRow = async (row: any) =>{
     state.renderData[row] = {}
+  }
+  const saveChannel = () => {
+    const _data = JSON.stringify(state.renderData);
+    const _blob = new Blob([_data], { type: 'application/octet-stream' });
+    const _file  = URL.createObjectURL(_blob);
+    const _a = document.createElement("a");
+    _a.download="channel.json"
+    _a.href = _file;
+    document.body.appendChild(_a);
+    _a.click();
+    document.body.removeChild(_a);
+    URL.revokeObjectURL(_file);
+  }
+  const restoreChannel = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.onchange = async() => {
+      const blob = new Blob([input.files[0]], {type: 'application/octet-stream' });
+      const _json = await blob.text()
+      state.renderData = JSON.parse(_json)
+    };
+    input.click();
   }
 </script>
 
