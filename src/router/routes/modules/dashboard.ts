@@ -31,6 +31,16 @@ const DASHBOARD: AppRouteRecordRaw = {
         requiresAuth: true,
         roles: ['*'],
       },
+    },
+    {
+      path: 'settings',
+      name: 'Settings',
+      component: () => import('@/views/list/settings/index.vue'),
+      meta: {
+        locale: '设置管理',
+        requiresAuth: true,
+        roles: ['*'],
+      },
     }
   ],
 };

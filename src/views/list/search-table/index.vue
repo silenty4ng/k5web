@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <Breadcrumb :items="['写频', '信道管理']" />
-    <a-card class="general-card" :title="$t('信道管理')">
+    <a-card class="general-card" title="信道管理">
       <a-row style="margin-bottom: 16px">
         <a-col :span="12">
           <a-space>
@@ -128,7 +128,6 @@
 
 <script lang="ts" setup>
   import { computed, ref, reactive } from 'vue';
-  import { useI18n } from 'vue-i18n';
   import useLoading from '@/hooks/loading';
   import type { TableColumnData } from '@arco-design/web-vue/es/table/interface';
   import { eeprom_read, uint8ArrayToHexReverseString, uint8ArrayToString, hexReverseStringToUint8Array, stringToUint8Array, eeprom_write, eeprom_reboot, eeprom_init } from '@/utils/serial.js';
@@ -136,7 +135,6 @@
   const appStore = useAppStore();
 
   const { loading, setLoading } = useLoading(false);
-  const { t } = useI18n();
   const state: {
     bandwidthOption: any[],
     stepOption: any[],
@@ -191,7 +189,7 @@
 
   const columns = computed<TableColumnData[]>(() => [
     {
-      title: t('searchTable.columns.index'),
+      title: '#',
       dataIndex: 'index',
       slotName: 'index',
       width: 70

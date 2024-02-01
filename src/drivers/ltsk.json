@@ -2,5 +2,6 @@
     "name": "LoseHu Patch LTS（BD8DFN）扩容版",
     "uart": "losehu",
     "charset": "losehu",
-    "K": true
+    "K": true,
+    "localmdc": true
 }

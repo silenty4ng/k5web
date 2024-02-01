@@ -167,7 +167,8 @@
         "uart": "official",
         "charset": "official",
         "K": false,
-        "H": false
+        "H": false,
+        "localmdc": false
       }
 
       Object.keys(configuration_list).some(e=>{
