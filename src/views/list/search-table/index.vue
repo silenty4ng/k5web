@@ -30,9 +30,9 @@
           </a-space>
         </a-col>
       </a-row>
-      <a-table v-bind:loading="loading" :columns="columns" :data="state.renderData" style="margin-top: 20px" :pagination="{pageSize: 15, current: state.nowPage}" @page-change="(e)=>{state.nowPage = e}">
+      <a-table v-bind:loading="loading" :columns="columns" :data="state.renderData" style="margin-top: 20px" :pagination="{pageSize: state.pageSize, current: state.nowPage, showPageSize: true, pageSizeOptions: [15, 30, 50] }" @page-change="(e)=>{state.nowPage = e}" @page-size-change="(e)=>{state.pageSize = e}">
         <template #index="{ record, rowIndex }">
-          {{(state.nowPage - 1) * 15 + rowIndex + 1}}
+          {{(state.nowPage - 1) * state.pageSize + rowIndex + 1}}
         </template>
         <template #name="{ record, rowIndex }">
           <a-input v-model="record.name" />
@@ -112,8 +112,14 @@
         <template #dtmf="{ record, rowIndex }">
           <a-switch v-model="record.dtmf" />
         </template>
+        <template #scanlist="{ record, rowIndex }">
+          <a-checkbox-group v-model="record.scanlist">
+            <a-checkbox value="I">I</a-checkbox>
+            <a-checkbox value="II">II</a-checkbox>
+          </a-checkbox-group>
+        </template>
         <template #operate="{ record, rowIndex }">
-          <a-button @click="clearRow((state.nowPage - 1) * 15 + rowIndex)">清空</a-button>
+          <a-button @click="clearRow((state.nowPage - 1) * state.pageSize + rowIndex)">清空</a-button>
         </template>
       </a-table>
     </a-card>
@@ -132,6 +138,7 @@
   const { loading, setLoading } = useLoading(false);
   const { t } = useI18n();
   const state: {
+    bandwidthOption: any[],
     stepOption: any[],
     scrambOption: any[],
     renderData: any[],
@@ -140,8 +147,11 @@
     toneOption: any[],
     CTCSSOption: any[],
     pttidOption: any[],
-    modeOption: any[]
+    modeOption: any[],
+    pageSize: number,
+    nowPage: number
   } = reactive({
+    pageSize: 15,
     nowPage: 1,
     bandwidthOption: {'0': '25KHz', '1': '12.5KHz'},
     modeOption: {'0': 'FM', '1': 'AM', '2': 'USB'},
@@ -295,11 +305,17 @@
       width: 150
     },
     {
+      title: '扫描列表',
+      dataIndex: 'scanlist',
+      slotName: 'scanlist',
+      width: 150
+    },
+    {
       title: '操作',
       dataIndex: 'operate',
       slotName: 'operate',
       width: 150
-    },
+    }
   ]);
 
   const readChannel = async() => {
@@ -311,6 +327,11 @@
       const _data = await eeprom_read(appStore.connectPort, i, 0x80, appStore.configuration?.uart)
       rawEEPROM.set(_data, i)
     }
+    let rawEEPROM2 = new Uint8Array(0x0C0);
+    for (let i = 0x0D60; i < 0x0E20; i += 0x40) {
+      const _data = await eeprom_read(appStore.connectPort, i, 0x40, appStore.configuration?.uart)
+      rawEEPROM2.set(_data, i - 0x0D60)
+    }
     let rawEEPROM3 = new Uint8Array(0x0C80);
     for (let i = 0x0F50; i < 0x1BD0; i += 0x80) {
       const _data = await eeprom_read(appStore.connectPort, i, 0x80, appStore.configuration?.uart)
@@ -319,11 +340,13 @@
     let x = 0;
     const _renderData = [];
     for (let i = 0; i < 0x0C80; i += 0x10) {
-      const _channel = uint8ArrayToHexReverseString(rawEEPROM.subarray(i, i + 0x10))
-      console.log(_channel)
+      const _channel   = uint8ArrayToHexReverseString(rawEEPROM.subarray(i, i + 0x10))
+      const _scanlist  = uint8ArrayToHexReverseString(rawEEPROM2.subarray(i / 0x10, i / 0x10 + 0x01))
       const _channelData : any = {}
-      _channelData.rx           = _channel.substr(24, 8) != "ffffffff" ? parseInt(_channel.substr(24, 8), 16) / 100000 : undefined
-      if(_channelData.rx){
+      _channelData.rx  = _channel.substr(24, 8) != "ffffffff" ? parseInt(_channel.substr(24, 8), 16) / 100000 : undefined
+      if(_channelData.rx && _scanlist != "ff"){
+        console.info(_channel)
+        console.info(_scanlist)
         _channelData.offset     = _channel.substr(16, 8) != "00000000" ? parseInt(_channel.substr(16, 8), 16) / 100000 : undefined
         _channelData.txcodeflag = _channel.substr(9, 1)
         if(_channelData.txcodeflag == "1"){
@@ -358,6 +381,11 @@
         _channelData.dtmf      = _channelData.pttid_dtmf >> 0 & 0x01 ? true : false
         _channelData.mode      = parseInt(_channel.substr(8, 1), 16).toString()
         _channelData.name      = uint8ArrayToString(rawEEPROM3.subarray(i, i + 0x10), appStore.configuration?.charset)
+        _channelData.scanlist  = []
+        if(parseInt(_scanlist.substr(0, 1), 16) & 0x08)_channelData.scanlist.push("I")
+        if(parseInt(_scanlist.substr(0, 1), 16) & 0x04)_channelData.scanlist.push("II")
+      }else{
+        _channelData.rx = undefined
       }
       _renderData.push(_channelData)
       x += 1;
@@ -430,14 +458,19 @@
 
         console.log(_channelhex)
         rawEEPROM.set(hexReverseStringToUint8Array(_channelhex), i)
-        rawEEPROM2.set([0xC5], i >> 4)
+
+        let scanlist = 0;
+        if(_channel.scanlist?.indexOf('I')  >= 0) scanlist += 8;
+        if(_channel.scanlist?.indexOf('II') >= 0) scanlist += 4;
+        console.log((scanlist << 4) + 5)
+        rawEEPROM2.set([(scanlist << 4) + 5], i >> 4)
 
         const mergedArray = new Uint8Array(0x10);
-        mergedArray.set(stringToUint8Array(_channel.name, appStore.configuration?.charset).subarray(0, 0x10), 0);
+        mergedArray.set(stringToUint8Array(_channel.name ?? "", appStore.configuration?.charset).subarray(0, 0x10), 0);
         rawEEPROM3.set(mergedArray, i)
       }else{
         rawEEPROM.set(hexReverseStringToUint8Array("ffffffffffffffffffffffffffffffff"), i)
-        rawEEPROM2.set([0x0F], i >> 4)
+        rawEEPROM2.set([0xFF], i >> 4)
         rawEEPROM3.set(hexReverseStringToUint8Array("ffffffffffffffffffffffffffffffff"), i)
       }
       i += 0x10
