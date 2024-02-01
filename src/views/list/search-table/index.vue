@@ -25,7 +25,7 @@
               保存
             </a-button>
             <a-button @click="restoreChannel">
-              读取
+              加载
             </a-button>
           </a-space>
         </a-col>
