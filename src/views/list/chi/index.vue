@@ -6,8 +6,8 @@
         <a-card class="general-card" title="字库写入">
           <a-space>
             <a-button @click="restore(1)">写入 117 字库（K）</a-button>
-            <a-button @click="restore(2)">写入 118 字库（K）</a-button>
-            <a-button @click="restore(3)">写入 118 字库（H）</a-button>
+            <a-button @click="restore(2)">写入 118+ 字库（K）</a-button>
+            <a-button @click="restore(3)">写入 118+ 字库（H）</a-button>
           </a-space>
           <a-divider />
           <div id="statusArea" style="height: 20em; background-color: azure; color: silver; overflow: auto; padding: 20px" v-html="state.status"></div>
