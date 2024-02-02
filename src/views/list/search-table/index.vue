@@ -41,8 +41,8 @@
             showPageSize: true,
             pageSizeOptions: [15, 30, 50]
           }"
-        @page-change="(e)=>{setLoading(true);cstate.nowPage = e;setLoading(false);}"
-        @page-size-change="(e)=>{setLoading(true);cstate.pageSize = e;setLoading(false);}"
+        @page-change="(e)=>{cstate.nowPage = e;}"
+        @page-size-change="(e)=>{cstate.pageSize = e;}"
       >
         <template #index="{ record, rowIndex }">
           {{(cstate.nowPage - 1) * cstate.pageSize + rowIndex + 1}}
