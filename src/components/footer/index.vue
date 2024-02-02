@@ -1,6 +1,6 @@
 <template>
   <a-layout-footer class="footer">
-    <a href="https://github.com/silenty4ng/k5web" target="_blank">K5Web - V0.1.202402021050</a>
+    <a href="https://github.com/silenty4ng/k5web" target="_blank">K5Web - V0.1.202402022130</a>
   </a-layout-footer>
 </template>
 
