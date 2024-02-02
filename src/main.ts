@@ -1,6 +1,7 @@
 import { createApp } from 'vue';
 import ArcoVue from '@arco-design/web-vue';
 import ArcoVueIcon from '@arco-design/web-vue/es/icon';
+import TDesign from 'tdesign-vue-next';
 import globalComponents from '@/components';
 import router from './router';
 import store from './store';
@@ -13,11 +14,13 @@ import App from './App.vue';
 // https://arco.design/docs/designlab/use-theme-package
 import '@/assets/style/global.less';
 import '@/api/interceptor';
+import 'tdesign-vue-next/es/style/index.css';
 
 const app = createApp(App);
 
 app.use(ArcoVue, {});
 app.use(ArcoVueIcon);
+app.use(TDesign);
 
 app.use(router);
 app.use(store);
