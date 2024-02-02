@@ -31,7 +31,6 @@
         </a-col>
       </a-row>
       <t-table
-        row-key="index"
         :loading="loading"
         size="large"
         :columns="columns"
@@ -40,6 +39,7 @@
           defaultPageSize: cstate.pageSize,
           total: cstate.renderData.length,
           defaultCurrent: 1,
+          pageSizeOptions: [15, 30, 50, 100, 200]
         }"
         @change="(e: any)=>{cstate.pageSize = e.pagination.pageSize, cstate.nowPage = e.pagination.current}"
         bordered
@@ -48,119 +48,32 @@
         <template #index="{ row, rowIndex }">
           {{ (cstate.nowPage - 1) * cstate.pageSize + rowIndex + 1 }}
         </template>
+        <template #reverse="{ row, rowIndex }">
+          <t-switch v-model="row.reverse" />
+        </template>
+        <template #busy="{ row, rowIndex }">
+          <t-switch v-model="row.busy" />
+        </template>
+        <template #dtmf="{ row, rowIndex }">
+          <t-switch v-model="row.dtmf" />
+        </template>
+        <template #scanlist="{ row, rowIndex }">
+          <t-checkbox-group v-model="row.scanlist">
+            <t-checkbox key="I" label="I" value="I" />
+            <t-checkbox key="II" label="II" value="II" />
+          </t-checkbox-group>
+        </template>
+        <template #operate="{ row, rowIndex }">
+          <t-button theme="default" variant="dashed" @click="clearRow((cstate.nowPage - 1) * cstate.pageSize + rowIndex)">清空</t-button>
+        </template>
       </t-table>
-      <!-- <a-table
-        :loading="loading"
-        :columns="columns"
-        :data="cstate.renderData"
-        style="margin-top: 20px"
-        :pagination="{
-            pageSize: cstate.pageSize,
-            current: cstate.nowPage,
-            showPageSize: true,
-            pageSizeOptions: [15, 30, 50]
-          }"
-        @page-change="(e)=>{cstate.nowPage = e;}"
-        @page-size-change="(e)=>{cstate.pageSize = e;}"
-      >
-        <template #index="{ record, rowIndex }">
-          {{(cstate.nowPage - 1) * cstate.pageSize + rowIndex + 1}}
-        </template>
-        <template #name="{ record, rowIndex }">
-          <a-input v-model="record.name" />
-        </template>
-        <template #bandwidth="{ record, rowIndex }">
-          <a-select v-model="record.bandwidth" allow-clear>
-            <a-option v-for="value of Object.keys(state.bandwidthOption)" :value="value">{{state.bandwidthOption[value]}}</a-option>
-          </a-select>
-        </template>
-        <template #tx="{ record, rowIndex }">
-          <a-input-number v-model="record.tx" :precision="5" />
-        </template>
-        <template #rx="{ record, rowIndex }">
-          <a-input-number v-model="record.rx" :precision="5" />
-        </template>
-        <template #power="{ record, rowIndex }">
-          <a-select v-model="record.power" allow-clear>
-            <a-option v-for="value of Object.keys(state.powerOption)" :value="value">{{state.powerOption[value]}}</a-option>
-          </a-select>
-        </template>
-        <template #rxTone="{ record, rowIndex }">
-          <a-select v-model="record.rxTone" allow-clear>
-            <a-option v-for="value of Object.keys(state.toneOption)" :value="value">{{state.toneOption[value]}}</a-option>
-          </a-select>
-        </template>
-        <template #rxCTCSS="{ record, rowIndex }">
-          <a-select v-model="record.rxCTCSS" allow-clear>
-            <a-option v-for="value of state.CTCSSOption" :value="value">{{value.toFixed(1)}}</a-option>
-          </a-select>
-        </template>
-        <template #rxDCS="{ record, rowIndex }">
-          <a-select v-model="record.rxDCS" allow-clear>
-            <a-option v-for="value of state.DCSOption" :value="value">{{"0" + value}}</a-option>
-          </a-select>
-        </template>
-        <template #txTone="{ record, rowIndex }">
-          <a-select v-model="record.txTone" allow-clear>
-            <a-option v-for="value of Object.keys(state.toneOption)" :value="value">{{state.toneOption[value]}}</a-option>
-          </a-select>
-        </template>
-        <template #txCTCSS="{ record, rowIndex }">
-          <a-select v-model="record.txCTCSS" allow-clear>
-            <a-option v-for="value of state.CTCSSOption" :value="value">{{value.toFixed(1)}}</a-option>
-          </a-select>
-        </template>
-        <template #txDCS="{ record, rowIndex }">
-          <a-select v-model="record.txDCS" allow-clear>
-            <a-option v-for="value of state.DCSOption" :value="value">{{"0" + value}}</a-option>
-          </a-select>
-        </template>
-        <template #step="{ record, rowIndex }">
-          <a-select v-model="record.step" allow-clear>
-            <a-option v-for="value of state.stepOption" :value="value">{{value.toFixed(1)}}</a-option>
-          </a-select>
-        </template>
-        <template #reverse="{ record, rowIndex }">
-          <a-switch v-model="record.reverse" />
-        </template>
-        <template #scramb="{ record, rowIndex }">
-          <a-select v-model="record.scramb" allow-clear>
-            <a-option v-for="value of state.scrambOption">{{value}}</a-option>
-          </a-select>
-        </template>
-        <template #busy="{ record, rowIndex }">
-          <a-switch v-model="record.busy" />
-        </template>
-        <template #pttid="{ record, rowIndex }">
-          <a-select v-model="record.pttid" allow-clear>
-            <a-option v-for="value of state.pttidOption">{{value}}</a-option>
-          </a-select>
-        </template>
-        <template #mode="{ record, rowIndex }">
-          <a-select v-model="record.mode" allow-clear>
-            <a-option v-for="value of Object.keys(state.modeOption)" :value="value">{{state.modeOption[value]}}</a-option>
-          </a-select>
-        </template>
-        <template #dtmf="{ record, rowIndex }">
-          <a-switch v-model="record.dtmf" />
-        </template>
-        <template #scanlist="{ record, rowIndex }">
-          <a-checkbox-group v-model="record.scanlist">
-            <a-checkbox value="I">I</a-checkbox>
-            <a-checkbox value="II">II</a-checkbox>
-          </a-checkbox-group>
-        </template>
-        <template #operate="{ record, rowIndex }">
-          <a-button @click="clearRow((cstate.nowPage - 1) * cstate.pageSize + rowIndex)">清空</a-button>
-        </template>
-      </a-table> -->
     </a-card>
   </div>
 </template>
 
 <script lang="ts" setup>
   import { ref, computed, reactive } from 'vue';
-  import { Input, Select, DatePicker, MessagePlugin, InputNumber } from 'tdesign-vue-next';
+  import { Input, Select } from 'tdesign-vue-next';
   import useLoading from '@/hooks/loading';
   import { eeprom_read, uint8ArrayToHexReverseString, uint8ArrayToString, hexReverseStringToUint8Array, stringToUint8Array, eeprom_write, eeprom_reboot, eeprom_init } from '@/utils/serial.js';
   import { useAppStore } from '@/store';
@@ -252,13 +165,14 @@
       colKey: 'rx',
       align: 'left',
       width: 200,
+      cell: (h, { row }) => parseFloat(row.rx) ? parseFloat(row.rx).toFixed(5) : undefined,
       edit: {
         component: Input,
         props: {
           clearable: true
         },
         onEdited: (context: any) => {
-          context.newRowData.rx = context.newRowData.rx ? parseFloat(context.newRowData.rx).toFixed(5) : undefined
+          context.newRowData.rx = context.newRowData.rx ? context.newRowData.rx : undefined
           const newData = [...cstate.renderData];
           newData.splice(context.rowIndex, 1, context.newRowData);
           cstate.renderData = newData;
@@ -270,13 +184,14 @@
       colKey: 'tx',
       align: 'left',
       width: 200,
+      cell: (h, { row }) => parseFloat(row.tx) ? parseFloat(row.tx).toFixed(5) : undefined,
       edit: {
         component: Input,
         props: {
           clearable: true
         },
         onEdited: (context: any) => {
-          context.newRowData.tx = context.newRowData.tx ? parseFloat(context.newRowData.tx).toFixed(5) : undefined
+          context.newRowData.tx = context.newRowData.tx ? context.newRowData.tx : undefined
           const newData = [...cstate.renderData];
           newData.splice(context.rowIndex, 1, context.newRowData);
           cstate.renderData = newData;
@@ -306,7 +221,7 @@
       title: '接收亚音类型',
       colKey: 'rxTone',
       align: 'left',
-      width: 150,
+      width: 180,
       cell: (h, { row }) => state.toneOption[row.rxTone] ?? "",
       edit: {
         component: Select,
@@ -326,12 +241,12 @@
       colKey: 'rxCTCSS',
       align: 'left',
       width: 150,
-      cell: (h, { row }) => state.CTCSSOption.find((t)=>{t == row.rxCTCSS}),
+      cell: (h, { row }) => state.CTCSSOption.indexOf(row.rxCTCSS) >= 0 ? row.rxCTCSS?.toFixed(1) : undefined,
       edit: {
         component: Select,
         props: {
           clearable: true,
-          options: state.CTCSSOption.map(e=>{return {value: e, label: e}}),
+          options: state.CTCSSOption.map(e=>{return {value: e, label: e.toFixed(1)}}),
         },
         onEdited: (context: any) => {
           const newData = [...cstate.renderData];
@@ -344,13 +259,26 @@
       title: '接收亚音数码',
       colKey: 'rxDCS',
       align: 'left',
-      width: 150
+      width: 150,
+      cell: (h, { row }) => state.DCSOption.indexOf(row.rxDCS) >= 0 ? "0" + row.rxDCS : undefined,
+      edit: {
+        component: Select,
+        props: {
+          clearable: true,
+          options: state.DCSOption.map(e=>{return {value: e, label: "0" + e}}),
+        },
+        onEdited: (context: any) => {
+          const newData = [...cstate.renderData];
+          newData.splice(context.rowIndex, 1, context.newRowData);
+          cstate.renderData = newData;
+        }
+      },
     },
     {
       title: '发送亚音类型',
       colKey: 'txTone',
       align: 'left',
-      width: 150,
+      width: 180,
       cell: (h, { row }) => state.toneOption[row.txTone] ?? "",
       edit: {
         component: Select,
@@ -369,31 +297,58 @@
       title: '发送亚音频（Hz）',
       colKey: 'txCTCSS',
       align: 'left',
-      width: 150
+      width: 150,
+      cell: (h, { row }) => state.CTCSSOption.indexOf(row.txCTCSS) >= 0 ? row.txCTCSS?.toFixed(1) : undefined,
+      edit: {
+        component: Select,
+        props: {
+          clearable: true,
+          options: state.CTCSSOption.map(e=>{return {value: e, label: e.toFixed(1)}}),
+        },
+        onEdited: (context: any) => {
+          const newData = [...cstate.renderData];
+          newData.splice(context.rowIndex, 1, context.newRowData);
+          cstate.renderData = newData;
+        }
+      },
     },
     {
       title: '发送亚音数码',
       colKey: 'txDCS',
       align: 'left',
-      width: 150
+      width: 150,
+      cell: (h, { row }) => state.DCSOption.indexOf(row.txDCS) >= 0 ? "0" + row.txDCS : undefined,
+      edit: {
+        component: Select,
+        props: {
+          clearable: true,
+          options: state.DCSOption.map(e=>{return {value: e, label: "0" + e}}),
+        },
+        onEdited: (context: any) => {
+          const newData = [...cstate.renderData];
+          newData.splice(context.rowIndex, 1, context.newRowData);
+          cstate.renderData = newData;
+        }
+      },
     },
     {
       title: '频率步进',
       colKey: 'step',
       align: 'left',
-      width: 150
-    },
-    {
-      title: '倒频',
-      colKey: 'reverse',
-      align: 'left',
-      width: 150
-    },
-    {
-      title: '倒频',
-      colKey: 'reverse',
-      align: 'left',
-      width: 150
+      width: 150,
+      cell: (h, { row }) => state.stepOption.indexOf(row.step) >= 0 ? row.step?.toFixed(1) : undefined,
+      edit: {
+        component: Select,
+        props: {
+          clearable: true,
+          options: state.stepOption.map(e=>{return {value: e, label: e.toFixed(1)}}),
+        },
+        onEdited: (context: any) => {
+          const newData = [...cstate.renderData];
+          newData.splice(context.rowIndex, 1, context.newRowData);
+          cstate.renderData = newData;
+        }
+      },
     },
     {
       title: '倒频',
@@ -405,7 +360,19 @@
       title: '加密',
       colKey: 'scramb',
       align: 'left',
-      width: 150
+      width: 150,
+      edit: {
+        component: Select,
+        props: {
+          clearable: true,
+          options: state.scrambOption.map(e=>{return {value: e, label: e}}),
+        },
+        onEdited: (context: any) => {
+          const newData = [...cstate.renderData];
+          newData.splice(context.rowIndex, 1, context.newRowData);
+          cstate.renderData = newData;
+        }
+      },
     },
     {
       title: '繁忙禁发',
@@ -417,13 +384,38 @@
       title: '信令码',
       colKey: 'pttid',
       align: 'left',
-      width: 150
+      width: 150,
+      edit: {
+        component: Select,
+        props: {
+          clearable: true,
+          options: state.pttidOption.map(e=>{return {value: e, label: e}}),
+        },
+        onEdited: (context: any) => {
+          const newData = [...cstate.renderData];
+          newData.splice(context.rowIndex, 1, context.newRowData);
+          cstate.renderData = newData;
+        }
+      },
     },
     {
       title: '信道模式',
       colKey: 'mode',
       align: 'left',
-      width: 150
+      width: 150,
+      cell: (h, { row }) => state.modeOption[row.mode] ?? "",
+      edit: {
+        component: Select,
+        props: {
+          clearable: true,
+          options: Object.keys(state.modeOption).map(e=>{return {value: e, label: state.modeOption[e]}}),
+        },
+        onEdited: (context: any) => {
+          const newData = [...cstate.renderData];
+          newData.splice(context.rowIndex, 1, context.newRowData);
+          cstate.renderData = newData;
+        }
+      },
     },
     {
       title: 'DTMF解码',
@@ -590,14 +582,14 @@
         if(_channel.scanlist?.indexOf('I')  >= 0) scanlist += 8;
         if(_channel.scanlist?.indexOf('II') >= 0) scanlist += 4;
         console.log((scanlist << 4) + 0)
-        rawEEPROM2.set([(scanlist << 4) + 0], i >> 4)
+        rawEEPROM2.set([(scanlist << 4) + 0], i / 0x10)
 
         const mergedArray = new Uint8Array(0x10);
         mergedArray.set(stringToUint8Array(_channel.name ?? "", appStore.configuration?.charset).subarray(0, 0x10), 0);
         rawEEPROM3.set(mergedArray, i)
       }else{
         rawEEPROM.set(hexReverseStringToUint8Array("ffffffffffffffffffffffffffffffff"), i)
-        rawEEPROM2.set([0xFF], i >> 4)
+        rawEEPROM2.set([0xFF], i / 0x10)
         rawEEPROM3.set(hexReverseStringToUint8Array("ffffffffffffffffffffffffffffffff"), i)
       }
       i += 0x10
@@ -613,7 +605,9 @@
     setLoading(false)
   }
   const clearRow = async (row: any) =>{
-    cstate.renderData[row] = {}
+    const newData = [...cstate.renderData];
+    newData.splice(row, 1, {});
+    cstate.renderData = newData;
   }
   const saveChannel = () => {
     const _data = JSON.stringify(cstate.renderData);
