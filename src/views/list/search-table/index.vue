@@ -30,16 +30,29 @@
           </a-space>
         </a-col>
       </a-row>
-      <a-table v-bind:loading="loading" :columns="columns" :data="state.renderData" style="margin-top: 20px" :pagination="{pageSize: state.pageSize, current: state.nowPage, showPageSize: true, pageSizeOptions: [15, 30, 50] }" @page-change="(e)=>{state.nowPage = e}" @page-size-change="(e)=>{state.pageSize = e}">
+      <a-table
+        :loading="loading"
+        :columns="columns"
+        :data="cstate.renderData"
+        style="margin-top: 20px"
+        :pagination="{
+            pageSize: cstate.pageSize,
+            current: cstate.nowPage,
+            showPageSize: true,
+            pageSizeOptions: [15, 30, 50]
+          }"
+        @page-change="(e)=>{setLoading(true);cstate.nowPage = e;setLoading(false);}"
+        @page-size-change="(e)=>{setLoading(true);cstate.pageSize = e;setLoading(false);}"
+      >
         <template #index="{ record, rowIndex }">
-          {{(state.nowPage - 1) * state.pageSize + rowIndex + 1}}
+          {{(cstate.nowPage - 1) * cstate.pageSize + rowIndex + 1}}
         </template>
         <template #name="{ record, rowIndex }">
           <a-input v-model="record.name" />
         </template>
         <template #bandwidth="{ record, rowIndex }">
           <a-select v-model="record.bandwidth" allow-clear>
-            <a-option v-for="value of Object.keys(state.bandwidthOption)" :value="value">{{state.bandwidthOption[value] ?? value}}</a-option>
+            <a-option v-for="value of Object.keys(state.bandwidthOption)" :value="value">{{state.bandwidthOption[value]}}</a-option>
           </a-select>
         </template>
         <template #tx="{ record, rowIndex }">
@@ -50,12 +63,12 @@
         </template>
         <template #power="{ record, rowIndex }">
           <a-select v-model="record.power" allow-clear>
-            <a-option v-for="value of Object.keys(state.powerOption)" :value="value">{{state.powerOption[value] ?? value}}</a-option>
+            <a-option v-for="value of Object.keys(state.powerOption)" :value="value">{{state.powerOption[value]}}</a-option>
           </a-select>
         </template>
         <template #rxTone="{ record, rowIndex }">
           <a-select v-model="record.rxTone" allow-clear>
-            <a-option v-for="value of Object.keys(state.toneOption)" :value="value">{{state.toneOption[value] ?? value}}</a-option>
+            <a-option v-for="value of Object.keys(state.toneOption)" :value="value">{{state.toneOption[value]}}</a-option>
           </a-select>
         </template>
         <template #rxCTCSS="{ record, rowIndex }">
@@ -70,7 +83,7 @@
         </template>
         <template #txTone="{ record, rowIndex }">
           <a-select v-model="record.txTone" allow-clear>
-            <a-option v-for="value of Object.keys(state.toneOption)" :value="value">{{state.toneOption[value] ?? value}}</a-option>
+            <a-option v-for="value of Object.keys(state.toneOption)" :value="value">{{state.toneOption[value]}}</a-option>
           </a-select>
         </template>
         <template #txCTCSS="{ record, rowIndex }">
@@ -106,7 +119,7 @@
         </template>
         <template #mode="{ record, rowIndex }">
           <a-select v-model="record.mode" allow-clear>
-            <a-option v-for="value of Object.keys(state.modeOption)" :value="value">{{state.modeOption[value] ?? value}}</a-option>
+            <a-option v-for="value of Object.keys(state.modeOption)" :value="value">{{state.modeOption[value]}}</a-option>
           </a-select>
         </template>
         <template #dtmf="{ record, rowIndex }">
@@ -119,7 +132,7 @@
           </a-checkbox-group>
         </template>
         <template #operate="{ record, rowIndex }">
-          <a-button @click="clearRow((state.nowPage - 1) * state.pageSize + rowIndex)">清空</a-button>
+          <a-button @click="clearRow((cstate.nowPage - 1) * cstate.pageSize + rowIndex)">清空</a-button>
         </template>
       </a-table>
     </a-card>
@@ -127,30 +140,14 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref, reactive } from 'vue';
+  import { reactive } from 'vue';
   import useLoading from '@/hooks/loading';
-  import type { TableColumnData } from '@arco-design/web-vue/es/table/interface';
   import { eeprom_read, uint8ArrayToHexReverseString, uint8ArrayToString, hexReverseStringToUint8Array, stringToUint8Array, eeprom_write, eeprom_reboot, eeprom_init } from '@/utils/serial.js';
   import { useAppStore } from '@/store';
   const appStore = useAppStore();
 
-  const { loading, setLoading } = useLoading(false);
-  const state: {
-    bandwidthOption: any[],
-    stepOption: any[],
-    scrambOption: any[],
-    renderData: any[],
-    powerOption: any[],
-    DCSOption: any[],
-    toneOption: any[],
-    CTCSSOption: any[],
-    pttidOption: any[],
-    modeOption: any[],
-    pageSize: number,
-    nowPage: number
-  } = reactive({
-    pageSize: 15,
-    nowPage: 1,
+  const { loading, setLoading } = useLoading(true);
+  const state = {
     bandwidthOption: {'0': '25KHz', '1': '12.5KHz'},
     modeOption: {'0': 'FM', '1': 'AM', '2': 'USB'},
     powerOption: {'0': '低', '1': '中', '2': '高'},
@@ -174,20 +171,25 @@
     731, 732, 734, 743, 754],
     stepOption: [2.50, 5.00, 6.25, 10.00, 12.50, 25.00, 8.33, 0.01, 0.05, 0.10, 0.25, 0.50, 1.00, 1.25, 9.00, 15.00, 20.00, 30.00, 50.00, 100.00, 125.00, 200.00, 250.00, 500.00],
     scrambOption: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
-    pttidOption: ['上线码', '下线码', '上线+下线码', 'Quindar码'],
-    renderData: []
+    pttidOption: ['上线码', '下线码', '上线+下线码', 'Quindar码']
+  }
+
+  const cstate : {
+    renderData: any[],
+    pageSize: number,
+    nowPage: number
+  } = reactive({
+    renderData: [],
+    pageSize: 15,
+    nowPage: 1,
   })
 
-  const initData = () => {
-    const data:any = [];
-    Array.from({length: 200}).map(e=>{
-      data.push({});
-    })
-    state.renderData = data;
-  }
-  initData()
+  setTimeout(() => {
+    cstate.renderData = Array.from({length: 200}).map(e=>{return {}});
+    setLoading(false)
+  }, 1);
 
-  const columns = computed<TableColumnData[]>(() => [
+  const columns = [
     {
       title: '#',
       dataIndex: 'index',
@@ -314,7 +316,7 @@
       slotName: 'operate',
       width: 150
     }
-  ]);
+  ];
 
   const readChannel = async() => {
     if(appStore.connectState != true){alert('请先连接手台！'); return;};
@@ -388,7 +390,7 @@
       _renderData.push(_channelData)
       x += 1;
     }
-    state.renderData = _renderData;
+    cstate.renderData = _renderData;
     setLoading(false)
   }
   const writeChannel = async() =>{
@@ -399,7 +401,7 @@
     let rawEEPROM2 = new Uint8Array(0x0C8);
     let rawEEPROM3 = new Uint8Array(0x0C80);
     let i = 0
-    state.renderData.map(_channel=>{
+    cstate.renderData.map(_channel=>{
       if(_channel.rx){
         let _channelhex = ""
         _channelhex += parseInt(_channel.scramb) > 0 ? parseInt(_channel.scramb).toString(16).padStart(2, '0') : '00'
@@ -484,10 +486,10 @@
     setLoading(false)
   }
   const clearRow = async (row: any) =>{
-    state.renderData[row] = {}
+    cstate.renderData[row] = {}
   }
   const saveChannel = () => {
-    const _data = JSON.stringify(state.renderData);
+    const _data = JSON.stringify(cstate.renderData);
     const _blob = new Blob([_data], { type: 'application/octet-stream' });
     const _file  = URL.createObjectURL(_blob);
     const _a = document.createElement("a");
@@ -504,7 +506,7 @@
     input.onchange = async() => {
       const blob = new Blob([input.files[0]], {type: 'application/octet-stream' });
       const _json = await blob.text()
-      state.renderData = JSON.parse(_json)
+      cstate.renderData = JSON.parse(_json)
     };
     input.click();
   }
