@@ -30,7 +30,26 @@
           </a-space>
         </a-col>
       </a-row>
-      <a-table
+      <t-table
+        row-key="index"
+        :loading="loading"
+        size="large"
+        :columns="columns"
+        :data="cstate.renderData"
+        :pagination="{
+          defaultPageSize: cstate.pageSize,
+          total: cstate.renderData.length,
+          defaultCurrent: 1,
+        }"
+        @change="(e: any)=>{cstate.pageSize = e.pagination.pageSize, cstate.nowPage = e.pagination.current}"
+        bordered
+        lazy-load
+      >
+        <template #index="{ row, rowIndex }">
+          {{ (cstate.nowPage - 1) * cstate.pageSize + rowIndex + 1 }}
+        </template>
+      </t-table>
+      <!-- <a-table
         :loading="loading"
         :columns="columns"
         :data="cstate.renderData"
@@ -134,19 +153,20 @@
         <template #operate="{ record, rowIndex }">
           <a-button @click="clearRow((cstate.nowPage - 1) * cstate.pageSize + rowIndex)">清空</a-button>
         </template>
-      </a-table>
+      </a-table> -->
     </a-card>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { reactive } from 'vue';
+  import { ref, computed, reactive } from 'vue';
+  import { Input, Select, DatePicker, MessagePlugin, InputNumber } from 'tdesign-vue-next';
   import useLoading from '@/hooks/loading';
   import { eeprom_read, uint8ArrayToHexReverseString, uint8ArrayToString, hexReverseStringToUint8Array, stringToUint8Array, eeprom_write, eeprom_reboot, eeprom_init } from '@/utils/serial.js';
   import { useAppStore } from '@/store';
   const appStore = useAppStore();
 
-  const { loading, setLoading } = useLoading(true);
+  const { loading, setLoading } = useLoading(false);
   const state = {
     bandwidthOption: {'0': '25KHz', '1': '12.5KHz'},
     modeOption: {'0': 'FM', '1': 'AM', '2': 'USB'},
@@ -179,144 +199,251 @@
     pageSize: number,
     nowPage: number
   } = reactive({
-    renderData: [],
+    renderData: Array.from({length: 200}).map(e=>{return {}}),
     pageSize: 15,
     nowPage: 1,
   })
 
-  setTimeout(() => {
-    cstate.renderData = Array.from({length: 200}).map(e=>{return {}});
-    setLoading(false)
-  }, 1);
-
-  const columns = [
+  const columns = computed(() => [
     {
       title: '#',
-      dataIndex: 'index',
-      slotName: 'index',
-      width: 70
+      colKey: 'index',
+      align: 'left',
+      width: 100
     },
     {
       title: '信道名称',
-      dataIndex: 'name',
-      slotName: 'name',
-      width: 200
+      colKey: 'name',
+      width: 150,
+      align: 'left',
+      edit: {
+        component: Input,
+        props: {
+          clearable: true
+        },
+        onEdited: (context: any) => {
+          const newData = [...cstate.renderData];
+          newData.splice(context.rowIndex, 1, context.newRowData);
+          cstate.renderData = newData;
+        },
+      },
     },
     {
       title: '带宽',
-      dataIndex: 'bandwidth',
-      slotName: 'bandwidth',
-      width: 150
+      colKey: 'bandwidth',
+      align: 'left',
+      width: 150,
+      cell: (h, { row }) => state.bandwidthOption[row.bandwidth] ?? "",
+      edit: {
+        component: Select,
+        props: {
+          clearable: true,
+          options: Object.keys(state.bandwidthOption).map(e=>{return {value: e, label: state.bandwidthOption[e]}}),
+        },
+        onEdited: (context: any) => {
+          const newData = [...cstate.renderData];
+          newData.splice(context.rowIndex, 1, context.newRowData);
+          cstate.renderData = newData;
+        }
+      },
     },
     {
       title: '接收频率',
-      dataIndex: 'rx',
-      slotName: 'rx',
-      width: 150
+      colKey: 'rx',
+      align: 'left',
+      width: 200,
+      edit: {
+        component: Input,
+        props: {
+          clearable: true
+        },
+        onEdited: (context: any) => {
+          context.newRowData.rx = context.newRowData.rx ? parseFloat(context.newRowData.rx).toFixed(5) : undefined
+          const newData = [...cstate.renderData];
+          newData.splice(context.rowIndex, 1, context.newRowData);
+          cstate.renderData = newData;
+        },
+      },
     },
     {
       title: '发送频率',
-      dataIndex: 'tx',
-      slotName: 'tx',
-      width: 150
+      colKey: 'tx',
+      align: 'left',
+      width: 200,
+      edit: {
+        component: Input,
+        props: {
+          clearable: true
+        },
+        onEdited: (context: any) => {
+          context.newRowData.tx = context.newRowData.tx ? parseFloat(context.newRowData.tx).toFixed(5) : undefined
+          const newData = [...cstate.renderData];
+          newData.splice(context.rowIndex, 1, context.newRowData);
+          cstate.renderData = newData;
+        },
+      },
     },
     {
       title: '发送功率',
-      dataIndex: 'power',
-      slotName: 'power',
-      width: 150
+      colKey: 'power',
+      align: 'left',
+      width: 150,
+      cell: (h, { row }) => state.powerOption[row.power] ?? "",
+      edit: {
+        component: Select,
+        props: {
+          clearable: true,
+          options: Object.keys(state.powerOption).map(e=>{return {value: e, label: state.powerOption[e]}}),
+        },
+        onEdited: (context: any) => {
+          const newData = [...cstate.renderData];
+          newData.splice(context.rowIndex, 1, context.newRowData);
+          cstate.renderData = newData;
+        }
+      },
     },
     {
       title: '接收亚音类型',
-      dataIndex: 'rxTone',
-      slotName: 'rxTone',
-      width: 150
+      colKey: 'rxTone',
+      align: 'left',
+      width: 150,
+      cell: (h, { row }) => state.toneOption[row.rxTone] ?? "",
+      edit: {
+        component: Select,
+        props: {
+          clearable: true,
+          options: Object.keys(state.toneOption).map(e=>{return {value: e, label: state.toneOption[e]}}),
+        },
+        onEdited: (context: any) => {
+          const newData = [...cstate.renderData];
+          newData.splice(context.rowIndex, 1, context.newRowData);
+          cstate.renderData = newData;
+        }
+      },
     },
     {
       title: '接收亚音频（Hz）',
-      dataIndex: 'rxCTCSS',
-      slotName: 'rxCTCSS',
-      width: 150
+      colKey: 'rxCTCSS',
+      align: 'left',
+      width: 150,
+      cell: (h, { row }) => state.CTCSSOption.find((t)=>{t == row.rxCTCSS}),
+      edit: {
+        component: Select,
+        props: {
+          clearable: true,
+          options: state.CTCSSOption.map(e=>{return {value: e, label: e}}),
+        },
+        onEdited: (context: any) => {
+          const newData = [...cstate.renderData];
+          newData.splice(context.rowIndex, 1, context.newRowData);
+          cstate.renderData = newData;
+        }
+      },
     },
     {
       title: '接收亚音数码',
-      dataIndex: 'rxDCS',
-      slotName: 'rxDCS',
+      colKey: 'rxDCS',
+      align: 'left',
       width: 150
     },
     {
       title: '发送亚音类型',
-      dataIndex: 'txTone',
-      slotName: 'txTone',
-      width: 150
+      colKey: 'txTone',
+      align: 'left',
+      width: 150,
+      cell: (h, { row }) => state.toneOption[row.txTone] ?? "",
+      edit: {
+        component: Select,
+        props: {
+          clearable: true,
+          options: Object.keys(state.toneOption).map(e=>{return {value: e, label: state.toneOption[e]}}),
+        },
+        onEdited: (context: any) => {
+          const newData = [...cstate.renderData];
+          newData.splice(context.rowIndex, 1, context.newRowData);
+          cstate.renderData = newData;
+        }
+      },
     },
     {
       title: '发送亚音频（Hz）',
-      dataIndex: 'txCTCSS',
-      slotName: 'txCTCSS',
+      colKey: 'txCTCSS',
+      align: 'left',
       width: 150
     },
     {
       title: '发送亚音数码',
-      dataIndex: 'txDCS',
-      slotName: 'txDCS',
+      colKey: 'txDCS',
+      align: 'left',
       width: 150
     },
     {
       title: '频率步进',
-      dataIndex: 'step',
-      slotName: 'step',
+      colKey: 'step',
+      align: 'left',
       width: 150
     },
     {
       title: '倒频',
-      dataIndex: 'reverse',
-      slotName: 'reverse',
+      colKey: 'reverse',
+      align: 'left',
+      width: 150
+    },
+    {
+      title: '倒频',
+      colKey: 'reverse',
+      align: 'left',
+      width: 150
+    },
+    {
+      title: '倒频',
+      colKey: 'reverse',
+      align: 'left',
       width: 150
     },
     {
       title: '加密',
-      dataIndex: 'scramb',
-      slotName: 'scramb',
+      colKey: 'scramb',
+      align: 'left',
       width: 150
     },
     {
       title: '繁忙禁发',
-      dataIndex: 'busy',
-      slotName: 'busy',
+      colKey: 'busy',
+      align: 'left',
       width: 150
     },
     {
       title: '信令码',
-      dataIndex: 'pttid',
-      slotName: 'pttid',
+      colKey: 'pttid',
+      align: 'left',
       width: 150
     },
     {
       title: '信道模式',
-      dataIndex: 'mode',
-      slotName: 'mode',
+      colKey: 'mode',
+      align: 'left',
       width: 150
     },
     {
       title: 'DTMF解码',
-      dataIndex: 'dtmf',
-      slotName: 'dtmf',
+      colKey: 'dtmf',
+      align: 'left',
       width: 150
     },
     {
       title: '扫描列表',
-      dataIndex: 'scanlist',
-      slotName: 'scanlist',
+      colKey: 'scanlist',
+      align: 'left',
       width: 150
     },
     {
       title: '操作',
-      dataIndex: 'operate',
-      slotName: 'operate',
+      colKey: 'operate',
+      align: 'left',
       width: 150
     }
-  ];
+  ]);
 
   const readChannel = async() => {
     if(appStore.connectState != true){alert('请先连接手台！'); return;};
