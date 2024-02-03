@@ -44,6 +44,8 @@
         @change="(e: any)=>{cstate.pageSize = e.pagination.pageSize, cstate.nowPage = e.pagination.current}"
         bordered
         lazy-load
+        :headerAffixedTop="{ offsetTop: 60 }"
+        :hover="true"
       >
         <template #index="{ row, rowIndex }">
           {{ (cstate.nowPage - 1) * cstate.pageSize + rowIndex + 1 }}
