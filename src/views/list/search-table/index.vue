@@ -127,7 +127,7 @@
     {
       title: '信道名称',
       colKey: 'name',
-      width: 150,
+      width: 250,
       align: 'left',
       edit: {
         component: Input,
