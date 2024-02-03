@@ -32,7 +32,7 @@
       </a-row>
       <t-table
         :loading="loading"
-        size="large"
+        size="medium"
         :columns="columns"
         :data="cstate.renderData"
         :pagination="{
