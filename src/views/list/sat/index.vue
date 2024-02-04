@@ -4,7 +4,7 @@
     <a-row :gutter="20" align="stretch">
       <a-col :span="24">
         <a-card class="general-card" title="卫星写入">
-          <a-spin :loading="loading" style="width: 100%;" tip="正在下载卫星数据 ...">
+          <a-spin :loading="loading" style="width: 100%;" tip="正在处理 ...">
             <a-form-item :label-col-style="{width: '25%'}" field="sat" label="选择卫星">
               <a-select v-model="state.sat" @change="changeSat" placeholder="选择卫星 ..." allow-search allow-clear>
                 <a-option v-for="item in state.satData" :key="item.name" :value="item.name">{{item.name}}</a-option>
@@ -35,11 +35,18 @@
             </a-form-item>
             <a-form-item :label-col-style="{width: '25%'}" field="txTone" label="上行亚音">
               <a-select v-model="state.txTone" allow-search allow-clear>
+                <a-option :value="0">关闭</a-option>
                 <a-option v-for="item in state.CTCSSOption" :key="item" :value="item">{{item.toFixed(1)}}</a-option>
               </a-select>
             </a-form-item>
             <a-form-item :label-col-style="{width: '25%'}" field="rx" label="下行频率">
               <a-input-number :precision="5" v-model="state.rx" />
+            </a-form-item>
+            <a-form-item :label-col-style="{width: '25%'}" field="rxTone" label="下行亚音">
+              <a-select v-model="state.rxTone" allow-search allow-clear>
+                <a-option :value="0">关闭</a-option>
+                <a-option v-for="item in state.CTCSSOption" :key="item" :value="item">{{item.toFixed(1)}}</a-option>
+              </a-select>
             </a-form-item>
             <a-form-item :label-col-style="{width: '25%'}" label="">
               <a-button @click="writeIt">写入数据</a-button>
@@ -75,7 +82,8 @@ const state : {
   txTone: number | undefined,
   CTCSSOption: any[],
   pass: any,
-  passOption: any[]
+  passOption: any[],
+  rxTone: number | undefined,
 } = reactive({
   status: "点击写入按钮写入卫星数据到设备<br/><br/>",
   sat: '',
@@ -85,7 +93,8 @@ const state : {
   alt: 0,
   tx: 0,
   rx: 0,
-  txTone: undefined,
+  txTone: 0,
+  rxTone: 0,
   CTCSSOption: [67.0, 69.3, 71.9, 74.4, 77.0, 79.7, 82.5, 85.4,
     88.5, 91.5, 94.8, 97.4, 100.0, 103.5, 107.2, 110.9,
     114.8, 118.8, 123.0, 127.3, 131.8, 136.5, 141.3, 146.2,
@@ -134,6 +143,7 @@ const initSat = async () => {
 }
 initSat()
 const getLocation = async () => {
+  setLoading(true)
   navigator.geolocation.getCurrentPosition((e)=>{
     if(e.coords){
       state.lat = e.coords.latitude
@@ -141,6 +151,7 @@ const getLocation = async () => {
       if(e.coords.altitude)state.alt = e.coords.altitude
     }
   });
+  setLoading(false)
 }
 getLocation()
 
@@ -160,6 +171,7 @@ const restoreRange = async (start: any = 0, uint8Array: any) => {
 
 const getPass = async () => {
   if(!state.sat){alert('请选择卫星！'); return;}; 
+  setLoading(true)
   const res = await (await fetch('https://k5.vicicode.com/api/pass', {
     method: "POST",
     mode: "cors",
@@ -180,8 +192,13 @@ const getPass = async () => {
     const _passOption = [res.pass_times[i], res.departure_times[i]]
     passOption.push(_passOption)
   }
-  state.pass = undefined
+  if(passOption.length > 0){
+    state.pass = passOption[0][0] + "|" + passOption[0][1]
+  }else{
+    state.pass = undefined
+  }
   state.passOption = passOption
+  setLoading(false)
 }
 
 const writeIt = async() => {
@@ -191,6 +208,7 @@ const writeIt = async() => {
   //   return;
   // }
   if(!state.pass){alert('请选择过境时间！'); return;};
+  setLoading(true)
   const res = await (await fetch('https://k5.vicicode.com/api/doppler', {
     method: "POST",
     mode: "cors",
@@ -211,6 +229,11 @@ const writeIt = async() => {
     })
   })).json()
   state.status += JSON.stringify(res.shift_array) + '<br/>'
+  nextTick(()=>{
+    const textarea = document?.getElementById('statusArea');
+    if(textarea)textarea.scrollTop = textarea?.scrollHeight;
+  })
+  setLoading(false)
 }
 </script>
 
