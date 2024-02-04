@@ -52,6 +52,16 @@ const LIST: AppRouteRecordRaw = {
         roles: ['*'],
       },
     },
+    {
+      path: 'sat',
+      name: 'Sat',
+      component: () => import('@/views/list/sat/index.vue'),
+      meta: {
+        locale: '卫星写入（WIP）',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    }
   ],
 };
 

@@ -9,6 +9,7 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    ASpan: typeof import('@arco-design/web-vue')['Span']
     Block: typeof import('./src/components/global-setting/block.vue')['default']
     Breadcrumb: typeof import('./src/components/breadcrumb/index.vue')['default']
     Chart: typeof import('./src/components/chart/index.vue')['default']
