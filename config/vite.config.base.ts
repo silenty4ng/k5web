@@ -11,6 +11,7 @@ import { TDesignResolver } from 'unplugin-vue-components/resolvers';
 import { ArcoResolver } from 'unplugin-vue-components/resolvers';
 
 export default defineConfig({
+  base: './',
   plugins: [
     vue(),
     vueJsx(),
