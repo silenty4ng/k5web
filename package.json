@@ -1,9 +1,9 @@
 {
-  "name": "arco-design-pro-vue",
-  "description": "Arco Design Pro for Vue",
+  "name": "k5web",
+  "description": "K5Web",
   "version": "1.0.0",
   "private": true,
-  "author": "ArcoDesign Team",
+  "author": "Silent YANG",
   "license": "MIT",
   "main": "main.js",
   "scripts": {
