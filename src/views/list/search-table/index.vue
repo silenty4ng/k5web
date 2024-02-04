@@ -463,7 +463,7 @@
     for (let i = 0; i < 0x0C80; i += 0x10) {
       const _channel   = uint8ArrayToHexReverseString(rawEEPROM.subarray(i, i + 0x10))
       const _scanlist  = uint8ArrayToHexReverseString(rawEEPROM2.subarray(i / 0x10, i / 0x10 + 0x01))
-      const _channelData : any = {}
+      const _channelData : any = {scanlist: []}
       _channelData.rx  = _channel.substr(24, 8) != "ffffffff" ? parseInt(_channel.substr(24, 8), 16) / 100000 : undefined
       if(_channelData.rx && _scanlist != "ff"){
         console.info(_channel)
@@ -502,7 +502,6 @@
         _channelData.dtmf      = _channelData.pttid_dtmf >> 0 & 0x01 ? true : false
         _channelData.mode      = parseInt(_channel.substr(8, 1), 16).toString()
         _channelData.name      = uint8ArrayToString(rawEEPROM3.subarray(i, i + 0x10), appStore.configuration?.charset)
-        _channelData.scanlist  = []
         if(parseInt(_scanlist.substr(0, 1), 16) & 0x08)_channelData.scanlist.push("I")
         if(parseInt(_scanlist.substr(0, 1), 16) & 0x04)_channelData.scanlist.push("II")
       }else{
