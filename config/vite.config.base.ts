@@ -5,12 +5,26 @@ import vueJsx from '@vitejs/plugin-vue-jsx';
 import svgLoader from 'vite-svg-loader';
 import configArcoStyleImportPlugin from './plugin/arcoStyleImport';
 
+import AutoImport from 'unplugin-auto-import/vite';
+import Components from 'unplugin-vue-components/vite';
+import { TDesignResolver } from 'unplugin-vue-components/resolvers';
+
 export default defineConfig({
   plugins: [
     vue(),
     vueJsx(),
     svgLoader({ svgoConfig: {} }),
     configArcoStyleImportPlugin(),
+    AutoImport({
+      resolvers: [TDesignResolver({
+        library: 'vue-next'
+      })],
+    }),
+    Components({
+      resolvers: [TDesignResolver({
+        library: 'vue-next'
+      })],
+    }),
   ],
   resolve: {
     alias: [
@@ -31,7 +45,7 @@ export default defineConfig({
         replacement: 'vue/dist/vue.esm-bundler.js', // compile template
       },
     ],
-    extensions: ['.ts', '.js'],
+    extensions: ['.ts', '.js', '.css'],
   },
   define: {
     'process.env': {},

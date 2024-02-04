@@ -1,7 +1,5 @@
 import { createApp } from 'vue';
-import ArcoVue from '@arco-design/web-vue';
 import ArcoVueIcon from '@arco-design/web-vue/es/icon';
-import TDesign from 'tdesign-vue-next';
 import globalComponents from '@/components';
 import router from './router';
 import store from './store';
@@ -18,9 +16,7 @@ import 'tdesign-vue-next/es/style/index.css';
 
 const app = createApp(App);
 
-app.use(ArcoVue, {});
 app.use(ArcoVueIcon);
-app.use(TDesign);
 
 app.use(router);
 app.use(store);
