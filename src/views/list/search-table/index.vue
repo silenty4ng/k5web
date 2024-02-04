@@ -114,7 +114,7 @@
     pageSize: number,
     nowPage: number
   } = reactive({
-    renderData: Array.from({length: 200}).map(e=>{return {}}),
+    renderData: Array.from({length: 200}).map(e=>{return {scanlist: []}}),
     pageSize: 15,
     nowPage: 1,
   })
