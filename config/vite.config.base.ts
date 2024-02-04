@@ -8,6 +8,7 @@ import configArcoStyleImportPlugin from './plugin/arcoStyleImport';
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import { TDesignResolver } from 'unplugin-vue-components/resolvers';
+import { ArcoResolver } from 'unplugin-vue-components/resolvers';
 
 export default defineConfig({
   plugins: [
@@ -23,7 +24,7 @@ export default defineConfig({
     Components({
       resolvers: [TDesignResolver({
         library: 'vue-next'
-      })],
+      }), ArcoResolver()],
     }),
   ],
   resolve: {
