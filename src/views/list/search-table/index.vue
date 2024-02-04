@@ -608,7 +608,7 @@
   }
   const clearRow = async (row: any) =>{
     const newData = [...cstate.renderData];
-    newData.splice(row, 1, {});
+    newData.splice(row, 1, {scanlist: []});
     cstate.renderData = newData;
   }
   const saveChannel = () => {
