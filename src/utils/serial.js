@@ -995,6 +995,9 @@ function uint8ArrayToHexReverseString(uint8Array) {
 }
 
 function hexReverseStringToUint8Array(hexReverseString) {
+    if(hexReverseString.length % 2 !== 0){
+        hexReverseString = "0" + hexReverseString
+    }
     const packet = new Uint8Array(hexReverseString.length / 2);
     let offset = 0;
     [...(hexReverseString.matchAll(/[0-9a-f]{2}/g))].reverse().map(e => {
