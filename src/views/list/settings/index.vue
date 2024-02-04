@@ -33,13 +33,13 @@
             </a-col>
           </a-row>
           <a-spin :loading="loading" style="width: 100%;">
-            <a-form-item :label-col-style="{width: '15%'}" field="logo_line1" label="启动画面首行文字">
+            <a-form-item :label-col-style="{width: '25%'}" field="logo_line1" label="启动画面首行文字">
               <a-input v-model="state.logo_line1" />
             </a-form-item>
-            <a-form-item :label-col-style="{width: '15%'}" field="logo_line2" label="启动画面次行文字">
+            <a-form-item :label-col-style="{width: '25%'}" field="logo_line2" label="启动画面次行文字">
               <a-input v-model="state.logo_line2" />
             </a-form-item>
-            <a-form-item :label-col-style="{width: '15%'}" field="logo_line2" label="本地播放首尾音（仅117P6）">
+            <a-form-item :label-col-style="{width: '25%'}" field="logo_line2" label="本地播放首尾音（仅117P6）">
               <a-switch v-model="state.mdc_audio_local" type="round"/>
             </a-form-item>
           </a-spin>
