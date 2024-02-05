@@ -130,7 +130,7 @@ onUnmounted(()=>{
 })
 
 const syncTime = async () => {
-  const date = new Date(new Date().getTime() + 1000);
+  const date = new Date();
   const dateArray = [
     ...hexReverseStringToUint8Array(parseInt(date.getFullYear().toString().substring(2,4)).toString(16)),
     ...hexReverseStringToUint8Array((date.getMonth() + 1).toString(16)),
