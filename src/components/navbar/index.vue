@@ -149,6 +149,7 @@
         alert('连接失败');
         return;
       }
+      appStore.updateSettings({ connectPort: _connect });
 
       const driversList : any = {};
       Object.keys(drivers).forEach((key) => {
@@ -175,10 +176,9 @@
         }
       })
 
-      console.log(_configuration);
-      appStore.updateSettings({ connectState: true, connectPort: _connect, firmwareVersion: version, configuration: _configuration });
+      appStore.updateSettings({ connectState: true, firmwareVersion: version, configuration: _configuration });
     }else{
-      disconnect(appStore.connectPort);
+      await disconnect(appStore.connectPort);
       appStore.updateSettings({ connectState: false, connectPort: null, firmwareVersion: "" });
     }
   }
