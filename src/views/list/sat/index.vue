@@ -129,6 +129,7 @@ onUnmounted(()=>{
 })
 
 const syncTime = async () => {
+  if (appStore.connectState != true) { alert('请先连接手台！'); return; };
   const date = new Date();
   setLoading(true)
   await eeprom_init(appStore.connectPort);
