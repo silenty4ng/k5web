@@ -6,7 +6,8 @@
         <a-card class="general-card" title="卫星写入">
           <a-spin :loading="loading" style="width: 100%;" tip="正在处理 ...">
             <a-form-item :label-col-style="{ width: '25%' }" field="dt" label="浏览器时间">
-              {{ state.dt }}&nbsp;&nbsp;<t-button size="small" theme="success" @click="syncTime">同步时间到台站</t-button>
+              {{ state.dt }}
+              <!-- &nbsp;&nbsp;<t-button size="small" theme="success" @click="syncTime">同步时间到台站</t-button> -->
             </a-form-item>
             <a-form-item :label-col-style="{ width: '25%' }" field="sat" label="选择卫星">
               <a-select v-model="state.sat" @change="changeSat" placeholder="选择卫星 ..." allow-search allow-clear>
@@ -129,17 +130,16 @@ onUnmounted(()=>{
 })
 
 const syncTime = async () => {
-  if (appStore.connectState != true) { alert('请先连接手台！'); return; };
-  const date = new Date();
-  setLoading(true)
-  await eeprom_init(appStore.connectPort);
-  await eeprom_write(appStore.connectPort, 0x90000, hexReverseStringToUint8Array(parseInt(date.getFullYear().toString().substring(2,4)).toString(16)), 0x01, appStore.configuration?.uart);
-  await eeprom_write(appStore.connectPort, 0x90001, hexReverseStringToUint8Array((date.getMonth() + 1).toString(16)), 0x01, appStore.configuration?.uart);
-  await eeprom_write(appStore.connectPort, 0x90002, hexReverseStringToUint8Array(date.getDate().toString(16)), 0x01, appStore.configuration?.uart);
-  await eeprom_write(appStore.connectPort, 0x90003, hexReverseStringToUint8Array(date.getHours().toString(16)), 0x01, appStore.configuration?.uart);
-  await eeprom_write(appStore.connectPort, 0x90004, hexReverseStringToUint8Array(date.getMinutes().toString(16)), 0x01, appStore.configuration?.uart);
-  await eeprom_write(appStore.connectPort, 0x90005, hexReverseStringToUint8Array(date.getSeconds().toString(16)), 0x01, appStore.configuration?.uart);
-  setLoading(false)
+  const date = new Date(new Date().getTime() + 1000);
+  const dateArray = [
+    ...hexReverseStringToUint8Array(parseInt(date.getFullYear().toString().substring(2,4)).toString(16)),
+    ...hexReverseStringToUint8Array((date.getMonth() + 1).toString(16)),
+    ...hexReverseStringToUint8Array(date.getDate().toString(16)),
+    ...hexReverseStringToUint8Array(date.getHours().toString(16)),
+    ...hexReverseStringToUint8Array(date.getMinutes().toString(16)),
+    ...hexReverseStringToUint8Array(date.getSeconds().toString(16))
+  ]
+  await eeprom_write(appStore.connectPort, 0x02BC0, new Uint8Array(dateArray), 0x06, appStore.configuration?.uart);
 }
 
 const changeSat = async (sat: any) => {
@@ -202,7 +202,6 @@ const restoreRange = async (start: any = 0, uint8Array: any) => {
     })
   }
   state.status = state.status + "写入进度：100.0%<br/>";
-  await eeprom_reboot(appStore.connectPort);
 }
 
 const getPass = async () => {
@@ -339,6 +338,8 @@ const writeIt = async () => {
   payload = new Uint8Array(0x1E00)
   payload.set(new Uint8Array(shift_arr).subarray(0, 0x1E00))
   await restoreRange(0x1E200, payload)
+  await syncTime()
+  await eeprom_reboot(appStore.connectPort);
   setLoading(false)
 }
 </script>
