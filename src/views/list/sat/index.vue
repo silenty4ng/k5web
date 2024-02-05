@@ -5,6 +5,9 @@
       <a-col :span="24">
         <a-card class="general-card" title="卫星写入">
           <a-spin :loading="loading" style="width: 100%;" tip="正在处理 ...">
+            <a-form-item :label-col-style="{ width: '25%' }" field="dt" label="浏览器时间">
+              {{ state.dt }}&nbsp;&nbsp;<t-button size="small" theme="success" @click="syncTime">同步时间到台站</t-button>
+            </a-form-item>
             <a-form-item :label-col-style="{ width: '25%' }" field="sat" label="选择卫星">
               <a-select v-model="state.sat" @change="changeSat" placeholder="选择卫星 ..." allow-search allow-clear>
                 <a-option v-for="item in state.satData" :key="item.name" :value="item.name">{{ item.name }}</a-option>
@@ -64,7 +67,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, nextTick } from 'vue';
+import { reactive, nextTick, onMounted, onUnmounted } from 'vue';
 import { useAppStore } from '@/store';
 import { eeprom_write, eeprom_reboot, eeprom_init, hexReverseStringToUint8Array, stringToUint8Array } from '@/utils/serial.js';
 import useLoading from '@/hooks/loading';
@@ -87,6 +90,8 @@ const state: {
   pass: any,
   passOption: any[],
   rxTone: number | undefined,
+  dt: any,
+  timer: any
 } = reactive({
   status: "点击写入按钮写入卫星数据到设备<br/><br/>",
   sat: '',
@@ -106,8 +111,35 @@ const state: {
     203.5, 206.5, 210.7, 218.1, 225.7, 229.1, 233.6, 241.8,
     250.3, 254.1],
   pass: undefined,
-  passOption: []
+  passOption: [],
+  dt: '',
+  timer: undefined
 })
+
+onMounted(()=>{
+  state.timer = setInterval(()=>{
+    state.dt = new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })
+  }, 1000)
+})
+
+onUnmounted(()=>{
+  try{
+    clearInterval(state.timer)
+  }catch{}
+})
+
+const syncTime = async () => {
+  const date = new Date();
+  setLoading(true)
+  await eeprom_init(appStore.connectPort);
+  await eeprom_write(appStore.connectPort, 0x90000, hexReverseStringToUint8Array(parseInt(date.getFullYear().toString().substring(2,4)).toString(16)), 0x01, appStore.configuration?.uart);
+  await eeprom_write(appStore.connectPort, 0x90001, hexReverseStringToUint8Array((date.getMonth() + 1).toString(16)), 0x01, appStore.configuration?.uart);
+  await eeprom_write(appStore.connectPort, 0x90002, hexReverseStringToUint8Array(date.getDate().toString(16)), 0x01, appStore.configuration?.uart);
+  await eeprom_write(appStore.connectPort, 0x90003, hexReverseStringToUint8Array(date.getHours().toString(16)), 0x01, appStore.configuration?.uart);
+  await eeprom_write(appStore.connectPort, 0x90004, hexReverseStringToUint8Array(date.getMinutes().toString(16)), 0x01, appStore.configuration?.uart);
+  await eeprom_write(appStore.connectPort, 0x90005, hexReverseStringToUint8Array(date.getSeconds().toString(16)), 0x01, appStore.configuration?.uart);
+  setLoading(false)
+}
 
 const changeSat = async (sat: any) => {
   const data = state.satData.find(e => e.name == sat);
