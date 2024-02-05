@@ -13,6 +13,9 @@
           存储大小：{{ state.eepromSize }} <a-button size="mini" type="primary" @click="checkEeprom">检测</a-button>
       </a-card>
     </a-space>
+    <div>
+      <img style="margin-bottom: 10px;" width="600px" src="/gy.png" />
+    </div>
   </a-col>
 </template>
 
