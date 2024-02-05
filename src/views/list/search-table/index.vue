@@ -31,6 +31,7 @@
         </a-col>
       </a-row>
       <t-table
+        class="ttable"
         :loading="loading"
         size="medium"
         :columns="columns"
@@ -666,6 +667,14 @@
     .title {
       margin-left: 12px;
       cursor: pointer;
+    }
+  }
+  .ttable {
+    :deep(.t-table__affixed-header-elm-wrap){
+      height: 60px !important;
+    }
+    :deep(.t-table__content){
+      scrollbar-width: auto !important;
     }
   }
 </style>
