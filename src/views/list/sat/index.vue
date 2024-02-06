@@ -156,21 +156,14 @@ onUnmounted(()=>{
 const writeTime = async () => {
   if (appStore.connectState != true) { alert('请先连接手台！'); return; };
   setLoading(true)
-  const date = state.dtCustom ? new Date(state.dtCustom) : new Date();
-  const dateArray = [
-    ...hexReverseStringToUint8Array(parseInt(date.getFullYear().toString().substring(2,4)).toString(16)),
-    ...hexReverseStringToUint8Array((date.getMonth() + 1).toString(16)),
-    ...hexReverseStringToUint8Array(date.getDate().toString(16)),
-    ...hexReverseStringToUint8Array(date.getHours().toString(16)),
-    ...hexReverseStringToUint8Array(date.getMinutes().toString(16)),
-    ...hexReverseStringToUint8Array(date.getSeconds().toString(16))
-  ]
-  await eeprom_write(appStore.connectPort, 0x02BC0, new Uint8Array(dateArray), 0x06, appStore.configuration?.uart);
+  await eeprom_init(appStore.connectPort);
+  await syncTime();
+  await eeprom_reboot(appStore.connectPort);
   setLoading(false)
 }
 
 const syncTime = async () => {
-  const date = new Date();
+  const date = state.dtCustom ? new Date(state.dtCustom) : new Date();
   const dateArray = [
     ...hexReverseStringToUint8Array(parseInt(date.getFullYear().toString().substring(2,4)).toString(16)),
     ...hexReverseStringToUint8Array((date.getMonth() + 1).toString(16)),
