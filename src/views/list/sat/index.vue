@@ -7,7 +7,18 @@
           <a-spin :loading="loading" style="width: 100%;" tip="正在处理 ...">
             <a-form-item :label-col-style="{ width: '25%' }" field="dt" label="浏览器时间">
               {{ state.dt }}
-              <!-- &nbsp;&nbsp;<t-button size="small" theme="success" @click="syncTime">同步时间到台站</t-button> -->
+            </a-form-item>
+            <a-form-item :label-col-style="{ width: '25%' }" field="dtCustom" label="自定义时间">
+              <div>
+                <a-date-picker
+                style="width: 220px; margin: 0 24px 24px 0;"
+                show-time
+                :time-picker-props="{ defaultValue: '00:00:00' }"
+                format="YYYY-MM-DD HH:mm:ss"
+                v-model="state.dtCustom"
+              />
+              &nbsp;&nbsp;<t-button size="small" theme="success" @click="writeTime">写入时间到台站</t-button>
+              </div>
             </a-form-item>
             <a-form-item :label-col-style="{ width: '25%' }" field="sat" label="选择卫星">
               <a-select v-model="state.sat" @change="changeSat" placeholder="选择卫星 ..." allow-search allow-clear>
@@ -102,7 +113,8 @@ const state: {
   rxTone: number | undefined,
   dt: any,
   timer: any,
-  passCustom: any
+  passCustom: any,
+  dtCustom: any
 } = reactive({
   status: "点击写入按钮写入卫星数据到设备<br/><br/>",
   sat: '',
@@ -125,7 +137,8 @@ const state: {
   passOption: [],
   dt: '',
   timer: undefined,
-  passCustom: undefined
+  passCustom: undefined,
+  dtCustom: undefined
 })
 
 onMounted(()=>{
@@ -139,6 +152,22 @@ onUnmounted(()=>{
     clearInterval(state.timer)
   }catch{}
 })
+
+const writeTime = async () => {
+  if (appStore.connectState != true) { alert('请先连接手台！'); return; };
+  setLoading(true)
+  const date = state.dtCustom ? new Date(state.dtCustom) : new Date();
+  const dateArray = [
+    ...hexReverseStringToUint8Array(parseInt(date.getFullYear().toString().substring(2,4)).toString(16)),
+    ...hexReverseStringToUint8Array((date.getMonth() + 1).toString(16)),
+    ...hexReverseStringToUint8Array(date.getDate().toString(16)),
+    ...hexReverseStringToUint8Array(date.getHours().toString(16)),
+    ...hexReverseStringToUint8Array(date.getMinutes().toString(16)),
+    ...hexReverseStringToUint8Array(date.getSeconds().toString(16))
+  ]
+  await eeprom_write(appStore.connectPort, 0x02BC0, new Uint8Array(dateArray), 0x06, appStore.configuration?.uart);
+  setLoading(false)
+}
 
 const syncTime = async () => {
   const date = new Date();
