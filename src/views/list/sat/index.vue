@@ -351,12 +351,12 @@ const writeIt = async () => {
   // 手台的发射接收亚音
   payload = new Uint8Array(2)
   if(state.txTone && state.txTone > 0){
-    payload.set(hexReverseStringToUint8Array(state.txTone.toString(16)).subarray(0, 0x02))
+    payload.set(hexReverseStringToUint8Array(parseInt((state.txTone * 10).toFixed(0)).toString(16)).subarray(0, 0x02))
   }
   await eeprom_write(appStore.connectPort, 0x2BB8, payload, 0x02, appStore.configuration?.uart);
   payload = new Uint8Array(2)
   if(state.rxTone && state.rxTone > 0){
-    payload.set(hexReverseStringToUint8Array(state.rxTone.toString(16)).subarray(0, 0x02))
+    payload.set(hexReverseStringToUint8Array(parseInt((state.rxTone * 10).toFixed(0)).toString(16)).subarray(0, 0x02))
   }
   await eeprom_write(appStore.connectPort, 0x2BBA, payload, 0x02, appStore.configuration?.uart);
   // 开始过境时间的UNIX时间戳与2000年1月1日UNIX时间戳的差
