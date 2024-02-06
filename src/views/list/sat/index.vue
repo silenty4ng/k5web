@@ -35,6 +35,15 @@
                   :value="item[0] + '|' + item[1]">{{ item[0] + " - " + item[1] }}</a-option>
               </a-select>
             </a-form-item>
+            <a-form-item :label-col-style="{ width: '25%' }" field="passCustom" label="自定义过境时间">
+              <a-range-picker
+                style="width: 360px; margin: 0 24px 24px 0;"
+                show-time
+                :time-picker-props="{ defaultValue: ['00:00:00', '00:00:00'] }"
+                format="YYYY-MM-DD HH:mm:ss"
+                v-model="state.passCustom"
+              />
+            </a-form-item>
             <a-form-item :label-col-style="{ width: '25%' }" field="tx" label="上行频率">
               <a-input-number :precision="5" v-model="state.tx" />
             </a-form-item>
@@ -92,7 +101,8 @@ const state: {
   passOption: any[],
   rxTone: number | undefined,
   dt: any,
-  timer: any
+  timer: any,
+  passCustom: any
 } = reactive({
   status: "点击写入按钮写入卫星数据到设备<br/><br/>",
   sat: '',
@@ -114,7 +124,8 @@ const state: {
   pass: undefined,
   passOption: [],
   dt: '',
-  timer: undefined
+  timer: undefined,
+  passCustom: undefined
 })
 
 onMounted(()=>{
@@ -249,6 +260,10 @@ const writeIt = async () => {
   //   alert('固件版本不匹配');
   //   return;
   // }
+  if (!state.sat) { alert('请选择卫星！'); return; };
+  if(state.passCustom){
+    state.pass = state.passCustom[0] + "|" + state.passCustom[1]
+  }
   if (!state.pass) { alert('请选择过境时间！'); return; };
   setLoading(true)
   const res = await (await fetch('https://k5.vicicode.com/api/doppler', {
