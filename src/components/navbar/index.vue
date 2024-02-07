@@ -135,6 +135,8 @@
     "LOSEHU11[8-9].*H"   : "losehu118h.json",
     "LOSEHU11[8-9].*K"   : "losehu118k.json",
     "LOSEHU11[8-9].*"    : "losehu118.json",
+    "LOSEHU11[2-7].*K"   : "losehu117k.json",
+    "LOSEHU11[2-7].*"    : "losehu117.json",
     ".*"                 : "todo.json"
   }
 
