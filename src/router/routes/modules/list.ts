@@ -57,7 +57,7 @@ const LIST: AppRouteRecordRaw = {
       name: 'Sat',
       component: () => import('@/views/list/sat/index.vue'),
       meta: {
-        locale: '卫星写入（Beta）',
+        locale: '卫星写入',
         requiresAuth: true,
         roles: ['*'],
       },
