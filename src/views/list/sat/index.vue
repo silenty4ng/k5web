@@ -284,10 +284,10 @@ const getPass = async () => {
 
 const writeIt = async () => {
   if (appStore.connectState != true) { alert('请先连接手台！'); return; };
-  // if(appStore.configuration?.sat != true){
-  //   alert('固件版本不匹配');
-  //   return;
-  // }
+  if(appStore.configuration?.sat != true){
+    alert('固件版本不匹配');
+    return;
+  }
   if (!state.sat) { alert('请选择卫星！'); return; };
   if(state.passCustom){
     state.pass = state.passCustom[0] + "|" + state.passCustom[1]
