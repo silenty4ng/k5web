@@ -146,7 +146,7 @@ const state: {
 })
 
 onMounted(async ()=>{
-  const rst = await (await fetch('https://raw.githubusercontent.com/palewire/ham-satellite-database/main/data/amsat-active-frequencies.json')).text()
+  const rst = await (await fetch('https://git.vicicode.com/mirrors/ham-satellite-database/raw/branch/main/data/amsat-active-frequencies.json')).text()
   state.freqDb = JSON.parse(rst)
   state.timer = setInterval(()=>{
     state.dt = new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })
