@@ -115,7 +115,8 @@ const state: {
   dt: any,
   timer: any,
   passCustom: any,
-  dtCustom: any
+  dtCustom: any,
+  freqDb: any
 } = reactive({
   showh: 0,
   status: "点击写入按钮写入卫星数据到设备<br/><br/>",
@@ -140,10 +141,13 @@ const state: {
   dt: '',
   timer: undefined,
   passCustom: undefined,
-  dtCustom: undefined
+  dtCustom: undefined,
+  freqDb: []
 })
 
-onMounted(()=>{
+onMounted(async ()=>{
+  const rst = await (await fetch('https://raw.githubusercontent.com/palewire/ham-satellite-database/main/data/amsat-active-frequencies.json')).text()
+  state.freqDb = JSON.parse(rst)
   state.timer = setInterval(()=>{
     state.dt = new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })
   }, 1000)
@@ -188,17 +192,23 @@ const changeSat = async (sat: any) => {
     data.path.map((e: string) => {
       state.status += e + '<br/>'
     })
-  }
-  if(data.path.length > 2){
-    state.tx = parseFloat(data.path[2].split(" ")[1])
-    state.txTone = parseFloat(data.path[2].split(" ")[2])
-    state.rx = parseFloat(data.path[2].split(" ")[3])
-    state.rxTone = parseFloat(data.path[2].split(" ")[4])
-  }else{
-    state.tx = 0
-    state.txTone = 0
-    state.rx = 0
-    state.rxTone = 0
+    let freqFlag = false
+    state.freqDb.map((e: any)=>{
+      if(data.path[1].split(" ")[1] == e.norad_id && e.mode.indexOf('FM') != -1){
+        freqFlag = true
+        state.tx = parseFloat(e.uplink)
+        state.rx = parseFloat(e.downlink)
+        state.txTone = parseFloat(state.CTCSSOption.reduce((_e: any)=>{
+          return e.mode.indexOf(_e) != -1 ? _e : 0
+        }))
+      }
+    })
+    if(!freqFlag){
+      state.tx = 0
+      state.rx = 0
+      state.txTone = 0
+      state.rxTone = 0
+    }
   }
   nextTick(() => {
     const textarea = document?.getElementById('statusArea');
@@ -208,7 +218,7 @@ const changeSat = async (sat: any) => {
 
 const initSat = async () => {
   setLoading(true)
-  const rst = await (await fetch('https://k5.vicicode.com/api/amateur.txt')).text()
+  const rst = await (await fetch('https://celestrak.org/NORAD/elements/amateur.txt')).text()
   const lines = rst.split(/\r?\n/);
   const sat = [];
   let _sat: any = {};
