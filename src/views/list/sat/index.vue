@@ -198,8 +198,8 @@ const changeSat = async (sat: any) => {
         freqFlag = true
         state.tx = parseFloat(e.uplink)
         state.rx = parseFloat(e.downlink)
-        state.txTone = parseFloat(state.CTCSSOption.reduce((_e: any)=>{
-          return e.mode.indexOf(_e) != -1 ? _e : 0
+        state.txTone = parseFloat(state.CTCSSOption.reduce((_e: any, _n: any)=>{
+          return e.mode.indexOf(_n) != -1 ? _n : _e
         }))
       }
     })
