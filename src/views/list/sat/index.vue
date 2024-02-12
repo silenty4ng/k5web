@@ -189,6 +189,17 @@ const changeSat = async (sat: any) => {
       state.status += e + '<br/>'
     })
   }
+  if(data.path.length > 2){
+    state.tx = parseFloat(data.path[2].split(" ")[1])
+    state.txTone = parseFloat(data.path[2].split(" ")[2])
+    state.rx = parseFloat(data.path[2].split(" ")[3])
+    state.rxTone = parseFloat(data.path[2].split(" ")[4])
+  }else{
+    state.tx = 0
+    state.txTone = 0
+    state.rx = 0
+    state.rxTone = 0
+  }
   nextTick(() => {
     const textarea = document?.getElementById('statusArea');
     if (textarea) textarea.scrollTop = textarea?.scrollHeight;
@@ -197,7 +208,7 @@ const changeSat = async (sat: any) => {
 
 const initSat = async () => {
   setLoading(true)
-  const rst = await (await fetch('https://celestrak.org/NORAD/elements/amateur.txt')).text()
+  const rst = await (await fetch('https://k5.vicicode.com/api/amateur.txt')).text()
   const lines = rst.split(/\r?\n/);
   const sat = [];
   let _sat: any = {};
