@@ -195,10 +195,11 @@ const changeSat = async (sat: any) => {
     let freqFlag = false
     state.freqDb.map((e: any)=>{
       if(data.path[1].split(" ")[1] == e.norad_id && e.mode.indexOf('FM') != -1){
+        console.log(e)
         freqFlag = true
-        state.tx = parseFloat(e.uplink)
-        state.rx = parseFloat(e.downlink)
-        state.txTone = parseFloat(state.CTCSSOption.reduce((_e: any, _n: any)=>{
+        state.tx = e.uplink ? parseFloat(e.uplink.split('/')[0]) : 0
+        state.rx = e.downlink ? parseFloat(e.downlink.split('/')[0]) : 0
+        state.txTone = parseFloat([0, ...state.CTCSSOption].reduce((_e: any, _n: any)=>{
           return e.mode.indexOf(_n) != -1 ? _n : _e
         }))
       }
