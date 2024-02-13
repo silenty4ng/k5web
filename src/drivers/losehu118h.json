@@ -3,4 +3,5 @@
     "uart": "losehu",
     "charset": "gb2312",
     "H": true
+    "sat": true
 }
