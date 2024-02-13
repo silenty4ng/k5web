@@ -5,9 +5,9 @@
       <a-col :span="24">
         <a-card class="general-card" title="字库写入">
           <a-space>
-            <a-button @click="restore(1)">写入 117 字库（K）</a-button>
-            <a-button @click="restore(2)">写入 118+ 字库（K）</a-button>
-            <a-button @click="restore(3)">写入 118+ 字库（H）</a-button>
+            <a-button @click="restore(1)">写入 117 字库</a-button>
+            <a-button @click="restore(2)">写入 118+ 字库</a-button>
+            <!-- <a-button @click="restore(3)">写入 118+ 字库（H）</a-button> -->
             <a-button @click="restore(4)">写入拼音检索表（2Mbit EEPROM可用）</a-button>
           </a-space>
           <a-divider />
@@ -54,11 +54,7 @@ const restore = async(type: any = 1) => {
     alert('固件版本不匹配');
     return;
   }
-  if((type == 2 && appStore.configuration?.charset != "gb2312") || (type == 2 && appStore.configuration?.K != true)){
-    alert('固件版本不匹配');
-    return;
-  }
-  if((type == 3 && appStore.configuration?.charset != "gb2312") || (type == 3 && appStore.configuration?.H != true)){
+  if(type == 2 && appStore.configuration?.charset != "gb2312"){
     alert('固件版本不匹配');
     return;
   }
