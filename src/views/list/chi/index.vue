@@ -3,12 +3,13 @@
     <Breadcrumb :items="['小工具', '字库写入']" />
     <a-row :gutter="20" align="stretch">
       <a-col :span="24">
-        <a-card class="general-card" title="字库写入">
+        <a-card class="general-card" title="字库写入" @click="()=>{state.showHide += 1}">
           <a-space>
             <a-button @click="restore(1)">写入 117 字库</a-button>
             <a-button @click="restore(2)">写入 118+ 字库</a-button>
             <!-- <a-button @click="restore(3)">写入 118+ 字库（H）</a-button> -->
             <a-button @click="restore(4)">写入拼音检索表（2Mbit EEPROM可用）</a-button>
+            <a-button v-show="state.showHide >= 5" @click="restore(5)">写入拼音检索表（测试）</a-button>
           </a-space>
           <a-divider />
           <div id="statusArea" style="height: 20em; background-color: azure; color: silver; overflow: auto; padding: 20px" v-html="state.status"></div>
@@ -27,7 +28,8 @@ const appStore = useAppStore();
 
 const state = reactive({
   status: "点击写入按钮写入字库到设备<br/><br/>",
-  eepromType: ""
+  eepromType: "",
+  showHide: 0
 })
 
 const restoreRange = async (start: any = 0, uint8Array: any) => {
@@ -107,6 +109,21 @@ const restore = async(type: any = 1) => {
   }
   if(type == 4){
     fontPacket = await fetch('/pinyin.bin')
+    const reader = fontPacket.body.getReader();
+    const chunks = [];
+    while(true) {
+      const {done, value} = await reader.read();
+      if (done) {
+        break;
+      }
+      chunks.push(...value)
+    }
+    const binary = new Uint8Array(chunks)
+    await restoreRange(0x20000, binary)
+    return;
+  }
+  if(type == 5){
+    fontPacket = await fetch('/pinyin_plus.bin')
     const reader = fontPacket.body.getReader();
     const chunks = [];
     while(true) {
