@@ -5,10 +5,10 @@
       <a-col :span="24">
         <a-card class="general-card" title="卫星写入">
           <a-spin :loading="loading" style="width: 100%;" tip="正在处理 ...">
-            <a-form-item :label-col-style="{ width: '25%' }" field="dt" label="浏览器时间" @click="showHide">
+            <a-form-item :label-col-style="{ width: '25%' }" field="dt" label="浏览器时间" @click="()=>{state.showHide += 1}">
               {{ state.dt }}
             </a-form-item>
-            <a-form-item v-show="state.showh >= 5" :label-col-style="{ width: '25%' }" field="dtCustom" label="自定义时间">
+            <a-form-item v-show="state.showHide >= 5" :label-col-style="{ width: '25%' }" field="dtCustom" label="自定义时间">
               <div>
                 <a-date-picker
                 style="width: 220px; margin: 0 24px 24px 0;"
@@ -46,7 +46,7 @@
                   :value="item[0] + '|' + item[1]">{{ item[0] + " - " + item[1] }}</a-option>
               </a-select>
             </a-form-item>
-            <a-form-item v-show="state.showh >= 5" :label-col-style="{ width: '25%' }" field="passCustom" label="自定义过境时间">
+            <a-form-item v-show="state.showHide >= 5" :label-col-style="{ width: '25%' }" field="passCustom" label="自定义过境时间">
               <a-range-picker
                 style="width: 360px; margin: 0 24px 24px 0;"
                 show-time
@@ -98,7 +98,7 @@ const { loading, setLoading } = useLoading(true);
 const appStore = useAppStore();
 
 const state: {
-  showh: number,
+  showHide: number,
   status: string,
   sat: string,
   satData: any[],
@@ -118,7 +118,7 @@ const state: {
   dtCustom: any,
   freqDb: any
 } = reactive({
-  showh: 0,
+  showHide: 0,
   status: "点击写入按钮写入卫星数据到设备<br/><br/>",
   sat: '',
   satData: [],
@@ -158,10 +158,6 @@ onUnmounted(()=>{
     clearInterval(state.timer)
   }catch{}
 })
-
-const showHide = () => {
-  state.showh += 1;
-}
 
 const writeTime = async () => {
   if (appStore.connectState != true) { alert('请先连接手台！'); return; };
