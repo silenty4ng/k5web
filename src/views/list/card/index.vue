@@ -3,7 +3,7 @@
     <Breadcrumb :items="['小工具', '备份/还原']" />
     <a-row :gutter="20" align="stretch">
       <a-col :span="24">
-        <a-card class="general-card" title="备份/还原">
+        <a-card class="general-card" title="备份/还原" @click="()=>{state.showHide += 1}">
         <a-tabs default-active-key="1">
           <a-tab-pane key="1" title="快捷备份">
             <a-space>
@@ -16,6 +16,7 @@
           <a-tab-pane key="2" title="完整备份">
               <a-space>
                 <a-button type="primary" @click="backup">备份</a-button>
+                <a-input v-show="state.showHide >= 5" v-model="state.startInfo" />
                 <a-button @click="restore">恢复</a-button>
                 <a-select v-model="state.eepromType" :style="{width:'320px'}" placeholder="选择EEPROM大小">
                   <a-option value="1">8KB（64Kbit）</a-option>
@@ -44,7 +45,9 @@ const appStore = useAppStore();
 
 const state = reactive({
   status: "点击备份按钮将生成 EEPROM 备份文件<br/><br/>",
-  eepromType: ""
+  eepromType: "",
+  showHide: 0,
+  startInfo: "0x00"
 })
 
 const checkEeprom = async () => {
@@ -148,7 +151,7 @@ const backup = async() => {
 
 const restore = async() => {
   if(appStore.connectState != true){alert('请先连接手台！'); return;};
-  await restoreRange()
+  await restoreRange(parseInt(state.startInfo))
 }
 </script>
 
