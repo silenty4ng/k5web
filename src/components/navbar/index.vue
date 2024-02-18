@@ -129,7 +129,8 @@
   const configuration_list : any = {
     "LOSEHU.*P.*K"       : "ltsk.json",
     "LOSEHU.*P.*"        : "lts.json",
-    "LOSEHU12[0-9].*H"   : "losehu118h.json",
+    "LOSEHU12[4-9].*H"   : "losehu124h.json",
+    "LOSEHU12[0-3].*H"   : "losehu118h.json",
     "LOSEHU12[0-9].*K"   : "losehu120k.json",
     "LOSEHU12[0-9].*"    : "losehu118.json",
     "LOSEHU11[8-9].*H"   : "losehu118h.json",
@@ -168,7 +169,8 @@
         "K": false,
         "H": false,
         "localmdc": false,
-        "sat": false
+        "sat": false,
+        "newpinyin": false
       }
 
       Object.keys(configuration_list).some(e=>{

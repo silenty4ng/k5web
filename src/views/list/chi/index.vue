@@ -9,7 +9,7 @@
             <a-button @click="restore(2)">写入 118+ 字库</a-button>
             <!-- <a-button @click="restore(3)">写入 118+ 字库（H）</a-button> -->
             <a-button @click="restore(4)">写入拼音检索表（2Mbit EEPROM可用）</a-button>
-            <a-button v-show="state.showHide >= 5" @click="restore(5)">写入拼音检索表（测试）</a-button>
+            <!-- <a-button v-show="state.showHide >= 5" @click="restore(5)">写入拼音检索表（测试）</a-button> -->
           </a-space>
           <a-divider />
           <div id="statusArea" style="height: 20em; background-color: azure; color: silver; overflow: auto; padding: 20px" v-html="state.status"></div>
@@ -108,22 +108,11 @@ const restore = async(type: any = 1) => {
     return;
   }
   if(type == 4){
-    fontPacket = await fetch('/pinyin.bin')
-    const reader = fontPacket.body.getReader();
-    const chunks = [];
-    while(true) {
-      const {done, value} = await reader.read();
-      if (done) {
-        break;
-      }
-      chunks.push(...value)
+    if(appStore.configuration?.newpinyin){
+      fontPacket = await fetch('/pinyin_plus.bin')
+    }else{
+      fontPacket = await fetch('/pinyin.bin')
     }
-    const binary = new Uint8Array(chunks)
-    await restoreRange(0x20000, binary)
-    return;
-  }
-  if(type == 5){
-    fontPacket = await fetch('/pinyin_plus.bin')
     const reader = fontPacket.body.getReader();
     const chunks = [];
     while(true) {
