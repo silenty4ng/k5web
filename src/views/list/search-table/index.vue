@@ -139,7 +139,7 @@
         },
         onEdited: (context: any) => {
           const newData = [...cstate.renderData];
-          newData.splice(context.rowIndex, 1, context.newRowData);
+          newData.splice((cstate.nowPage - 1) * cstate.pageSize + context.rowIndex, 1, context.newRowData);
           cstate.renderData = newData;
         },
       },
@@ -158,7 +158,7 @@
         },
         onEdited: (context: any) => {
           const newData = [...cstate.renderData];
-          newData.splice(context.rowIndex, 1, context.newRowData);
+          newData.splice((cstate.nowPage - 1) * cstate.pageSize + context.rowIndex, 1, context.newRowData);
           cstate.renderData = newData;
         }
       },
@@ -177,7 +177,7 @@
         onEdited: (context: any) => {
           context.newRowData.rx = context.newRowData.rx ? context.newRowData.rx : undefined
           const newData = [...cstate.renderData];
-          newData.splice(context.rowIndex, 1, context.newRowData);
+          newData.splice((cstate.nowPage - 1) * cstate.pageSize + context.rowIndex, 1, context.newRowData);
           cstate.renderData = newData;
         },
       },
@@ -196,7 +196,7 @@
         onEdited: (context: any) => {
           context.newRowData.tx = context.newRowData.tx ? context.newRowData.tx : undefined
           const newData = [...cstate.renderData];
-          newData.splice(context.rowIndex, 1, context.newRowData);
+          newData.splice((cstate.nowPage - 1) * cstate.pageSize + context.rowIndex, 1, context.newRowData);
           cstate.renderData = newData;
         },
       },
@@ -215,7 +215,7 @@
         },
         onEdited: (context: any) => {
           const newData = [...cstate.renderData];
-          newData.splice(context.rowIndex, 1, context.newRowData);
+          newData.splice((cstate.nowPage - 1) * cstate.pageSize + context.rowIndex, 1, context.newRowData);
           cstate.renderData = newData;
         }
       },
@@ -234,7 +234,7 @@
         },
         onEdited: (context: any) => {
           const newData = [...cstate.renderData];
-          newData.splice(context.rowIndex, 1, context.newRowData);
+          newData.splice((cstate.nowPage - 1) * cstate.pageSize + context.rowIndex, 1, context.newRowData);
           cstate.renderData = newData;
         }
       },
@@ -253,7 +253,7 @@
         },
         onEdited: (context: any) => {
           const newData = [...cstate.renderData];
-          newData.splice(context.rowIndex, 1, context.newRowData);
+          newData.splice((cstate.nowPage - 1) * cstate.pageSize + context.rowIndex, 1, context.newRowData);
           cstate.renderData = newData;
         }
       },
@@ -272,7 +272,7 @@
         },
         onEdited: (context: any) => {
           const newData = [...cstate.renderData];
-          newData.splice(context.rowIndex, 1, context.newRowData);
+          newData.splice((cstate.nowPage - 1) * cstate.pageSize + context.rowIndex, 1, context.newRowData);
           cstate.renderData = newData;
         }
       },
@@ -291,7 +291,7 @@
         },
         onEdited: (context: any) => {
           const newData = [...cstate.renderData];
-          newData.splice(context.rowIndex, 1, context.newRowData);
+          newData.splice((cstate.nowPage - 1) * cstate.pageSize + context.rowIndex, 1, context.newRowData);
           cstate.renderData = newData;
         }
       },
@@ -310,7 +310,7 @@
         },
         onEdited: (context: any) => {
           const newData = [...cstate.renderData];
-          newData.splice(context.rowIndex, 1, context.newRowData);
+          newData.splice((cstate.nowPage - 1) * cstate.pageSize + context.rowIndex, 1, context.newRowData);
           cstate.renderData = newData;
         }
       },
@@ -329,7 +329,7 @@
         },
         onEdited: (context: any) => {
           const newData = [...cstate.renderData];
-          newData.splice(context.rowIndex, 1, context.newRowData);
+          newData.splice((cstate.nowPage - 1) * cstate.pageSize + context.rowIndex, 1, context.newRowData);
           cstate.renderData = newData;
         }
       },
@@ -348,7 +348,7 @@
         },
         onEdited: (context: any) => {
           const newData = [...cstate.renderData];
-          newData.splice(context.rowIndex, 1, context.newRowData);
+          newData.splice((cstate.nowPage - 1) * cstate.pageSize + context.rowIndex, 1, context.newRowData);
           cstate.renderData = newData;
         }
       },
@@ -372,7 +372,7 @@
         },
         onEdited: (context: any) => {
           const newData = [...cstate.renderData];
-          newData.splice(context.rowIndex, 1, context.newRowData);
+          newData.splice((cstate.nowPage - 1) * cstate.pageSize + context.rowIndex, 1, context.newRowData);
           cstate.renderData = newData;
         }
       },
@@ -396,7 +396,7 @@
         },
         onEdited: (context: any) => {
           const newData = [...cstate.renderData];
-          newData.splice(context.rowIndex, 1, context.newRowData);
+          newData.splice((cstate.nowPage - 1) * cstate.pageSize + context.rowIndex, 1, context.newRowData);
           cstate.renderData = newData;
         }
       },
@@ -415,7 +415,7 @@
         },
         onEdited: (context: any) => {
           const newData = [...cstate.renderData];
-          newData.splice(context.rowIndex, 1, context.newRowData);
+          newData.splice((cstate.nowPage - 1) * cstate.pageSize + context.rowIndex, 1, context.newRowData);
           cstate.renderData = newData;
         }
       },
