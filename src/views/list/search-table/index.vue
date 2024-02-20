@@ -47,7 +47,14 @@
         lazy-load
         :headerAffixedTop="{ offsetTop: 60 }"
         :hover="true"
+        drag-sort="row-handler"
+        @drag-sort="onDragSort"
       >
+        <template #drag="{ row, rowIndex }">
+          <span>
+            <MoveIcon />
+          </span>
+        </template>
         <template #index="{ row, rowIndex }">
           {{ (cstate.nowPage - 1) * cstate.pageSize + rowIndex + 1 }}
         </template>
@@ -80,6 +87,8 @@
   import useLoading from '@/hooks/loading';
   import { eeprom_read, uint8ArrayToHexReverseString, uint8ArrayToString, hexReverseStringToUint8Array, stringToUint8Array, eeprom_write, eeprom_reboot, eeprom_init } from '@/utils/serial.js';
   import { useAppStore } from '@/store';
+  import { MoveIcon } from 'tdesign-icons-vue-next';
+
   const appStore = useAppStore();
 
   const { loading, setLoading } = useLoading(false);
@@ -120,7 +129,16 @@
     nowPage: 1,
   })
 
+  const onDragSort = (params: any) => {
+    cstate.renderData = params.newData
+  }
+
   const columns = computed(() => [
+    {
+      colKey: 'drag', // 列拖拽排序必要参数
+      title: '排序',
+      width: 46,
+    },
     {
       title: '#',
       colKey: 'index',
