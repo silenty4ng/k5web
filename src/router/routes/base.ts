@@ -24,6 +24,12 @@ export const REDIRECT_MAIN: RouteRecordRaw = {
   ],
 };
 
+export const SATLOC: RouteRecordRaw = {
+  path: '/satloc',
+  name: 'satloc',
+  component: () => import('@/views/list/satloc/index.vue'),
+}
+
 export const NOT_FOUND_ROUTE: RouteRecordRaw = {
   path: '/:pathMatch(.*)*',
   name: 'notFound',

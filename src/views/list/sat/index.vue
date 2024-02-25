@@ -1,5 +1,13 @@
 <template>
   <div class="container">
+    <a-modal v-model:visible="state.visible" @ok="handleOk" ok-text="已扫码上传">
+      <template #title>
+        手机扫码获取经纬度
+      </template>
+      <div style="text-align: center;">
+        <img :src="state.qrcode" />
+      </div>
+    </a-modal>
     <Breadcrumb :items="['小工具', '卫星写入']" />
     <a-row :gutter="20" align="stretch">
       <a-col :span="24">
@@ -37,6 +45,7 @@
             <a-form-item :label-col-style="{ width: '25%' }" label="">
               <a-space>
                 <a-button @click="getLocation">浏览器获取经纬度</a-button>
+                <a-button @click="scanLocation">手机扫码获取经纬度</a-button>
                 <a-button @click="getPass">获取卫星过境时间</a-button>
               </a-space>
             </a-form-item>
@@ -92,12 +101,16 @@ import { reactive, nextTick, onMounted, onUnmounted } from 'vue';
 import { useAppStore } from '@/store';
 import { eeprom_write, eeprom_reboot, eeprom_init, hexReverseStringToUint8Array, stringToUint8Array } from '@/utils/serial.js';
 import useLoading from '@/hooks/loading';
+import QRCode from 'qrcode';
+import { v4 as uuidv4 } from 'uuid';
 
 const { loading, setLoading } = useLoading(true);
 
 const appStore = useAppStore();
 
 const state: {
+  uuid: string,
+  qrcode: string,
   showHide: number,
   status: string,
   sat: string,
@@ -116,8 +129,12 @@ const state: {
   timer: any,
   passCustom: any,
   dtCustom: any,
-  freqDb: any
+  freqDb: any,
+  visible: boolean,
 } = reactive({
+  uuid: '',
+  qrcode: '',
+  visible: false,
   showHide: 0,
   status: "点击写入按钮写入卫星数据到设备<br/><br/>",
   sat: '',
@@ -247,6 +264,33 @@ const getLocation = async () => {
   setLoading(false)
 }
 getLocation()
+
+const scanLocation = async () => {
+  state.visible = true
+  state.uuid = crypto.randomUUID()
+  state.qrcode = await QRCode.toDataURL(location.origin + '/#/satloc?uuid=' + state.uuid, { width: 250 })
+  console.log(state.uuid)
+}
+
+const handleOk = async () => {
+  const lol = await (await fetch('https://k5.vicicode.com/api/lol', {
+    method: "POST",
+    mode: "cors",
+    headers: {
+    "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+        func: 1,
+        uuid: state.uuid
+    })
+  })).json();
+  const jsonLol = JSON.parse(lol);
+  if(jsonLol.length >= 3){
+    state.lng = jsonLol[0],
+    state.lat = jsonLol[1],
+    state.alt = jsonLol[2]
+  }
+}
 
 const restoreRange = async (start: any = 0, uint8Array: any) => {
   await eeprom_init(appStore.connectPort);
