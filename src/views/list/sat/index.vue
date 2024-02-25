@@ -284,7 +284,7 @@ const handleOk = async () => {
         uuid: state.uuid
     })
   })).json();
-  const jsonLol = JSON.parse(lol);
+  const jsonLol = JSON.parse(lol.cache);
   if(jsonLol.length >= 3){
     state.lng = jsonLol[0],
     state.lat = jsonLol[1],
