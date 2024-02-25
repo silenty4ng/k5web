@@ -3,7 +3,10 @@
     <Breadcrumb :items="['小工具', '字库写入']" />
     <a-row :gutter="20" align="stretch">
       <a-col :span="24">
-        <a-card class="general-card" title="字库写入" @click="()=>{state.showHide += 1}">
+        <a-card class="general-card">
+          <template #title>
+            <span @click="()=>{state.showHide += 1}">字库写入</span>
+          </template>
           <a-space>
             <a-button @click="restore(1)">写入 117 字库</a-button>
             <a-button @click="restore(2)">写入 118+ 字库</a-button>

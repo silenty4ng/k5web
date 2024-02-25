@@ -3,7 +3,10 @@
     <Breadcrumb :items="['小工具', '备份/还原']" />
     <a-row :gutter="20" align="stretch">
       <a-col :span="24">
-        <a-card class="general-card" title="备份/还原" @click="()=>{state.showHide += 1}">
+        <a-card class="general-card">
+          <template #title>
+            <span @click="()=>{state.showHide += 1}">备份/还原</span>
+          </template>
         <a-tabs default-active-key="1">
           <a-tab-pane key="1" title="快捷备份">
             <a-space>
