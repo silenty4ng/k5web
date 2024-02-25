@@ -5,7 +5,8 @@
         手机扫码获取经纬度
       </template>
       <div style="text-align: center;">
-        <img :src="state.qrcode" />
+        <img :src="state.qrcode" /><br>
+        上传经纬度信息将被服务器缓存十分钟
       </div>
     </a-modal>
     <Breadcrumb :items="['小工具', '卫星写入']" />
@@ -102,7 +103,6 @@ import { useAppStore } from '@/store';
 import { eeprom_write, eeprom_reboot, eeprom_init, hexReverseStringToUint8Array, stringToUint8Array } from '@/utils/serial.js';
 import useLoading from '@/hooks/loading';
 import QRCode from 'qrcode';
-import { v4 as uuidv4 } from 'uuid';
 
 const { loading, setLoading } = useLoading(true);
 
