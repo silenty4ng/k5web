@@ -19,7 +19,7 @@
   window.TextDecoder = TextDecoder;
 
   // 遥测
-  if(location.hostname == 'k5.vicicode.com'){
+  if(location.hostname == 'k5.vicicode.com' || location.hostname == 'k5.lhw711.cn'){
     const aegis = new Aegis({
         id: 'yr5DeslJkz3Qn20jg0', // 上报 id
         reportApiSpeed: true, // 接口测速
