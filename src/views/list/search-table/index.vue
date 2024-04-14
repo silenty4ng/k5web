@@ -21,11 +21,28 @@
         </a-col>
         <a-col :span="12" style="text-align: right;">
           <a-space>
-            <a-button type="primary" @click="saveChannel">
-              保存
+            <a-dropdown>
+              <a-button>
+                保存/加载（即将废弃）<icon-down />
+              </a-button>
+              <template #content>
+                <a-button style="width: 200px; margin: 10px; margin-bottom: 0px;" type="primary" @click="saveChannel">
+                  保存
+                </a-button>
+                <br>
+                <a-button style="width: 200px; margin: 10px;" @click="restoreChannel">
+                  加载
+                </a-button>
+              </template>
+            </a-dropdown>
+            <a-button type="text" @click="downloadExcelTemplate">
+              下载导入模板
             </a-button>
-            <a-button @click="restoreChannel">
-              加载
+            <a-button type="primary" @click="restoreExcelChannel">
+              导入
+            </a-button>
+            <a-button @click="saveExcelChannel">
+              导出
             </a-button>
           </a-space>
         </a-col>
@@ -89,6 +106,7 @@
   import { useAppStore } from '@/store';
   import { MoveIcon } from 'tdesign-icons-vue-next';
   import { toTraditional } from 'chinese-simple2traditional';
+  import { read as xlsxRead, writeFile as xlsxWrite, utils as xlsxUtils } from "xlsx";
 
   const appStore = useAppStore();
 
@@ -358,12 +376,12 @@
       colKey: 'step',
       align: 'left',
       width: 150,
-      cell: (h, { row }) => state.stepOption.indexOf(row.step) >= 0 ? row.step?.toFixed(1) : undefined,
+      cell: (h, { row }) => state.stepOption.indexOf(row.step) >= 0 ? row.step?.toFixed(2) : undefined,
       edit: {
         component: Select,
         props: {
           clearable: true,
-          options: state.stepOption.map(e=>{return {value: e, label: e.toFixed(1)}}),
+          options: state.stepOption.map(e=>{return {value: e, label: e.toFixed(2)}}),
         },
         onEdited: (context: any) => {
           const newData = [...cstate.renderData];
@@ -646,9 +664,181 @@
     const input = document.createElement('input');
     input.type = 'file';
     input.onchange = async() => {
-      const blob = new Blob([input.files[0]], {type: 'application/octet-stream' });
+      const blob = new Blob([input.files[0]], {type: 'application/octet-stream'});
       const _json = await blob.text()
       cstate.renderData = JSON.parse(_json)
+    };
+    input.click();
+  }
+  const downloadExcelTemplate = () => {
+    const a = document.createElement('a');
+    a.href = '/K5Channel.xlsx';
+    a.download = 'K5Channel.xlsx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+  const saveExcelChannel = async () => {
+    const template = await fetch('/K5Channel.xlsx');
+    const workbook = xlsxRead(await template.arrayBuffer());
+    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+    for(let i = 2; i < 202; i++){
+      if(cstate.renderData[i - 2]?.name){
+        worksheet['B' + i] = {}
+        worksheet['B' + i].v = cstate.renderData[i - 2]?.name
+      }
+      if(cstate.renderData[i - 2]?.bandwidth){
+        worksheet['C' + i] = {}
+        worksheet['C' + i].v = state.bandwidthOption[cstate.renderData[i - 2]?.bandwidth]
+      }
+      if(cstate.renderData[i - 2]?.rx){
+        worksheet['D' + i] = {}
+        worksheet['D' + i].v = cstate.renderData[i - 2]?.rx
+      }
+      if(cstate.renderData[i - 2]?.tx){
+        worksheet['E' + i] = {}
+        worksheet['E' + i].v = cstate.renderData[i - 2]?.tx
+      }
+      if(cstate.renderData[i - 2]?.power){
+        worksheet['F' + i] = {}
+        worksheet['F' + i].v = state.powerOption[cstate.renderData[i - 2]?.power]
+      }
+      if(cstate.renderData[i - 2]?.rxTone){
+        worksheet['G' + i] = {}
+        worksheet['G' + i].v = state.toneOption[cstate.renderData[i - 2]?.rxTone]
+      }
+      if(cstate.renderData[i - 2]?.rxCTCSS){
+        worksheet['H' + i] = {}
+        worksheet['H' + i].v = cstate.renderData[i - 2]?.rxCTCSS
+      }
+      if(cstate.renderData[i - 2]?.rxDCS){
+        worksheet['I' + i] = {}
+        worksheet['I' + i].v = cstate.renderData[i - 2]?.rxDCS
+      }
+      if(cstate.renderData[i - 2]?.txTone){
+        worksheet['J' + i] = {}
+        worksheet['J' + i].v = state.toneOption[cstate.renderData[i - 2]?.txTone]
+      }
+      if(cstate.renderData[i - 2]?.txCTCSS){
+        worksheet['K' + i] = {}
+        worksheet['K' + i].v = cstate.renderData[i - 2]?.txCTCSS
+      }
+      if(cstate.renderData[i - 2]?.txDCS){
+        worksheet['L' + i] = {}
+        worksheet['L' + i].v = cstate.renderData[i - 2]?.txDCS
+      }
+      if(cstate.renderData[i - 2]?.step){
+        worksheet['M' + i] = {}
+        worksheet['M' + i].v = cstate.renderData[i - 2]?.step
+      }
+      if(cstate.renderData[i - 2]?.reverse){
+        worksheet['N' + i] = {}
+        worksheet['N' + i].v = cstate.renderData[i - 2]?.reverse == true ? '开' : '关'
+      }
+      if(cstate.renderData[i - 2]?.scramb){
+        worksheet['O' + i] = {}
+        worksheet['O' + i].v = cstate.renderData[i - 2]?.scramb
+      }
+      if(cstate.renderData[i - 2]?.busy){
+        worksheet['P' + i] = {}
+        worksheet['P' + i].v = cstate.renderData[i - 2]?.busy == true ? '开' : '关'
+      }
+      if(cstate.renderData[i - 2]?.pttid){
+        worksheet['Q' + i] = {}
+        worksheet['Q' + i].v = cstate.renderData[i - 2]?.pttid
+      }
+      if(cstate.renderData[i - 2]?.mode){
+        worksheet['R' + i] = {}
+        worksheet['R' + i].v = state.modeOption[cstate.renderData[i - 2]?.mode]
+      }
+      if(cstate.renderData[i - 2]?.dtmf){
+        worksheet['S' + i] = {}
+        worksheet['S' + i].v = cstate.renderData[i - 2]?.dtmf == true ? '开' : '关'
+      }
+      if(cstate.renderData[i - 2]?.scanlist){
+        worksheet['T' + i] = {}
+        worksheet['T' + i].v = cstate.renderData[i - 2]?.scanlist.join(',')
+      }
+    }
+    xlsxWrite(workbook, 'K5Channel.xlsx');
+  }
+  const restoreExcelChannel = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.onchange = async() => {
+      const blob = new Blob([input.files[0]], {type: 'application/octet-stream'});
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const renderData : any = Array.from({length: 200}).map(e=>{return {scanlist: []}})
+        var data = e.target?.result;
+        var workbook = xlsxRead(data);
+        for(let i = 2; i < 202; i++){
+          if(workbook.Sheets.Sheet1['B' + i]?.w){
+            renderData[i - 2]['name'] = workbook.Sheets.Sheet1['B' + i]?.w
+          }
+          if(workbook.Sheets.Sheet1['C' + i]?.w){
+            renderData[i - 2]['bandwidth'] = Object.keys(state.bandwidthOption).find(key=>state.bandwidthOption[key]==workbook.Sheets.Sheet1['C' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['D' + i]?.w){
+            renderData[i - 2]['rx'] = workbook.Sheets.Sheet1['D' + i]?.w
+          }
+          if(workbook.Sheets.Sheet1['E' + i]?.w){
+            renderData[i - 2]['tx'] = workbook.Sheets.Sheet1['E' + i]?.w
+          }
+          if(workbook.Sheets.Sheet1['F' + i]?.w){
+            renderData[i - 2]['power'] = Object.keys(state.powerOption).find(key=>state.powerOption[key]==workbook.Sheets.Sheet1['F' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['G' + i]?.w){
+            renderData[i - 2]['rxTone'] = Object.keys(state.toneOption).find(key=>state.toneOption[key]==workbook.Sheets.Sheet1['G' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['H' + i]?.w){
+            renderData[i - 2]['rxCTCSS'] = parseFloat(workbook.Sheets.Sheet1['H' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['I' + i]?.w){
+            renderData[i - 2]['rxDCS'] = parseFloat(workbook.Sheets.Sheet1['I' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['J' + i]?.w){
+            renderData[i - 2]['txTone'] = Object.keys(state.toneOption).find(key=>state.toneOption[key]==workbook.Sheets.Sheet1['J' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['K' + i]?.w){
+            renderData[i - 2]['txCTCSS'] = parseFloat(workbook.Sheets.Sheet1['K' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['L' + i]?.w){
+            renderData[i - 2]['txDCS'] = parseFloat(workbook.Sheets.Sheet1['L' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['M' + i]?.w){
+            renderData[i - 2]['step'] = parseFloat(workbook.Sheets.Sheet1['M' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['N' + i]?.w){
+            renderData[i - 2]['reverse'] = workbook.Sheets.Sheet1['N' + i]?.w == '开' ? true : false
+          }
+          if(workbook.Sheets.Sheet1['O' + i]?.w){
+            renderData[i - 2]['scramb'] = parseFloat(workbook.Sheets.Sheet1['O' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['P' + i]?.w){
+            renderData[i - 2]['busy'] = workbook.Sheets.Sheet1['P' + i]?.w == '开' ? true : false
+          }
+          if(workbook.Sheets.Sheet1['Q' + i]?.w){
+            renderData[i - 2]['pttid'] = workbook.Sheets.Sheet1['Q' + i]?.w
+          }
+          if(workbook.Sheets.Sheet1['R' + i]?.w){
+            renderData[i - 2]['mode'] = Object.keys(state.modeOption).find(key=>state.modeOption[key]==workbook.Sheets.Sheet1['R' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['S' + i]?.w){
+            renderData[i - 2]['dtmf'] = workbook.Sheets.Sheet1['S' + i]?.w == '开' ? true : false
+          }
+          if(workbook.Sheets.Sheet1['T' + i]?.w){
+            if(workbook.Sheets.Sheet1['T' + i]?.w.split(',').indexOf('I') >= 0){
+              renderData[i - 2]['scanlist'].push('I')
+            }
+            if(workbook.Sheets.Sheet1['T' + i]?.w.split(',').indexOf('II') >= 0){
+              renderData[i - 2]['scanlist'].push('II')
+            }
+          }
+        }
+        cstate.renderData = renderData
+      };
+      reader.readAsArrayBuffer(blob);
     };
     input.click();
   }
