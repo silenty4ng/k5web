@@ -105,7 +105,7 @@
   import { eeprom_read, uint8ArrayToHexReverseString, uint8ArrayToString, hexReverseStringToUint8Array, stringToUint8Array, eeprom_write, eeprom_reboot, eeprom_init } from '@/utils/serial.js';
   import { useAppStore } from '@/store';
   import { MoveIcon } from 'tdesign-icons-vue-next';
-  import { toTraditional } from 'chinese-simple2traditional';
+  import { toSimplified } from 'chinese-simple2traditional';
   import { read as xlsxRead, writeFile as xlsxWrite, utils as xlsxUtils } from "xlsx";
 
   const appStore = useAppStore();
@@ -624,7 +624,7 @@
         rawEEPROM2.set([(scanlist << 4) + 0], i / 0x10)
 
         const mergedArray = new Uint8Array(0x10);
-        mergedArray.set(stringToUint8Array(_channel.name ? toTraditional(_channel.name) : "", appStore.configuration?.charset).subarray(0, 0x10), 0);
+        mergedArray.set(stringToUint8Array(_channel.name ? toSimplified(_channel.name) : "", appStore.configuration?.charset).subarray(0, 0x10), 0);
         rawEEPROM3.set(mergedArray, i)
       }else{
         rawEEPROM.set(hexReverseStringToUint8Array("ffffffffffffffffffffffffffffffff"), i)
