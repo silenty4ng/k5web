@@ -146,7 +146,20 @@
       try{
         if(appStore.connectPort)await disconnect(appStore.connectPort);
       }catch{}
-      const _connect = await connect();
+      let _connect;
+      if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
+        alert('手机写频开发中，无法正常使用，请使用电脑连接电台写频！！！')
+        await serial.requestPort().then(selectedPort => {
+          _connect = selectedPort;
+        });
+        if(_connect){
+          await _connect.connect().then().catch((e)=>{
+            alert('请尝试刷新网页重新插拔写频线')
+          })
+        }
+      }else{
+        _connect = await connect();
+      }
 
       if(!_connect){
         alert('连接失败');

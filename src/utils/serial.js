@@ -853,6 +853,10 @@ function unpacketize(packet) {
  * @returns {Promise<Uint8Array>} - A promise that resolves with the received packet or gets rejected on timeout.
  */
 async function readPacket(port, expectedData, timeout = 1000) {
+    if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
+        await new Promise(resolve => setTimeout(resolve, timeout))
+        return unpacketize(new Uint8Array(sessionStorage.getItem('webusb').split(',')));
+    }
     // Create a reader to read data from the serial port
     const reader = port.readable.getReader();
     let buffer = new Uint8Array();
@@ -957,6 +961,10 @@ async function readPacket(port, expectedData, timeout = 1000) {
  * @throws {Error} - If the packet could not be sent.
  */
 async function sendPacket(port, data) {
+    if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
+        await port.send(packetize(data));
+        return
+    }
     try {
         // create writer for port
         const writer = port.writable.getWriter();
@@ -1008,6 +1016,7 @@ function hexReverseStringToUint8Array(hexReverseString) {
 }
 
 async function eeprom_init(port) {
+    sessionStorage.removeItem('webusb')
     const packet = new Uint8Array([0x14, 0x05, 0x04, 0x00, 0xff, 0xff, 0xff, 0xff]);
     await sendPacket(port, packet);
     const response = await readPacket(port, 0x15);
@@ -1017,6 +1026,7 @@ async function eeprom_init(port) {
 }
 
 async function eeprom_read(port, address, size = 0x80, protocol = "official") {
+    sessionStorage.removeItem('webusb')
     if (protocol == "official") {
         // packet format: uint16 ID, uint16 length, uint16 address, uint8 size, uint8 padding, uint32 timestamp
         // size can be up to 0x80 bytes
