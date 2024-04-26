@@ -1,5 +1,3 @@
-window.addEventListener("load", initiate, false);
-
 //The different hardware we support + their specific data/configs
 const table = {
     0x0403: {"FTDI": {
@@ -351,37 +349,5 @@ function send(string) {
     console.log(data);
     if (port) {
         port.send(data);
-    }
-}
-
-//the init function which we have an event listener connected to
-function initiate(){
-    serial.getPorts()
-        .then(ports => {
-        //these are devices already paired, let's try the first one...
-        if (ports.length > 0) {
-            port = ports[0];
-            connect();
-        }
-    });
-
-    document.querySelector("#connect").onclick = async function () {
-        await serial.requestPort().then(selectedPort => {
-            if (port === undefined || port.device_ !== selectedPort.device_) {
-                port = selectedPort;
-                connect();
-            } else {
-                // port already selected...
-            }
-        });
-    }
-
-    document.querySelector("#disconnect").onclick = function() {
-        disconnect()
-    }
-
-    document.querySelector("#submit").onclick = () => {
-        let source = document.querySelector("#editor").value;
-        send(source);
     }
 }
