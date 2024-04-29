@@ -4,10 +4,8 @@
     <global-setting />
   </a-config-provider>
   <t-sticky-tool
-      :style="{ position: 'absolute', overflow: 'hidden' }"
-      :offset="[-20, 20]"
-      @click="handleClick"
-      @hover="handleHover"
+      :style="{ overflow: 'hidden' }"
+      :offset="[-20, 140]"
     >
     <t-sticky-item label="问题反馈" :popup="renderQa" :popup-props="{ overlayInnerStyle: { margin: '10px', height: '450px' } }">
       <template #icon><chat-icon /></template>
@@ -15,11 +13,14 @@
     <t-sticky-item label="扫码红包" :popup="renderPopup" :popup-props="{ overlayInnerStyle: { margin: '10px', height: '450px' } }">
       <template #icon><qrcode-icon /></template>
     </t-sticky-item>
+    <t-sticky-item label="打赏" :popup="renderShang" :popup-props="{ overlayInnerStyle: { margin: '10px', height: '450px' } }">
+      <template #icon><fish-icon /></template>
+    </t-sticky-item>
   </t-sticky-tool>
 </template>
 
 <script lang="ts" setup>
-  import { ChatIcon, QrcodeIcon } from 'tdesign-icons-vue-next';
+  import { ChatIcon, QrcodeIcon, FishIcon } from 'tdesign-icons-vue-next';
   import { computed, h } from 'vue';
   import zhCN from '@arco-design/web-vue/es/locale/lang/zh-cn';
   import GlobalSetting from '@/components/global-setting/index.vue';
@@ -53,7 +54,11 @@
 
   const renderPopup = () => {
     return h("img", { src: '/1714006925783.jpg', height: 440 });
-  };
+  }
+
+  const renderShang = () => {
+    return h("img", { src: '/mm_facetoface_collect_qrcode_1714392837792.png', height: 440 });
+  }
 
   const { currentLocale } = useLocale();
   const locale = computed(() => {

@@ -477,6 +477,10 @@
     }
   ]);
 
+  const freqRange = [
+    50, 108, 136, 174, 350, 400, 470
+  ];
+
   const readChannel = async() => {
     if(appStore.connectState != true){alert('请先连接手台！'); return;};
     await eeprom_init(appStore.connectPort);
@@ -620,8 +624,7 @@
         let scanlist = 0;
         if(_channel.scanlist?.indexOf('I')  >= 0) scanlist += 8;
         if(_channel.scanlist?.indexOf('II') >= 0) scanlist += 4;
-        console.log((scanlist << 4) + 0)
-        rawEEPROM2.set([(scanlist << 4) + 0], i / 0x10)
+        rawEEPROM2.set([(scanlist << 4) + freqRange.indexOf(freqRange.reduce((i, e)=>{return e < _channel.rx ? e : i}))], i / 0x10)
 
         const mergedArray = new Uint8Array(0x10);
         mergedArray.set(stringToUint8Array(_channel.name ? toSimplified(_channel.name) : "", appStore.configuration?.charset).subarray(0, 0x10), 0);
