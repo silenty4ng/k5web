@@ -5,7 +5,7 @@
       <a-col :span="24">
         <a-card class="general-card">
           <template #title>
-            <span @click="()=>{state.showHide += 1}">备份/还原</span>
+            <span @click="()=>{state.showHide += 1}">备份/还原（手台应在开机状态下）</span>
           </template>
         <a-tabs default-active-key="1">
           <a-tab-pane key="1" title="快捷备份">

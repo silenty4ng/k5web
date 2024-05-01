@@ -3,7 +3,7 @@
     <Breadcrumb :items="['小工具', '固件升级']" />
     <a-row :gutter="20" align="stretch">
       <a-col :span="24">
-        <a-card class="general-card" title="固件升级">
+        <a-card class="general-card" title="固件升级（手台应在刷机模式下）">
           <a-space>
             <a-button @click="selectFile">{{ state.binaryFile ? state.binaryName : '选择固件' }}</a-button>
             <a-button type="primary" :disabled="!state.binaryFile" @click="flashIt">更新</a-button>

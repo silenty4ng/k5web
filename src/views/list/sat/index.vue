@@ -9,10 +9,10 @@
         上传经纬度信息将被服务器缓存十分钟
       </div>
     </a-modal>
-    <Breadcrumb :items="['小工具', '卫星写入']" />
+    <Breadcrumb :items="['小工具', '星历写入']" />
     <a-row :gutter="20" align="stretch">
       <a-col :span="24">
-        <a-card class="general-card" title="卫星写入">
+        <a-card class="general-card" title="星历写入（手台应在开机状态下）">
           <a-spin :loading="loading" style="width: 100%;" tip="正在处理 ...">
             <a-form-item :label-col-style="{ width: '25%' }" field="dt" label="浏览器时间" @click="()=>{state.showHide += 1}">
               {{ state.dt }}

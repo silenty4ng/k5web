@@ -4,7 +4,7 @@
     <a-row :gutter="20" align="stretch">
       <a-col :span="24">
         <a-spin :loading="state.loading" tip="写入中..." style="width: 100%;">
-          <a-card class="general-card" title="开机图片">
+          <a-card class="general-card" title="开机图片（手台应在开机状态下）">
             <a-row :gutter="20">
               <a-col :span="4" v-for="i in [
                 { name: '罗狮虎', url: '/img1.png'},

@@ -5,14 +5,24 @@
       <a-col :span="24">
         <a-card class="general-card">
           <template #title>
-            <span @click="()=>{state.showHide += 1}">字库写入</span>
+            <span @click="()=>{state.showHide += 1}">字库写入（手台应在开机状态下）</span>
           </template>
           <a-space>
-            <a-button @click="restore(1)">写入 117 字库</a-button>
-            <a-button @click="restore(2)">写入 118+ 字库</a-button>
-            <!-- <a-button @click="restore(3)">写入 118+ 字库（H）</a-button> -->
-            <a-button @click="restore(4)">写入拼音检索表（2Mbit EEPROM可用）</a-button>
-            <!-- <a-button v-show="state.showHide >= 5" @click="restore(5)">写入拼音检索表（测试）</a-button> -->
+            <t-card bordered>
+              <template #header>
+                117 版本 LOSEHU 固件写入
+              </template>
+              <a-button @click="restore(1)">写入 117 字库</a-button>
+            </t-card>
+            <t-card bordered>
+              <template #header>
+                LOSEHU H版固件需同时写入字库及索引表，K版只需写入字库。
+              </template>
+              <a-space>
+                <a-button @click="restore(2)">写入 118+ 字库</a-button>
+                <a-button @click="restore(4)">写入拼音检索表</a-button>
+              </a-space>
+            </t-card>
           </a-space>
           <a-divider />
           <div id="statusArea" style="height: 20em; background-color: azure; color: silver; overflow: auto; padding: 20px" v-html="state.status"></div>

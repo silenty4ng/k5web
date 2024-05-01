@@ -3,7 +3,7 @@
     <Breadcrumb :items="['小工具', '设置管理']" />
     <a-row :gutter="20" align="stretch">
       <a-col :span="24">
-        <a-card class="general-card" title="设置管理">
+        <a-card class="general-card" title="设置管理（手台应在开机状态下）">
           <a-row style="margin-bottom: 16px">
             <a-col :span="12">
               <a-space>

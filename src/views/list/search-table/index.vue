@@ -1,7 +1,10 @@
 <template>
   <div class="container">
     <Breadcrumb :items="['写频', '信道管理']" />
-    <a-card class="general-card" title="信道管理">
+    <a-card class="general-card">
+      <template #title>
+        <span @click="()=>{istate.showHide += 1}">信道管理（手台应在开机状态下）</span>
+      </template>
       <a-row style="margin-bottom: 16px">
         <a-col :span="12">
           <a-space>
@@ -21,9 +24,9 @@
         </a-col>
         <a-col :span="12" style="text-align: right;">
           <a-space>
-            <a-dropdown>
+            <a-dropdown v-if="istate.showHide >= 5">
               <a-button>
-                保存/加载（即将废弃）<icon-down />
+                保存/加载（已废弃）<icon-down />
               </a-button>
               <template #content>
                 <a-button style="width: 200px; margin: 10px; margin-bottom: 0px;" type="primary" @click="saveChannel">
@@ -146,6 +149,10 @@
     renderData: Array.from({length: 200}).map(e=>{return {scanlist: []}}),
     pageSize: 15,
     nowPage: 1,
+  })
+
+  const istate = reactive({
+    showHide: 0
   })
 
   const onDragSort = (params: any) => {
