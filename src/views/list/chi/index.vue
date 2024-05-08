@@ -10,16 +10,15 @@
           <a-space>
             <t-card bordered>
               <template #header>
-                117 版本 LOSEHU 固件写入
+                LOSEHU 固件字库写入
               </template>
-              <a-button @click="restore(1)">写入 117 字库</a-button>
+              <a-button @click="restore(1)">自动写入字库</a-button>
             </t-card>
             <t-card bordered>
               <template #header>
-                LOSEHU H版固件需同时写入字库及索引表，K版只需写入字库。
+                LOSEHU H 版固件拼音索引表
               </template>
               <a-space>
-                <a-button @click="restore(2)">写入 118+ 字库</a-button>
                 <a-button @click="restore(4)">写入拼音检索表</a-button>
               </a-space>
             </t-card>
@@ -65,61 +64,8 @@ const restore = async(type: any = 1) => {
     alert('固件版本不匹配');
     return;
   }
-  if((type == 1 && appStore.configuration?.charset != "losehu") || (type == 1 && appStore.configuration?.K != true)){
-    alert('固件版本不匹配');
-    return;
-  }
-  if(type == 2 && appStore.configuration?.charset != "gb2312"){
-    alert('固件版本不匹配');
-    return;
-  }
   state.status = state.status + "正在下载字库...<br />"
   let fontPacket = undefined
-  if(type == 1){
-    fontPacket = await fetch('/old_font.bin')
-    const reader = fontPacket.body.getReader();
-    const chunks = [];
-    while(true) {
-      const {done, value} = await reader.read();
-      if (done) {
-        break;
-      }
-      chunks.push(...value)
-    }
-    const binary = new Uint8Array(chunks)
-    await restoreRange(0x02000, binary)
-    return;
-  }
-  if(type == 2){
-    fontPacket = await fetch('/new_font_k.bin')
-    const reader = fontPacket.body.getReader();
-    const chunks = [];
-    while(true) {
-      const {done, value} = await reader.read();
-      if (done) {
-        break;
-      }
-      chunks.push(...value)
-    }
-    const binary = new Uint8Array(chunks)
-    await restoreRange(0x02480, binary)
-    return;
-  }
-  if(type == 3){
-    fontPacket = await fetch('/new_font_h.bin')
-    const reader = fontPacket.body.getReader();
-    const chunks = [];
-    while(true) {
-      const {done, value} = await reader.read();
-      if (done) {
-        break;
-      }
-      chunks.push(...value)
-    }
-    const binary = new Uint8Array(chunks)
-    await restoreRange(0x02480, binary)
-    return;
-  }
   if(type == 4){
     if(appStore.configuration?.newpinyin){
       fontPacket = await fetch('/pinyin_plus.bin')
@@ -138,6 +84,38 @@ const restore = async(type: any = 1) => {
     const binary = new Uint8Array(chunks)
     await restoreRange(0x20000, binary)
     return;
+  }
+  if(type == 1){
+    if(appStore.configuration?.charset == "losehu"){
+      fontPacket = await fetch('/old_font.bin')
+      const reader = fontPacket.body.getReader();
+      const chunks = [];
+      while(true) {
+        const {done, value} = await reader.read();
+        if (done) {
+          break;
+        }
+        chunks.push(...value)
+      }
+      const binary = new Uint8Array(chunks)
+      await restoreRange(0x02000, binary)
+      return;
+    }
+    if(appStore.configuration?.charset == "gb2312"){
+      fontPacket = await fetch('/new_font_k.bin')
+      const reader = fontPacket.body.getReader();
+      const chunks = [];
+      while(true) {
+        const {done, value} = await reader.read();
+        if (done) {
+          break;
+        }
+        chunks.push(...value)
+      }
+      const binary = new Uint8Array(chunks)
+      await restoreRange(0x02480, binary)
+      return;
+    }
   }
 }
 </script>
