@@ -36,10 +36,6 @@
               </a-col>
             </a-row>
             <t-pagination style="margin: 10px;" :total="6" showPageNumber :showPageSize="false" />
-            <a-tabs :active-key="state.activeKey" @change="(e)=>{state.activeKey = e}">
-              <a-tab-pane :key="1" title="LOSEHU 117"></a-tab-pane>
-              <a-tab-pane :key="2" title="LOSEHU 118+"></a-tab-pane>
-            </a-tabs>
             <div id="canvasDiv" style="zoom: 250%;"></div>
             <br>
             <a-space>
@@ -62,11 +58,9 @@ import { eeprom_write, eeprom_reboot, eeprom_init } from '@/utils/serial.js';
 const appStore = useAppStore();
 
 const state : {
-  activeKey: any,
   binaryFile: any,
   loading: boolean
 } = reactive({
-  activeKey: 1,
   binaryFile: undefined,
   loading: false
 })
@@ -197,17 +191,13 @@ const flashIt = async () => {
     alert('固件版本不匹配');
     return;
   }
-  if(state.activeKey == 2 && appStore.configuration?.charset != "gb2312"){
-    alert('固件版本不匹配');
-    return;
-  }
-  if(state.activeKey == 1 && appStore.configuration?.charset != "losehu"){
+  if(appStore.configuration?.charset != "losehu" && appStore.configuration?.charset != "gb2312"){
     alert('固件版本不匹配');
     return;
   }
   state.loading = true
   let position = 0x1E350;
-  if(state.activeKey == 2)position = 0x2080;
+  if(appStore.configuration?.charset == "gb2312")position = 0x2080;
   await eeprom_init(appStore.connectPort);
   const rawEEPROM = state.binaryFile;
   for (let i = position; i < rawEEPROM.length + position; i += 0x80) {

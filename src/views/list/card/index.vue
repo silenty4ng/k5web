@@ -30,12 +30,24 @@
                 <a-button type="text" @click="checkEeprom">自动检测</a-button>
               </a-space>
           </a-tab-pane>
+          <a-tab-pane key="3" title="清空数据">
+            <a-space>
+              <a-button type="primary" @click="showClearDialog">清空数据</a-button>
+            </a-space>
+          </a-tab-pane>
         </a-tabs>
         <a-divider />
         <div id="statusArea" style="height: 20em; background-color: azure; color: silver; overflow: auto; padding: 20px" v-html="state.status"></div>
         </a-card>
       </a-col>
     </a-row>
+    <t-dialog
+      v-model:visible="state.showDialog"
+      theme="warning"
+      :header="state.dialogTitle >= 3 ? '第 ' + state.dialogTitle + ' 次警告（最后警告）' : '第 ' + state.dialogTitle + ' 次警告'"
+      body="这将会清空 EEPROM 所有内容，包括配置及校准数据！！！"
+      @confirm="onClickConfirm"
+    />
   </div>
 </template>
 
@@ -50,12 +62,59 @@ const state = reactive({
   status: "点击备份按钮将生成 EEPROM 备份文件<br/><br/>",
   eepromType: "",
   showHide: 0,
-  startInfo: "0x00"
+  startInfo: "0x00",
+  showDialog: false,
+  dialogTitle: 1
 })
+
+const onClickConfirm = () => {
+  if(state.dialogTitle >= 3){
+    state.showDialog = false;
+    clearEEPROM();
+    return;
+  }
+  state.dialogTitle += 1;
+}
+
+const showClearDialog = () => {
+  state.dialogTitle = 1;
+  state.showDialog = true;
+}
 
 const checkEeprom = async () => {
   if(appStore.connectState != true){alert('请先连接手台！'); return;};
-  await check_eeprom();
+  const eepromSize = await check_eeprom(appStore.connectPort, appStore.configuration?.uart);
+  switch(eepromSize){
+    case 0x2000:
+      state.eepromType = "1";
+      break;
+    case 0x20000:
+      state.eepromType = "2";
+      break;
+    case 0x40000:
+      state.eepromType = "3";
+      break;
+    case 0x80000:
+      state.eepromType = "4";
+      break;
+    default:
+      break;
+  }
+}
+
+const clearEEPROM = async () => {
+  if(appStore.connectState != true){alert('请先连接手台！'); return;};
+  const eepromSize = await check_eeprom(appStore.connectPort, appStore.configuration?.uart);
+  let rawEEPROM = new Uint8Array(0x80);
+  for (let i = 0; i < eepromSize; i += 0x80) {
+    await eeprom_write(appStore.connectPort, i, rawEEPROM, 0x80, appStore.configuration?.uart);
+    state.status = state.status + "清空进度：" + (((i - 0) / eepromSize) * 100).toFixed(1) + "%<br/>";
+    nextTick(()=>{
+      const textarea = document?.getElementById('statusArea');
+      if(textarea)textarea.scrollTop = textarea?.scrollHeight;
+    })
+  }
+  await eeprom_reboot(appStore.connectPort);
 }
 
 const backupRange = async (start: any, end: any, name: any = new Date() + '_backup.bin') =>{

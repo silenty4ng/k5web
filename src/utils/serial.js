@@ -1110,9 +1110,62 @@ async function eeprom_reboot(port) {
     return true;
 }
 
-async function check_eeprom(port) {
-    alert('TODO')
-    return null;
+async function check_eeprom(port, protocol = "official") {
+    let eepromSize = 0;
+    const random = [
+      Math.round(Math.random() * 256),
+      Math.round(Math.random() * 256),
+      Math.round(Math.random() * 256),
+      Math.round(Math.random() * 256),
+      Math.round(Math.random() * 256),
+      Math.round(Math.random() * 256),
+      Math.round(Math.random() * 256),
+      Math.round(Math.random() * 256)
+    ]
+    await eeprom_init(port);
+    const rawEEPROM = new Uint8Array(random);
+    if(protocol == 'official'){
+      const bk1 = await eeprom_read(port, 0, 0x08, protocol);
+      await eeprom_write(port, 0, rawEEPROM, 0x08, protocol);
+      const check1 = await eeprom_read(port, 0, 0x08, protocol);
+      if(rawEEPROM.toString() == check1.toString()){
+        eepromSize = 0x2000
+      }
+      await eeprom_write(port, 0, bk1, 0x08, protocol);
+    }else{
+      const bk1 = await eeprom_read(port, 0, 0x08, protocol);
+      await eeprom_write(port, 0, rawEEPROM, 0x08, protocol);
+      const check1 = await eeprom_read(port, 0, 0x08, protocol);
+      if(rawEEPROM.toString() == check1.toString()){
+        eepromSize = 0x2000
+      }
+      await eeprom_write(port, 0, bk1, 0x08, protocol);
+
+      const bk2 = await eeprom_read(port, 0x1FFF8, 0x08, protocol);
+      await eeprom_write(port, 0x1FFF8, rawEEPROM, 0x08, protocol);
+      const check2 = await eeprom_read(port, 0x1FFF8, 0x08, protocol);
+      if(rawEEPROM.toString() == check2.toString()){
+        eepromSize = 0x20000
+      }
+      await eeprom_write(port, 0x1FFF8, bk2, 0x08, protocol);
+
+      const bk3 = await eeprom_read(port, 0x3FFF8, 0x08, protocol);
+      await eeprom_write(port, 0x3FFF8, rawEEPROM, 0x08, protocol);
+      const check3 = await eeprom_read(port, 0x3FFF8, 0x08, protocol);
+      if(rawEEPROM.toString() == check3.toString()){
+        eepromSize = 0x40000
+      }
+      await eeprom_write(port, 0x3FFF8, bk3, 0x08, protocol);
+
+      const bk4 = await eeprom_read(port, 0x7FFF8, 0x08, protocol);
+      await eeprom_write(port, 0x7FFF8, rawEEPROM, 0x08, protocol);
+      const check4 = await eeprom_read(port, 0x7FFF8, 0x08, protocol);
+      if(rawEEPROM.toString() == check4.toString()){
+        eepromSize = 0x80000
+      }
+      await eeprom_write(port, 0x7FFF8, bk4, 0x08, protocol);
+    }
+    return eepromSize;
 }
 
 function uint8ArrayToString(uint8Array, charset = "official") {
