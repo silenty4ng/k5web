@@ -3,7 +3,7 @@
     <router-view />
     <global-setting />
   </a-config-provider>
-  <t-sticky-tool
+  <!-- <t-sticky-tool
       :style="{ overflow: 'hidden' }"
       :offset="[-20, 140]"
     >
@@ -16,7 +16,7 @@
     <t-sticky-item label="打赏" :popup="renderShang" :popup-props="{ overlayInnerStyle: { margin: '10px', height: '450px' } }">
       <template #icon><fish-icon /></template>
     </t-sticky-item>
-  </t-sticky-tool>
+  </t-sticky-tool> -->
 </template>
 
 <script lang="ts" setup>

@@ -6,7 +6,7 @@
           :style="{ margin: 0, fontSize: '18px' }"
           :heading="5"
         >
-          K5Web 工具箱
+          K5Web
         </a-typography-title>
         <icon-menu-fold
           v-if="!topMenu && appStore.device === 'mobile'"
@@ -19,6 +19,9 @@
       <Menu v-if="topMenu" />
     </div>
     <ul class="right-side">
+      <li>
+        <t-link href="https://txc.qq.com/products/647342" target="_blank">问题反馈</t-link>
+      </li>
       <li>
         <a-button type="primary" @click="connectIt">{{ appStore.connectState ? '断开' : '连接' }}</a-button>
       </li>
