@@ -30,6 +30,8 @@ import localeSettings from './zh-CN/settings';
 
 export default {
   'menu.dashboard': '写频',
+  'menu.cps.channel': '信道管理',
+  'menu.cps.settings': '设置管理',
   'menu.server.dashboard': '仪表盘-服务端',
   'menu.server.workplace': '工作台-服务端',
   'menu.server.monitor': '实时监控-服务端',
@@ -44,6 +46,10 @@ export default {
   'menu.faq': '常见问题',
   'navbar.docs': '文档中心',
   'navbar.action.locale': '切换为中文',
+  'navbar.author': '作者：BD8DFN',
+  'navbar.connect': '连接',
+  'navbar.disconnect': '断开',
+  'navbar.qa': '问题反馈',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

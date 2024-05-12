@@ -20,10 +20,39 @@
     </div>
     <ul class="right-side">
       <li>
-        <t-link href="https://txc.qq.com/products/647342" target="_blank">问题反馈</t-link>
+        <t-link href="https://txc.qq.com/products/647342" target="_blank">{{ $t('navbar.qa') }}</t-link>
       </li>
       <li>
-        <a-button type="primary" @click="connectIt">{{ appStore.connectState ? '断开' : '连接' }}</a-button>
+        <a-button type="primary" @click="connectIt">{{ appStore.connectState ? $t('navbar.disconnect') : $t('navbar.connect') }}</a-button>
+      </li>
+      <li>
+        <a-tooltip :content="$t('settings.language')">
+          <a-button
+            class="nav-btn"
+            type="outline"
+            :shape="'circle'"
+            @click="setDropDownVisible"
+          >
+            <template #icon>
+              <icon-language />
+            </template>
+          </a-button>
+        </a-tooltip>
+        <a-dropdown trigger="click" @select="changeLocale as any">
+          <div ref="triggerBtn" class="trigger-btn"></div>
+          <template #content>
+            <a-doption
+              v-for="item in locales"
+              :key="item.value"
+              :value="item.value"
+            >
+              <template #icon>
+                <icon-check v-show="item.value === currentLocale" />
+              </template>
+              {{ item.label }}
+            </a-doption>
+          </template>
+        </a-dropdown>
       </li>
       <li>
         <a-tooltip

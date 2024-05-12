@@ -29,11 +29,13 @@ import localeUserSetting from '@/views/user/setting/locale/en-US';
 import localeSettings from './en-US/settings';
 
 export default {
-  'menu.dashboard': 'Dashboard',
+  'menu.dashboard': 'CPS',
+  'menu.cps.channel': 'Channel',
+  'menu.cps.settings': 'Settings',
   'menu.server.dashboard': 'Dashboard-Server',
   'menu.server.workplace': 'Workplace-Server',
   'menu.server.monitor': 'Monitor-Server',
-  'menu.list': 'List',
+  'menu.list': 'Tools',
   'menu.result': 'Result',
   'menu.exception': 'Exception',
   'menu.form': 'Form',
@@ -44,6 +46,10 @@ export default {
   'menu.faq': 'FAQ',
   'navbar.docs': 'Docs',
   'navbar.action.locale': 'Switch to English',
+  'navbar.author': 'Author: BD8DFN',
+  'navbar.connect': 'Connect',
+  'navbar.disconnect': 'Disconnect',
+  'navbar.qa': 'Feedback',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

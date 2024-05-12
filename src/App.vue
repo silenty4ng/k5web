@@ -23,6 +23,7 @@
   import { ChatIcon, QrcodeIcon, FishIcon } from 'tdesign-icons-vue-next';
   import { computed, h } from 'vue';
   import zhCN from '@arco-design/web-vue/es/locale/lang/zh-cn';
+  import enUS from '@arco-design/web-vue/es/locale/lang/en-us';
   import GlobalSetting from '@/components/global-setting/index.vue';
   import useLocale from '@/hooks/locale';
   import Aegis from 'aegis-web-sdk';
@@ -66,7 +67,7 @@
       case 'zh-CN':
         return zhCN;
       default:
-        return zhCN;
+        return enUS;
     }
   });
 </script>

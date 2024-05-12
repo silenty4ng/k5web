@@ -1,8 +1,8 @@
 export default {
   path: 'https://www.vicicode.com/',
-  name: '作者：BD8DFN',
+  name: 'BD8DFN',
   meta: {
-    locale: '作者：BD8DFN',
+    locale: 'navbar.author',
     requiresAuth: true,
     order: 8,
   },

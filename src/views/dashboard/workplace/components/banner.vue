@@ -2,15 +2,15 @@
   <a-col class="banner">
     <a-col>
       <a-typography-title :heading="5" style="margin-top: 0">
-        {{ appStore.connectState ? "欢迎你~，连接成功！" : "欢迎你~，点击右上角“连接”按钮连接手台。" }}
+        {{ appStore.connectState ? $t('workplace.welcomeSuc') : $t('workplace.welcome') }}
       </a-typography-title>
     </a-col>
     <a-divider class="panel-border" />
     <a-space>
-      <a-card v-show="appStore.connectState" :style="{ marginTop: '2em', marginBottom: '2em' }" title="手台信息">
-          当前固件版本：{{ appStore.firmwareVersion }} <br />
-          匹配写频配置：{{ appStore.configuration?.name }} <br />
-          存储大小：{{ state.eepromSize }} <a-button size="mini" type="primary" @click="checkEeprom">检测</a-button>
+      <a-card v-show="appStore.connectState" :style="{ marginTop: '2em', marginBottom: '2em' }" :title="$t('workplace.info')">
+          {{ $t('workplace.current') }}{{ appStore.firmwareVersion }} <br />
+          {{ $t('workplace.writeconfig') }}{{ appStore.configuration?.name }} <br />
+          {{ $t('workplace.eepromSize') }}{{ state.eepromSize }} <a-button size="mini" type="primary" @click="checkEeprom">{{ $t('workplace.checkIt') }}</a-button>
       </a-card>
     </a-space>
     <div>
@@ -23,11 +23,13 @@
   import { reactive } from 'vue';
   import { useAppStore } from '@/store';
   import { eeprom_write, eeprom_reboot, eeprom_init, eeprom_read } from '@/utils/serial.js';
+  import { useI18n } from 'vue-i18n';
+  const { t } = useI18n();
 
   const appStore = useAppStore();
 
   const state = reactive({
-    eepromSize: "点击检测按钮检测"
+    eepromSize: t('workplace.clickCheck')
   })
 
   const checkEeprom = async () => {

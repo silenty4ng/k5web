@@ -27,7 +27,7 @@ const DASHBOARD: AppRouteRecordRaw = {
       name: 'Channel',
       component: () => import('@/views/list/search-table/index.vue'),
       meta: {
-        locale: '信道管理',
+        locale: 'menu.cps.channel',
         requiresAuth: true,
         roles: ['*'],
       },
@@ -37,7 +37,7 @@ const DASHBOARD: AppRouteRecordRaw = {
       name: 'Settings',
       component: () => import('@/views/list/settings/index.vue'),
       meta: {
-        locale: '设置管理',
+        locale: 'menu.cps.settings',
         requiresAuth: true,
         roles: ['*'],
       },
