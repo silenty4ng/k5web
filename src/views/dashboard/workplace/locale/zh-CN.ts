@@ -8,6 +8,7 @@ export default {
   'workplace.eepromSize': '存储大小：',
   'workplace.clickCheck': '点击检测按钮检测',
   'workplace.checkIt': '检测',
+  'workplace.unk': '未知、故障、不可用',
   'workplace.balance': '余额（元）',
   'workplace.order.pending': '待支付',
   'workplace.order.pendingRenewal': '待续费订单',

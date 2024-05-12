@@ -1,25 +1,25 @@
 <template>
   <div class="container">
-    <Breadcrumb :items="['小工具', '字库写入']" />
+    <Breadcrumb :items="[$t('menu.list'), $t('menu.font')]" />
     <a-row :gutter="20" align="stretch">
       <a-col :span="24">
         <a-card class="general-card">
           <template #title>
-            <span @click="()=>{state.showHide += 1}">字库写入（手台应在开机状态下）</span>
+            <span @click="()=>{state.showHide += 1}">{{ $t('menu.font') + $t('global.onStart') }}</span>
           </template>
           <a-space>
             <t-card bordered>
               <template #header>
-                LOSEHU 固件字库写入
+                {{ $t('tool.fontwrite') }}
               </template>
-              <a-button @click="restore(1)">自动写入字库</a-button>
+              <a-button @click="restore(1)">{{ $t('tool.writefontwrite') }}</a-button>
             </t-card>
             <t-card bordered>
               <template #header>
-                LOSEHU H 版固件拼音索引表
+                {{ $t('tool.pinyinwrite') }}
               </template>
               <a-space>
-                <a-button @click="restore(4)">写入拼音检索表</a-button>
+                <a-button @click="restore(4)">{{ $t('tool.writepinyin') }}</a-button>
               </a-space>
             </t-card>
           </a-space>
@@ -59,9 +59,9 @@ const restoreRange = async (start: any = 0, uint8Array: any) => {
 }
 
 const restore = async(type: any = 1) => {
-  if(appStore.connectState != true){alert('请先连接手台！'); return;};
+  if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
   if(appStore.configuration?.uart == "official"){
-    alert('固件版本不匹配');
+    alert(sessionStorage.getItem('noticeVersionNoSupport'));
     return;
   }
   state.status = state.status + "正在下载字库...<br />"

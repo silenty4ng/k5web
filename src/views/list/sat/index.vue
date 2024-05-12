@@ -1,20 +1,20 @@
 <template>
   <div class="container">
-    <a-modal v-model:visible="state.visible" @ok="handleOk" ok-text="已扫码上传">
+    <a-modal v-model:visible="state.visible" @ok="handleOk" ok-text="Scanned and uploaded">
       <template #title>
-        手机扫码获取经纬度
+        {{ $t('tool.scanqr') }}
       </template>
       <div style="text-align: center;">
         <img :src="state.qrcode" /><br>
-        上传经纬度信息将被服务器缓存十分钟
+        {{ $t('tool.scannotice') }}
       </div>
     </a-modal>
-    <Breadcrumb :items="['小工具', '星历写入']" />
+    <Breadcrumb :items="[$t('menu.list'), $t('menu.satellite')]" />
     <a-row :gutter="20" align="stretch">
       <a-col :span="24">
-        <a-card class="general-card" title="星历写入（手台应在开机状态下）">
+        <a-card class="general-card" :title="$t('menu.satellite') + $t('global.onStart')">
           <a-spin :loading="loading" style="width: 100%;" tip="正在处理 ...">
-            <a-form-item :label-col-style="{ width: '25%' }" field="dt" label="浏览器时间" @click="()=>{state.showHide += 1}">
+            <a-form-item :label-col-style="{ width: '25%' }" field="dt" :label="$t('tool.brtime')" @click="()=>{state.showHide += 1}">
               {{ state.dt }}
             </a-form-item>
             <a-form-item v-show="state.showHide >= 5" :label-col-style="{ width: '25%' }" field="dtCustom" label="自定义时间">
@@ -29,28 +29,28 @@
               &nbsp;&nbsp;<t-button size="small" theme="success" @click="writeTime">写入时间到台站</t-button>
               </div>
             </a-form-item>
-            <a-form-item :label-col-style="{ width: '25%' }" field="sat" label="选择卫星">
-              <a-select v-model="state.sat" @change="changeSat" placeholder="选择卫星 ..." allow-search allow-clear>
+            <a-form-item :label-col-style="{ width: '25%' }" field="sat" :label="$t('tool.selectSatellite')">
+              <a-select v-model="state.sat" @change="changeSat" :placeholder="$t('tool.selectSatellite') + '...'" allow-search allow-clear>
                 <a-option v-for="item in state.satData" :key="item.name" :value="item.name">{{ item.name }}</a-option>
               </a-select>
             </a-form-item>
-            <a-form-item :label-col-style="{ width: '25%' }" field="lng" label="台站经度">
+            <a-form-item :label-col-style="{ width: '25%' }" field="lng" :label="$t('tool.longitude')">
               <a-input-number :precision="6" v-model="state.lng" />
             </a-form-item>
-            <a-form-item :label-col-style="{ width: '25%' }" field="lat" label="台站纬度">
+            <a-form-item :label-col-style="{ width: '25%' }" field="lat" :label="$t('tool.latitude')">
               <a-input-number :precision="6" v-model="state.lat" />
             </a-form-item>
-            <a-form-item :label-col-style="{ width: '25%' }" field="alt" label="台站海拔">
+            <a-form-item :label-col-style="{ width: '25%' }" field="alt" :label="$t('tool.altitude')">
               <a-input-number :precision="0" v-model="state.alt" />
             </a-form-item>
             <a-form-item :label-col-style="{ width: '25%' }" label="">
               <a-space>
-                <a-button @click="getLocation">浏览器获取经纬度</a-button>
-                <a-button @click="scanLocation">手机扫码获取经纬度</a-button>
-                <a-button @click="getPass">获取卫星过境时间</a-button>
+                <a-button @click="getLocation">{{ $t('tool.brlonlat') }}</a-button>
+                <a-button @click="scanLocation">{{ $t('tool.phonelonlat') }}</a-button>
+                <a-button @click="getPass">{{ $t('tool.satpasstime') }}</a-button>
               </a-space>
             </a-form-item>
-            <a-form-item :label-col-style="{ width: '25%' }" field="pass" label="选择过境时间">
+            <a-form-item :label-col-style="{ width: '25%' }" field="pass" :label="$t('tool.selectPassTime')">
               <a-select v-model="state.pass" allow-search allow-clear>
                 <a-option v-for="item in state.passOption" :key="item[0] + '|' + item[1]"
                   :value="item[0] + '|' + item[1]">{{ item[0] + " - " + item[1] }}</a-option>
@@ -65,26 +65,26 @@
                 v-model="state.passCustom"
               />
             </a-form-item>
-            <a-form-item :label-col-style="{ width: '25%' }" field="tx" label="上行频率">
+            <a-form-item :label-col-style="{ width: '25%' }" field="tx" :label="$t('tool.txFreq')">
               <a-input-number :precision="5" v-model="state.tx" />
             </a-form-item>
-            <a-form-item :label-col-style="{ width: '25%' }" field="txTone" label="上行亚音">
+            <a-form-item :label-col-style="{ width: '25%' }" field="txTone" :label="$t('tool.txTone')">
               <a-select v-model="state.txTone" allow-search allow-clear>
-                <a-option :value="0">关闭</a-option>
+                <a-option :value="0">{{ $t('tool.off') }}</a-option>
                 <a-option v-for="item in state.CTCSSOption" :key="item" :value="item">{{ item.toFixed(1) }}</a-option>
               </a-select>
             </a-form-item>
-            <a-form-item :label-col-style="{ width: '25%' }" field="rx" label="下行频率">
+            <a-form-item :label-col-style="{ width: '25%' }" field="rx" :label="$t('tool.rxFreq')">
               <a-input-number :precision="5" v-model="state.rx" />
             </a-form-item>
-            <a-form-item :label-col-style="{ width: '25%' }" field="rxTone" label="下行亚音">
+            <a-form-item :label-col-style="{ width: '25%' }" field="rxTone" :label="$t('tool.rxTone')">
               <a-select v-model="state.rxTone" allow-search allow-clear>
-                <a-option :value="0">关闭</a-option>
+                <a-option :value="0">{{ $t('tool.off') }}</a-option>
                 <a-option v-for="item in state.CTCSSOption" :key="item" :value="item">{{ item.toFixed(1) }}</a-option>
               </a-select>
             </a-form-item>
             <a-form-item :label-col-style="{ width: '25%' }" label="">
-              <a-button @click="writeIt">写入数据</a-button>
+              <a-button @click="writeIt">{{ $t('tool.writeData') }}</a-button>
             </a-form-item>
             <a-divider />
             <div id="statusArea"
@@ -177,7 +177,7 @@ onUnmounted(()=>{
 })
 
 const writeTime = async () => {
-  if (appStore.connectState != true) { alert('请先连接手台！'); return; };
+  if (appStore.connectState != true) { alert(sessionStorage.getItem('noticeConnectK5')); return; };
   setLoading(true)
   await eeprom_init(appStore.connectPort);
   await syncTime();
@@ -345,9 +345,9 @@ const getPass = async () => {
 }
 
 const writeIt = async () => {
-  if (appStore.connectState != true) { alert('请先连接手台！'); return; };
+  if (appStore.connectState != true) { alert(sessionStorage.getItem('noticeConnectK5')); return; };
   if(appStore.configuration?.sat != true){
-    alert('固件版本不匹配');
+    alert(sessionStorage.getItem('noticeVersionNoSupport'));
     return;
   }
   if (!state.sat) { alert('请选择卫星！'); return; };

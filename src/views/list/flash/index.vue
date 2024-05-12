@@ -1,12 +1,12 @@
 <template>
   <div class="container">
-    <Breadcrumb :items="['小工具', '固件升级']" />
+    <Breadcrumb :items="[$t('menu.list'), $t('menu.flash')]" />
     <a-row :gutter="20" align="stretch">
       <a-col :span="24">
-        <a-card class="general-card" title="固件升级（手台应在刷机模式下）">
+        <a-card class="general-card" :title="$t('menu.flash') + $t('global.onBoot')">
           <a-space>
-            <a-button @click="selectFile">{{ state.binaryFile ? state.binaryName : '选择固件' }}</a-button>
-            <a-button type="primary" :disabled="!state.binaryFile" @click="flashIt">更新</a-button>
+            <a-button @click="selectFile">{{ state.binaryFile ? state.binaryName : $t('tool.selectFirmware') }}</a-button>
+            <a-button type="primary" :disabled="!state.binaryFile" @click="flashIt">{{ $t('tool.flash') }}</a-button>
           </a-space>
           <a-divider />
           <div id="statusArea" style="height: 20em; background-color: azure; color: silver; overflow: auto; padding: 20px"

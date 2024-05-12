@@ -8,6 +8,7 @@ export default {
   'workplace.eepromSize': 'EEPROM Size: ',
   'workplace.clickCheck': 'Click the TEST button to test',
   'workplace.checkIt': 'TEST',
+  'workplace.unk': 'Unknown / Faulty / Unavailable',
   'workplace.balance': 'Balance (CNY)',
   'workplace.order.pending': 'Pending',
   'workplace.order.pendingRenewal': 'Renewal Order',

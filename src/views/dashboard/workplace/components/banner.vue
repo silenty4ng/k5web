@@ -33,7 +33,7 @@
   })
 
   const checkEeprom = async () => {
-    let eepromSize = '未知、故障、不可用';
+    let eepromSize = t('workplace.unk');
     const random = [
       Math.round(Math.random() * 256),
       Math.round(Math.random() * 256),
@@ -51,7 +51,7 @@
       await eeprom_write(appStore.connectPort, 0, rawEEPROM, 0x08, appStore.configuration?.uart);
       const check1 = await eeprom_read(appStore.connectPort, 0, 0x08, appStore.configuration?.uart);
       if(rawEEPROM.toString() == check1.toString()){
-        eepromSize = '8KB（64Kbit）'
+        eepromSize = t('global.8kb')
       }
       await eeprom_write(appStore.connectPort, 0, bk1, 0x08, appStore.configuration?.uart);
     }else{
@@ -59,7 +59,7 @@
       await eeprom_write(appStore.connectPort, 0, rawEEPROM, 0x08, appStore.configuration?.uart);
       const check1 = await eeprom_read(appStore.connectPort, 0, 0x08, appStore.configuration?.uart);
       if(rawEEPROM.toString() == check1.toString()){
-        eepromSize = '8KB（64Kbit）'
+        eepromSize = t('global.8kb')
       }
       await eeprom_write(appStore.connectPort, 0, bk1, 0x08, appStore.configuration?.uart);
 
@@ -67,7 +67,7 @@
       await eeprom_write(appStore.connectPort, 0x1FFF8, rawEEPROM, 0x08, appStore.configuration?.uart);
       const check2 = await eeprom_read(appStore.connectPort, 0x1FFF8, 0x08, appStore.configuration?.uart);
       if(rawEEPROM.toString() == check2.toString()){
-        eepromSize = '128KB（1Mbit）'
+        eepromSize = t('global.128kb')
       }
       await eeprom_write(appStore.connectPort, 0x1FFF8, bk2, 0x08, appStore.configuration?.uart);
 
@@ -75,7 +75,7 @@
       await eeprom_write(appStore.connectPort, 0x3FFF8, rawEEPROM, 0x08, appStore.configuration?.uart);
       const check3 = await eeprom_read(appStore.connectPort, 0x3FFF8, 0x08, appStore.configuration?.uart);
       if(rawEEPROM.toString() == check3.toString()){
-        eepromSize = '256KB（2Mbit）'
+        eepromSize = t('global.256kb')
       }
       await eeprom_write(appStore.connectPort, 0x3FFF8, bk3, 0x08, appStore.configuration?.uart);
 
@@ -83,7 +83,7 @@
       await eeprom_write(appStore.connectPort, 0x7FFF8, rawEEPROM, 0x08, appStore.configuration?.uart);
       const check4 = await eeprom_read(appStore.connectPort, 0x7FFF8, 0x08, appStore.configuration?.uart);
       if(rawEEPROM.toString() == check4.toString()){
-        eepromSize = '512KB（4Mbit）'
+        eepromSize = t('global.512kb')
       }
       await eeprom_write(appStore.connectPort, 0x7FFF8, bk4, 0x08, appStore.configuration?.uart);
     }

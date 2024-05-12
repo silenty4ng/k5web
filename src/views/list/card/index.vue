@@ -1,38 +1,38 @@
 <template>
   <div class="container">
-    <Breadcrumb :items="['小工具', '备份/还原']" />
+    <Breadcrumb :items="[$t('menu.list'), $t('menu.rb')]" />
     <a-row :gutter="20" align="stretch">
       <a-col :span="24">
         <a-card class="general-card">
           <template #title>
-            <span @click="()=>{state.showHide += 1}">备份/还原（手台应在开机状态下）</span>
+            <span @click="()=>{state.showHide += 1}">{{ $t('menu.rb') + $t('global.onStart') }}</span>
           </template>
         <a-tabs default-active-key="1">
-          <a-tab-pane key="1" title="快捷备份">
+          <a-tab-pane key="1" :title="$t('tool.quickbackup')">
             <a-space>
-              <a-button type="primary" @click="backupConfig">备份配置</a-button>
-              <a-button @click="restoreConfig">恢复配置</a-button>
-              <a-button type="primary" @click="backupCalibration">备份校准</a-button>
-              <a-button @click="restoreCalibration">恢复校准</a-button>
+              <a-button type="primary" @click="backupConfig">{{ $t('tool.backupConfig') }}</a-button>
+              <a-button @click="restoreConfig">{{ $t('tool.restoreConfig') }}</a-button>
+              <a-button type="primary" @click="backupCalibration">{{ $t('tool.backupCalibration') }}</a-button>
+              <a-button @click="restoreCalibration">{{ $t('tool.restoreCalibration') }}</a-button>
             </a-space>
           </a-tab-pane>
-          <a-tab-pane key="2" title="完整备份">
+          <a-tab-pane key="2" :title="$t('tool.fullbackup')">
               <a-space>
-                <a-button type="primary" @click="backup">备份</a-button>
+                <a-button type="primary" @click="backup">{{ $t('tool.backup') }}</a-button>
                 <a-input v-show="state.showHide >= 5" v-model="state.startInfo" />
-                <a-button @click="restore">恢复</a-button>
-                <a-select v-model="state.eepromType" :style="{width:'320px'}" placeholder="选择EEPROM大小">
-                  <a-option value="1">8KB（64Kbit）</a-option>
-                  <a-option value="2">128KB（1Mbit）</a-option>
-                  <a-option value="3">256KB（2Mbit）</a-option>
-                  <a-option value="4">512KB（4Mbit）</a-option>
+                <a-button @click="restore">{{ $t('tool.restore') }}</a-button>
+                <a-select v-model="state.eepromType" :style="{width:'320px'}" :placeholder="$t('tool.selectSize')">
+                  <a-option value="1">{{ $t('global.8kb') }}</a-option>
+                  <a-option value="2">{{ $t('global.128kb') }}</a-option>
+                  <a-option value="3">{{ $t('global.256kb') }}</a-option>
+                  <a-option value="4">{{ $t('global.512kb') }}</a-option>
                 </a-select>
-                <a-button type="text" @click="checkEeprom">自动检测</a-button>
+                <a-button type="text" @click="checkEeprom">{{ $t('tool.autocheck') }}</a-button>
               </a-space>
           </a-tab-pane>
-          <a-tab-pane key="3" title="清空数据">
+          <a-tab-pane key="3" :title="$t('tool.cleardata')">
             <a-space>
-              <a-button type="primary" @click="showClearDialog">清空数据</a-button>
+              <a-button type="primary" @click="showClearDialog">{{ $t('tool.cleardata') }}</a-button>
             </a-space>
           </a-tab-pane>
         </a-tabs>
@@ -44,8 +44,8 @@
     <t-dialog
       v-model:visible="state.showDialog"
       theme="warning"
-      :header="state.dialogTitle >= 3 ? '第 ' + state.dialogTitle + ' 次警告（最后警告）' : '第 ' + state.dialogTitle + ' 次警告'"
-      body="这将会清空 EEPROM 所有内容，包括配置及校准数据！！！"
+      :header="state.dialogTitle >= 3 ? $t('tool.first') + state.dialogTitle + $t('tool.firstTitle') + $t('tool.last') : $t('tool.first') + state.dialogTitle + $t('tool.firstTitle')"
+      :body="$t('tool.clearMessage')"
       @confirm="onClickConfirm"
     />
   </div>
@@ -82,7 +82,7 @@ const showClearDialog = () => {
 }
 
 const checkEeprom = async () => {
-  if(appStore.connectState != true){alert('请先连接手台！'); return;};
+  if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
   const eepromSize = await check_eeprom(appStore.connectPort, appStore.configuration?.uart);
   switch(eepromSize){
     case 0x2000:
@@ -103,7 +103,7 @@ const checkEeprom = async () => {
 }
 
 const clearEEPROM = async () => {
-  if(appStore.connectState != true){alert('请先连接手台！'); return;};
+  if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
   const eepromSize = await check_eeprom(appStore.connectPort, appStore.configuration?.uart);
   let rawEEPROM = new Uint8Array(0x80);
   for (let i = 0; i < eepromSize; i += 0x80) {
@@ -168,25 +168,25 @@ const restoreRange = async (start: any = 0) => {
 }
 
 const backupConfig = async() => {
-  if(appStore.connectState != true){alert('请先连接手台！'); return;};
+  if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
   await backupRange(0, 0x1E00, 'config.bin')
 }
 const backupCalibration = async() => {
-  if(appStore.connectState != true){alert('请先连接手台！'); return;};
+  if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
   await backupRange(0x1E00, 0x2000, 'calibration.bin')
 }
 
 const restoreConfig = async() =>{
-  if(appStore.connectState != true){alert('请先连接手台！'); return;};
+  if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
   await restoreRange()
 }
 const restoreCalibration = async() =>{
-  if(appStore.connectState != true){alert('请先连接手台！'); return;};
+  if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
   await restoreRange(0x1E00)
 }
 
 const backup = async() => {
-  if(appStore.connectState != true){alert('请先连接手台！'); return;};
+  if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
   let _max = 0x2000;
   switch(state.eepromType){
     case "1":
@@ -212,7 +212,7 @@ const backup = async() => {
 }
 
 const restore = async() => {
-  if(appStore.connectState != true){alert('请先连接手台！'); return;};
+  if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
   await restoreRange(parseInt(state.startInfo))
 }
 </script>

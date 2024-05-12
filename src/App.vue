@@ -1,29 +1,18 @@
 <template>
-  <a-config-provider :locale="locale">
-    <router-view />
-    <global-setting />
-  </a-config-provider>
-  <!-- <t-sticky-tool
-      :style="{ overflow: 'hidden' }"
-      :offset="[-20, 140]"
-    >
-    <t-sticky-item label="问题反馈" :popup="renderQa" :popup-props="{ overlayInnerStyle: { margin: '10px', height: '450px' } }">
-      <template #icon><chat-icon /></template>
-    </t-sticky-item>
-    <t-sticky-item label="扫码红包" :popup="renderPopup" :popup-props="{ overlayInnerStyle: { margin: '10px', height: '450px' } }">
-      <template #icon><qrcode-icon /></template>
-    </t-sticky-item>
-    <t-sticky-item label="打赏" :popup="renderShang" :popup-props="{ overlayInnerStyle: { margin: '10px', height: '450px' } }">
-      <template #icon><fish-icon /></template>
-    </t-sticky-item>
-  </t-sticky-tool> -->
+  <t-config-provider v-if="reloadLang" :global-config="locale">
+    <a-config-provider :locale="locale">
+      <router-view />
+      <global-setting />
+    </a-config-provider>
+  </t-config-provider>
 </template>
 
 <script lang="ts" setup>
-  import { ChatIcon, QrcodeIcon, FishIcon } from 'tdesign-icons-vue-next';
-  import { computed, h } from 'vue';
+  import { computed, h, ref } from 'vue';
   import zhCN from '@arco-design/web-vue/es/locale/lang/zh-cn';
+  import tdesignZhCN from 'tdesign-vue-next/esm/locale/zh_CN';
   import enUS from '@arco-design/web-vue/es/locale/lang/en-us';
+  import tdesignEnUS from 'tdesign-vue-next/esm/locale/en_US';
   import GlobalSetting from '@/components/global-setting/index.vue';
   import useLocale from '@/hooks/locale';
   import Aegis from 'aegis-web-sdk';
@@ -62,12 +51,26 @@
   }
 
   const { currentLocale } = useLocale();
+
+  const reloadLang = ref(true);
+
   const locale = computed(() => {
+    let lang = undefined;
+    reloadLang.value = false;
     switch (currentLocale.value) {
       case 'zh-CN':
-        return zhCN;
+        sessionStorage.setItem('noticeConnectK5', '请先连接手台！')
+        sessionStorage.setItem('noticeVersionNoSupport', '固件版本不匹配')
+        lang = {...zhCN, ...tdesignZhCN};
+        break;
       default:
-        return enUS;
+        sessionStorage.setItem('noticeConnectK5', 'Connect first!')
+        sessionStorage.setItem('noticeVersionNoSupport', 'Firmware not supported')
+        lang = {...enUS, ...tdesignEnUS};
     }
+    setTimeout(() => {
+      reloadLang.value = true;
+    }, 1000);
+    return lang;
   });
 </script>

@@ -1,26 +1,27 @@
 <template>
     <div class="container">
         <div style="background-color: #fff; padding: 10%;" v-show="state.type != 0">
-            请点击网页“已扫码上传”按钮
+            请点击网页“已扫码上传”按钮 <br>
+            Please click on the "Scanned and Uploaded" button on PC page.
         </div>
         <div style="background-color: #fff; padding: 10%;" v-show="state.type == 0">
             <p style="font-size: 1.5rem; font-weight: bold;">
-                获取信息
+                获取信息（Information）
             </p>
             <a-divider />
             <p>
-                台站经度：{{ state.lng }}
+                台站经度（Longitude）：{{ state.lng }}
             </p>
             <a-divider />
             <p>
-                台站纬度：{{ state.lat }}
+                台站纬度（Latitude）：{{ state.lat }}
             </p>
             <a-divider />
             <p>
-                台站海拔：{{ state.alt }}
+                台站海拔（Altitude）：{{ state.alt }}
             </p>
             <a-divider />
-            <a-button type="primary" @click="upload">上传</a-button>
+            <a-button type="primary" @click="upload">上传（Upload）</a-button>
         </div>
     </div>
 </template>

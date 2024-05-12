@@ -1,10 +1,10 @@
 <template>
   <div class="container">
-    <Breadcrumb :items="['小工具', '开机图片']" />
+    <Breadcrumb :items="[$t('menu.list'), $t('menu.image')]" />
     <a-row :gutter="20" align="stretch">
       <a-col :span="24">
         <a-spin :loading="state.loading" tip="写入中..." style="width: 100%;">
-          <a-card class="general-card" title="开机图片（手台应在开机状态下）">
+          <a-card class="general-card" :title="$t('menu.image') + $t('global.onStart')">
             <a-row :gutter="20">
               <a-col :span="4" v-for="i in [
                 { name: '罗狮虎', url: '/img1.png'},
@@ -39,8 +39,8 @@
             <div id="canvasDiv" style="zoom: 250%;"></div>
             <br>
             <a-space>
-              <a-button @click="selectFile">选择图片</a-button>
-              <a-button type="primary" :disabled="!state.binaryFile" @click="flashIt">写入</a-button>
+              <a-button @click="selectFile">{{ $t('tool.selectImage') }}</a-button>
+              <a-button type="primary" :disabled="!state.binaryFile" @click="flashIt">{{ $t('tool.write') }}</a-button>
             </a-space>
           </a-card>
         </a-spin>
@@ -186,13 +186,13 @@ const selectFile = () => {
 }
 
 const flashIt = async () => {
-  if(appStore.connectState != true){alert('请先连接手台！'); return;};
+  if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
   if(appStore.configuration?.uart == "official"){
-    alert('固件版本不匹配');
+    alert(sessionStorage.getItem('noticeVersionNoSupport'));
     return;
   }
   if(appStore.configuration?.charset != "losehu" && appStore.configuration?.charset != "gb2312"){
-    alert('固件版本不匹配');
+    alert(sessionStorage.getItem('noticeVersionNoSupport'));
     return;
   }
   state.loading = true

@@ -1,9 +1,9 @@
 <template>
   <div class="container">
-    <Breadcrumb :items="['小工具', '设置管理']" />
+    <Breadcrumb :items="[$t('menu.dashboard'), $t('menu.cps.settings')]" />
     <a-row :gutter="20" align="stretch">
       <a-col :span="24">
-        <a-card class="general-card" title="设置管理（手台应在开机状态下）">
+        <a-card class="general-card" :title="$t('menu.cps.settings') + $t('global.onStart')">
           <a-row style="margin-bottom: 16px">
             <a-col :span="12">
               <a-space>
@@ -11,35 +11,35 @@
                   <template #icon>
                     <icon-plus />
                   </template>
-                  从设备读取
+                  {{ $t('cps.onDeviceRead') }}
                 </a-button>
                 <a-button @click="writeChannel">
                   <template #icon>
                     <icon-plus />
                   </template>
-                  写入设备
+                  {{ $t('cps.onDeviceWrite') }}
                 </a-button>
               </a-space>
             </a-col>
-            <a-col :span="12" style="text-align: right;">
+            <!-- <a-col :span="12" style="text-align: right;">
               <a-space>
                 <a-button type="primary" @click="saveChannel">
-                  保存
+                  {{ $t('cps.save') }}
                 </a-button>
                 <a-button @click="restoreChannel">
-                  加载
+                  {{ $t('cps.load') }}
                 </a-button>
               </a-space>
-            </a-col>
+            </a-col> -->
           </a-row>
           <a-spin :loading="loading" style="width: 100%;">
-            <a-form-item :label-col-style="{width: '25%'}" field="logo_line1" label="启动画面首行文字">
+            <a-form-item :label-col-style="{width: '25%'}" field="logo_line1" :label="$t('cps.line1')">
               <a-input v-model="state.logo_line1" />
             </a-form-item>
-            <a-form-item :label-col-style="{width: '25%'}" field="logo_line2" label="启动画面次行文字">
+            <a-form-item :label-col-style="{width: '25%'}" field="logo_line2" :label="$t('cps.line2')">
               <a-input v-model="state.logo_line2" />
             </a-form-item>
-            <a-form-item :label-col-style="{width: '25%'}" field="logo_line2" label="本地播放首尾音（仅117P6）">
+            <a-form-item :label-col-style="{width: '25%'}" field="logo_line2" :label="$t('cps.mdclocplay')">
               <a-switch v-model="state.mdc_audio_local" type="round"/>
             </a-form-item>
           </a-spin>
@@ -65,7 +65,7 @@ const state = reactive({
 })
 
 const readChannel = async() => {
-  if(appStore.connectState != true){alert('请先连接手台！'); return;};
+  if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
   await eeprom_init(appStore.connectPort);
   setLoading(true)
   if(appStore.configuration?.charset == "losehu"){
@@ -95,7 +95,7 @@ const readChannel = async() => {
 }
 
 const writeChannel = async() => {
-  if(appStore.connectState != true){alert('请先连接手台！'); return;};
+  if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
   setLoading(true)
   await eeprom_init(appStore.connectPort);
   if(appStore.configuration?.charset == "losehu"){

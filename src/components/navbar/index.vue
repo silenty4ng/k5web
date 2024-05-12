@@ -110,6 +110,8 @@
   import useUser from '@/hooks/user';
   import Menu from '@/components/menu/index.vue';
   import { connect, disconnect, eeprom_init } from '@/utils/serial.js';
+  import { useI18n } from 'vue-i18n';
+  const { t } = useI18n();
   const drivers = import.meta.glob('@/drivers/*.json', { eager: true });
 
   const appStore = useAppStore();
@@ -194,7 +196,7 @@
       }
 
       if(!_connect){
-        alert('连接失败');
+        alert(t('global.connectFail'));  
         return;
       }
       appStore.updateSettings({ connectPort: _connect });

@@ -17,7 +17,7 @@ const LIST: AppRouteRecordRaw = {
       name: 'Backup',
       component: () => import('@/views/list/card/index.vue'),
       meta: {
-        locale: '备份/还原',
+        locale: 'menu.rb',
         requiresAuth: true,
         roles: ['*'],
       },
@@ -27,7 +27,7 @@ const LIST: AppRouteRecordRaw = {
       name: 'Flash',
       component: () => import('@/views/list/flash/index.vue'),
       meta: {
-        locale: '固件升级',
+        locale: 'menu.flash',
         requiresAuth: true,
         roles: ['*'],
       },
@@ -37,7 +37,7 @@ const LIST: AppRouteRecordRaw = {
       name: 'Image',
       component: () => import('@/views/list/image/index.vue'),
       meta: {
-        locale: '开机图片',
+        locale: 'menu.image',
         requiresAuth: true,
         roles: ['*'],
       },
@@ -47,7 +47,7 @@ const LIST: AppRouteRecordRaw = {
       name: 'Chi',
       component: () => import('@/views/list/chi/index.vue'),
       meta: {
-        locale: '字库写入',
+        locale: 'menu.font',
         requiresAuth: true,
         roles: ['*'],
       },
@@ -57,7 +57,7 @@ const LIST: AppRouteRecordRaw = {
       name: 'Sat',
       component: () => import('@/views/list/sat/index.vue'),
       meta: {
-        locale: '星历写入',
+        locale: 'menu.satellite',
         requiresAuth: true,
         roles: ['*'],
       },

@@ -1,9 +1,9 @@
 <template>
   <div class="container">
-    <Breadcrumb :items="['写频', '信道管理']" />
+    <Breadcrumb :items="[$t('menu.dashboard'), $t('menu.cps.channel')]" />
     <a-card class="general-card">
       <template #title>
-        <span @click="()=>{istate.showHide += 1}">信道管理（手台应在开机状态下）</span>
+        <span @click="()=>{istate.showHide += 1}">{{ $t('menu.cps.channel') + $t('global.onStart') }}</span>
       </template>
       <a-row style="margin-bottom: 16px">
         <a-col :span="12">
@@ -12,13 +12,13 @@
               <template #icon>
                 <icon-plus />
               </template>
-              从设备读取
+              {{ $t('cps.onDeviceRead') }}
             </a-button>
             <a-button @click="writeChannel">
               <template #icon>
                 <icon-plus />
               </template>
-              写入设备
+              {{ $t('cps.onDeviceWrite') }}
             </a-button>
           </a-space>
         </a-col>
@@ -39,13 +39,13 @@
               </template>
             </a-dropdown>
             <a-button type="text" @click="downloadExcelTemplate">
-              下载导入模板
+              {{ $t('cps.downloadImportTemplate') }}
             </a-button>
             <a-button type="primary" @click="restoreExcelChannel">
-              导入
+              {{ $t('cps.import') }}
             </a-button>
             <a-button @click="saveExcelChannel">
-              导出
+              {{ $t('cps.export') }}
             </a-button>
           </a-space>
         </a-col>
@@ -94,7 +94,7 @@
           </t-checkbox-group>
         </template>
         <template #operate="{ row, rowIndex }">
-          <t-button theme="default" variant="dashed" @click="clearRow((cstate.nowPage - 1) * cstate.pageSize + rowIndex)">清空</t-button>
+          <t-button theme="default" variant="dashed" @click="clearRow((cstate.nowPage - 1) * cstate.pageSize + rowIndex)">{{ $t('cps.clear') }}</t-button>
         </template>
       </t-table>
     </a-card>
@@ -110,6 +110,8 @@
   import { MoveIcon } from 'tdesign-icons-vue-next';
   import { toSimplified } from 'chinese-simple2traditional';
   import { read as xlsxRead, writeFile as xlsxWrite, utils as xlsxUtils } from "xlsx";
+  import { useI18n } from 'vue-i18n';
+  const { t } = useI18n();
 
   const appStore = useAppStore();
 
@@ -162,7 +164,7 @@
   const columns = computed(() => [
     {
       colKey: 'drag', // 列拖拽排序必要参数
-      title: '排序',
+      title: t('cps.sort'),
       width: 46,
     },
     {
@@ -172,7 +174,7 @@
       width: 100
     },
     {
-      title: '信道名称',
+      title: t('cps.name'),
       colKey: 'name',
       width: 250,
       align: 'left',
@@ -189,7 +191,7 @@
       },
     },
     {
-      title: '带宽',
+      title: t('cps.bandwidth'),
       colKey: 'bandwidth',
       align: 'left',
       width: 150,
@@ -208,7 +210,7 @@
       },
     },
     {
-      title: '接收频率',
+      title: t('cps.rx'),
       colKey: 'rx',
       align: 'left',
       width: 200,
@@ -227,7 +229,7 @@
       },
     },
     {
-      title: '发送频率',
+      title: t('cps.tx'),
       colKey: 'tx',
       align: 'left',
       width: 200,
@@ -246,7 +248,7 @@
       },
     },
     {
-      title: '发送功率',
+      title: t('cps.power'),
       colKey: 'power',
       align: 'left',
       width: 150,
@@ -265,7 +267,7 @@
       },
     },
     {
-      title: '接收亚音类型',
+      title: t('cps.rxToneType'),
       colKey: 'rxTone',
       align: 'left',
       width: 180,
@@ -284,7 +286,7 @@
       },
     },
     {
-      title: '接收亚音频（Hz）',
+      title: t('cps.rxToneCTCSS'),
       colKey: 'rxCTCSS',
       align: 'left',
       width: 150,
@@ -303,7 +305,7 @@
       },
     },
     {
-      title: '接收亚音数码',
+      title: t('cps.rxToneDCS'),
       colKey: 'rxDCS',
       align: 'left',
       width: 150,
@@ -322,7 +324,7 @@
       },
     },
     {
-      title: '发送亚音类型',
+      title: t('cps.txToneType'),
       colKey: 'txTone',
       align: 'left',
       width: 180,
@@ -341,7 +343,7 @@
       },
     },
     {
-      title: '发送亚音频（Hz）',
+      title: t('cps.txToneCTCSS'),
       colKey: 'txCTCSS',
       align: 'left',
       width: 150,
@@ -360,7 +362,7 @@
       },
     },
     {
-      title: '发送亚音数码',
+      title: t('cps.txToneDCS'),
       colKey: 'txDCS',
       align: 'left',
       width: 150,
@@ -379,7 +381,7 @@
       },
     },
     {
-      title: '频率步进',
+      title: t('cps.step'),
       colKey: 'step',
       align: 'left',
       width: 150,
@@ -398,13 +400,13 @@
       },
     },
     {
-      title: '倒频',
+      title: t('cps.reverse'),
       colKey: 'reverse',
       align: 'left',
       width: 150
     },
     {
-      title: '加密',
+      title: t('cps.scramb'),
       colKey: 'scramb',
       align: 'left',
       width: 150,
@@ -422,13 +424,13 @@
       },
     },
     {
-      title: '繁忙禁发',
+      title: t('cps.busy'),
       colKey: 'busy',
       align: 'left',
       width: 150
     },
     {
-      title: '信令码',
+      title: t('cps.pttid'),
       colKey: 'pttid',
       align: 'left',
       width: 150,
@@ -446,7 +448,7 @@
       },
     },
     {
-      title: '信道模式',
+      title: t('cps.mode'),
       colKey: 'mode',
       align: 'left',
       width: 150,
@@ -465,19 +467,19 @@
       },
     },
     {
-      title: 'DTMF解码',
+      title: t('cps.dtmf'),
       colKey: 'dtmf',
       align: 'left',
       width: 150
     },
     {
-      title: '扫描列表',
+      title: t('cps.scanlist'),
       colKey: 'scanlist',
       align: 'left',
       width: 150
     },
     {
-      title: '操作',
+      title: t('cps.operate'),
       colKey: 'operate',
       align: 'left',
       width: 150
@@ -489,7 +491,7 @@
   ];
 
   const readChannel = async() => {
-    if(appStore.connectState != true){alert('请先连接手台！'); return;};
+    if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
     await eeprom_init(appStore.connectPort);
     setLoading(true)
     let rawEEPROM  = new Uint8Array(0x0C80);
@@ -563,7 +565,7 @@
     setLoading(false)
   }
   const writeChannel = async() =>{
-    if(appStore.connectState != true){alert('请先连接手台！'); return;};
+    if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
     await eeprom_init(appStore.connectPort);
     setLoading(true)
     let rawEEPROM  = new Uint8Array(0x0C80);
