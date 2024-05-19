@@ -29,6 +29,7 @@
           mask-closable
           :closable="false"
           @cancel="drawerCancel"
+          title="K5Web"
         >
           <Menu />
         </a-drawer>

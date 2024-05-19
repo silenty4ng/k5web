@@ -6,7 +6,7 @@
           :style="{ margin: 0, fontSize: '18px' }"
           :heading="5"
         >
-          K5Web
+          {{ !topMenu && appStore.device === 'mobile' ? '' : 'K5Web' }}
         </a-typography-title>
         <icon-menu-fold
           v-if="!topMenu && appStore.device === 'mobile'"
@@ -19,83 +19,143 @@
       <Menu v-if="topMenu" />
     </div>
     <ul class="right-side">
-      <li>
-        <t-link href="https://txc.qq.com/products/647342" target="_blank">{{ $t('navbar.qa') }}</t-link>
-      </li>
-      <li>
-        <a-button type="primary" @click="connectIt">{{ appStore.connectState ? $t('navbar.disconnect') : $t('navbar.connect') }}</a-button>
-      </li>
-      <li>
-        <a-tooltip :content="$t('settings.language')">
-          <a-button
-            class="nav-btn"
-            type="outline"
-            :shape="'circle'"
-            @click="setDropDownVisible"
-          >
-            <template #icon>
-              <icon-language />
-            </template>
-          </a-button>
-        </a-tooltip>
-        <a-dropdown trigger="click" @select="changeLocale as any">
-          <div ref="triggerBtn" class="trigger-btn"></div>
-          <template #content>
-            <a-doption
-              v-for="item in locales"
-              :key="item.value"
-              :value="item.value"
+      <template v-if="!topMenu && appStore.device === 'mobile'">
+        <li>
+          <t-link href="https://txc.qq.com/products/647342" target="_blank">{{ $t('navbar.qa') }}</t-link>
+        </li>
+        <li>
+          <a-button type="primary" @click="connectIt">{{ appStore.connectState ? $t('navbar.disconnect') : $t('navbar.connect') }}</a-button>
+        </li>
+        <li>
+          <a-tooltip :content="$t('settings.language')">
+            <a-button
+              class="nav-btn"
+              type="outline"
+              :shape="'circle'"
+              @click="setDropDownVisible"
             >
               <template #icon>
-                <icon-check v-show="item.value === currentLocale" />
+                <icon-language />
               </template>
-              {{ item.label }}
-            </a-doption>
-          </template>
-        </a-dropdown>
-      </li>
-      <li>
-        <a-tooltip
-          :content="
-            theme === 'light'
-              ? $t('settings.navbar.theme.toDark')
-              : $t('settings.navbar.theme.toLight')
-          "
-        >
-          <a-button
-            class="nav-btn"
-            type="outline"
-            :shape="'circle'"
-            @click="handleToggleTheme"
-          >
-            <template #icon>
-              <icon-moon-fill v-if="theme === 'dark'" />
-              <icon-sun-fill v-else />
+            </a-button>
+          </a-tooltip>
+          <a-dropdown trigger="click" @select="changeLocale as any">
+            <div ref="triggerBtn" class="trigger-btn"></div>
+            <template #content>
+              <a-doption
+                v-for="item in locales"
+                :key="item.value"
+                :value="item.value"
+              >
+                <template #icon>
+                  <icon-check v-show="item.value === currentLocale" />
+                </template>
+                {{ item.label }}
+              </a-doption>
             </template>
-          </a-button>
-        </a-tooltip>
-      </li>
-      <li>
-        <a-tooltip
-          :content="
-            isFullscreen
-              ? $t('settings.navbar.screen.toExit')
-              : $t('settings.navbar.screen.toFull')
-          "
-        >
-          <a-button
-            class="nav-btn"
-            type="outline"
-            :shape="'circle'"
-            @click="toggleFullScreen"
+          </a-dropdown>
+        </li>
+        <li>
+          <a-tooltip
+            :content="
+              theme === 'light'
+                ? $t('settings.navbar.theme.toDark')
+                : $t('settings.navbar.theme.toLight')
+            "
           >
-            <template #icon>
-              <icon-fullscreen-exit v-if="isFullscreen" />
-              <icon-fullscreen v-else />
+            <a-button
+              class="nav-btn"
+              type="outline"
+              :shape="'circle'"
+              @click="handleToggleTheme"
+            >
+              <template #icon>
+                <icon-moon-fill v-if="theme === 'dark'" />
+                <icon-sun-fill v-else />
+              </template>
+            </a-button>
+          </a-tooltip>
+        </li>
+      </template>
+      <template v-else="appStore.device === 'mobile'">
+        <li>
+          <t-link href="https://txc.qq.com/products/647342" target="_blank">{{ $t('navbar.qa') }}</t-link>
+        </li>
+        <li>
+          <a-button type="primary" @click="connectIt">{{ appStore.connectState ? $t('navbar.disconnect') : $t('navbar.connect') }}</a-button>
+        </li>
+        <li>
+          <a-tooltip :content="$t('settings.language')">
+            <a-button
+              class="nav-btn"
+              type="outline"
+              :shape="'circle'"
+              @click="setDropDownVisible"
+            >
+              <template #icon>
+                <icon-language />
+              </template>
+            </a-button>
+          </a-tooltip>
+          <a-dropdown trigger="click" @select="changeLocale as any">
+            <div ref="triggerBtn" class="trigger-btn"></div>
+            <template #content>
+              <a-doption
+                v-for="item in locales"
+                :key="item.value"
+                :value="item.value"
+              >
+                <template #icon>
+                  <icon-check v-show="item.value === currentLocale" />
+                </template>
+                {{ item.label }}
+              </a-doption>
             </template>
-          </a-button>
-        </a-tooltip>
-      </li>
+          </a-dropdown>
+        </li>
+        <li>
+          <a-tooltip
+            :content="
+              theme === 'light'
+                ? $t('settings.navbar.theme.toDark')
+                : $t('settings.navbar.theme.toLight')
+            "
+          >
+            <a-button
+              class="nav-btn"
+              type="outline"
+              :shape="'circle'"
+              @click="handleToggleTheme"
+            >
+              <template #icon>
+                <icon-moon-fill v-if="theme === 'dark'" />
+                <icon-sun-fill v-else />
+              </template>
+            </a-button>
+          </a-tooltip>
+        </li>
+        <li>
+          <a-tooltip
+            :content="
+              isFullscreen
+                ? $t('settings.navbar.screen.toExit')
+                : $t('settings.navbar.screen.toFull')
+            "
+          >
+            <a-button
+              class="nav-btn"
+              type="outline"
+              :shape="'circle'"
+              @click="toggleFullScreen"
+            >
+              <template #icon>
+                <icon-fullscreen-exit v-if="isFullscreen" />
+                <icon-fullscreen v-else />
+              </template>
+            </a-button>
+          </a-tooltip>
+        </li>
+      </template>
     </ul>
   </div>
 </template>
