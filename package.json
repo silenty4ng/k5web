@@ -21,7 +21,7 @@
     "@zxing/text-encoding": "^0.9.0",
     "aegis-web-sdk": "^1.39.1",
     "axios": "^0.24.0",
-    "chinese-simple2traditional": "^2.1.0",
+    "chinese-s2t": "^1.0.0",
     "dayjs": "^1.11.5",
     "echarts": "^5.4.0",
     "electron-squirrel-startup": "^1.0.0",

@@ -108,7 +108,7 @@
   import { eeprom_read, uint8ArrayToHexReverseString, uint8ArrayToString, hexReverseStringToUint8Array, stringToUint8Array, eeprom_write, eeprom_reboot, eeprom_init } from '@/utils/serial.js';
   import { useAppStore } from '@/store';
   import { MoveIcon } from 'tdesign-icons-vue-next';
-  import { toSimplified } from 'chinese-simple2traditional';
+  import Chinese from 'chinese-s2t';
   import { read as xlsxRead, writeFile as xlsxWrite, utils as xlsxUtils } from "xlsx";
   import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
@@ -636,7 +636,7 @@
         rawEEPROM2.set([(scanlist << 4) + freqRange.indexOf(freqRange.reduce((i, e)=>{return e < _channel.rx ? e : i}))], i / 0x10)
 
         const mergedArray = new Uint8Array(0x10);
-        mergedArray.set(stringToUint8Array(_channel.name ? toSimplified(_channel.name) : "", appStore.configuration?.charset).subarray(0, 0x10), 0);
+        mergedArray.set(stringToUint8Array(_channel.name ? Chinese.t2s(_channel.name) : "", appStore.configuration?.charset).subarray(0, 0x10), 0);
         rawEEPROM3.set(mergedArray, i)
       }else{
         rawEEPROM.set(hexReverseStringToUint8Array("ffffffffffffffffffffffffffffffff"), i)
