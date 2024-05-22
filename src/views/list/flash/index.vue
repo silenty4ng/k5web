@@ -18,7 +18,8 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, nextTick } from 'vue';
+import { reactive, nextTick, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { useAppStore } from '@/store';
 import { disconnect, connect, readPacket, sendPacket, unpackVersion, unpack, flash_generateCommand } from '@/utils/serial.js';
 
@@ -32,6 +33,28 @@ const state : {
   status: "点击更新按钮更新固件到设备<br/><br/>",
   binaryFile: undefined,
   binaryName: ''
+})
+
+const route = useRoute();
+
+onMounted(async ()=>{
+  if(route.query.url){
+    const packet = await fetch(route.query.url)
+    const reader = packet?.body?.getReader();
+    if(reader){
+      const chunks = [];
+      while(true) {
+        const {done, value} = await reader.read();
+        if (done) {
+          break;
+        }
+        chunks.push(...value)
+      }
+      const binary = new Uint8Array(chunks)
+      state.binaryFile = binary
+      state.binaryName = route.query.url.substring(route.query.url.lastIndexOf('/') + 1)
+    }
+  }
 })
 
 const selectFile = () => {

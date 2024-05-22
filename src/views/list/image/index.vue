@@ -5,37 +5,6 @@
       <a-col :span="24">
         <a-spin :loading="state.loading" tip="写入中..." style="width: 100%;">
           <a-card class="general-card" :title="$t('menu.image') + $t('global.onStart')">
-            <a-row :gutter="20">
-              <a-col :span="4" v-for="i in [
-                { name: '罗狮虎', url: '/img1.png'},
-                { name: '离线小恐龙', url: '/img2.png'},
-                { name: '不忘初心牢记使命', url: '/img3.png'},
-                { name: '为人民服务', url: '/img4.png'},
-                { name: '严禁收听敌台广播', url: '/img5.png'},
-                { name: '爱因斯坦', url: '/img6.png'}
-              ]">
-                <t-card :style="{ width: '100%' }">
-                  <template #cover>
-                    <img :title="i.name" :src="i.url">
-                  </template>
-                  <template #footer>
-                    <t-row :align="'middle'" justify="center" style="gap: 24px">
-                      <t-col flex="auto" style="display: inline-flex; justify-content: center">
-                        <t-button variant="text" shape="square" @click="upImg(i)">
-                          <thumb-up-icon />
-                        </t-button>
-                      </t-col>
-                      <t-col flex="auto" style="display: inline-flex; justify-content: center">
-                        <t-button variant="text" shape="square" @click="useImg(i)">
-                          <check-double-icon />
-                        </t-button>
-                      </t-col>
-                    </t-row>
-                  </template>
-                </t-card>
-              </a-col>
-            </a-row>
-            <t-pagination style="margin: 10px;" :total="6" showPageNumber :showPageSize="false" />
             <div id="canvasDiv" style="zoom: 250%;"></div>
             <br>
             <a-space>
@@ -50,8 +19,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ThumbUpIcon, CheckDoubleIcon } from 'tdesign-icons-vue-next';
-import { reactive, nextTick } from 'vue';
+import { reactive, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { useAppStore } from '@/store';
 import { eeprom_write, eeprom_reboot, eeprom_init } from '@/utils/serial.js';
 
@@ -65,11 +34,15 @@ const state : {
   loading: false
 })
 
-const upImg = (i:any) => {
-  alert('图片工坊即将推出');
-}
+const route = useRoute();
 
-const useImg = (i:any) => {
+onMounted(()=>{
+  if(route.query.url){
+    useImg(route.query.url)
+  }
+})
+
+const useImg = (url: string) => {
     const canvas = document.createElement("canvas");
     canvas.width = 128;
     canvas.height = 64;
@@ -78,7 +51,7 @@ const useImg = (i:any) => {
     canvasDiv.innerHTML = "";
     canvasDiv?.append(canvas, canvas2);
     const img = new Image()
-    img.src = i.url;
+    img.src = url;
     img.onload = () => {
       const ctx = canvas.getContext('2d');
       ctx?.drawImage(img, 0, 0, 128, 64);
