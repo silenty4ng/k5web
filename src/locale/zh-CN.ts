@@ -139,6 +139,8 @@ export default {
   'menu.workshop': '创意工坊',
   'menu.firmware': '固件市场',
   'global.use': '使用',
+  'tool.ssbpatch': 'LOSEHU S 版固件 SI4732 单边带补丁',
+  'tool.writessbpatch': '写入单边带补丁',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

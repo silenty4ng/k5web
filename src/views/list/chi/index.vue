@@ -22,6 +22,14 @@
                 <a-button @click="restore(4)">{{ $t('tool.writepinyin') }}</a-button>
               </a-space>
             </t-card>
+            <t-card bordered>
+              <template #header>
+                {{ $t('tool.ssbpatch') }}
+              </template>
+              <a-space>
+                <a-button @click="restore(5)">{{ $t('tool.writessbpatch') }}</a-button>
+              </a-space>
+            </t-card>
           </a-space>
           <a-divider />
           <div id="statusArea" style="height: 20em; background-color: azure; color: silver; overflow: auto; padding: 20px" v-html="state.status"></div>
@@ -34,7 +42,7 @@
 <script lang="ts" setup>
 import { reactive, nextTick } from 'vue';
 import { useAppStore } from '@/store';
-import { eeprom_write, eeprom_reboot, eeprom_init } from '@/utils/serial.js';
+import { eeprom_write, eeprom_reboot, eeprom_init, check_eeprom } from '@/utils/serial.js';
 
 const appStore = useAppStore();
 
@@ -83,6 +91,26 @@ const restore = async(type: any = 1) => {
     }
     const binary = new Uint8Array(chunks)
     await restoreRange(0x20000, binary)
+    return;
+  }
+  if(type == 5){
+    const eepromSize = await check_eeprom(appStore.connectPort, appStore.configuration?.uart);
+    if(eepromSize != 0x40000 && eepromSize != 0x40000){
+      state.status = state.status + "只支持 2Mbit 以上 EEPROM 写入<br/>";
+      return
+    }
+    fontPacket = await fetch('/ssb.bin')
+    const reader = fontPacket.body.getReader();
+    const chunks = [];
+    while(true) {
+      const {done, value} = await reader.read();
+      if (done) {
+        break;
+      }
+      chunks.push(...value)
+    }
+    const binary = new Uint8Array(chunks)
+    await restoreRange(0x3C228, binary)
     return;
   }
   if(type == 1){

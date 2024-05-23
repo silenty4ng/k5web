@@ -139,6 +139,8 @@ export default {
   'menu.workshop': 'Workshop',
   'menu.firmware': 'Firmware',
   'global.use': 'Use',
+  'tool.ssbpatch': 'LOSEHU S Firmware SI4732 SSB Patch',
+  'tool.writessbpatch': 'SSB Patch Write',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

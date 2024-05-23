@@ -5,11 +5,18 @@
       <a-col :span="24">
         <a-spin :loading="state.loading" tip="写入中..." style="width: 100%;">
           <a-card class="general-card" :title="$t('menu.image') + $t('global.onStart')">
-            <div id="canvasDiv" style="zoom: 250%;"></div>
+            <div id="canvasDiv" style="zoom: 250%; display: none"></div>
+            <div>
+              <table style="padding: 0; margin: 0; border-spacing: 0">
+                <tr v-for="col, y in state.matrix">
+                  <td @mousedown="state.mousedown = true; changePixel(x, y)" @mouseup="state.mousedown = false;" @mouseover="changePixel(x, y)" v-for="row, x in col" :style="'background-color: ' + row + '; height: 5px; width: 3.5px;'"></td>
+                </tr>
+              </table>
+            </div>
             <br>
             <a-space>
               <a-button @click="selectFile">{{ $t('tool.selectImage') }}</a-button>
-              <a-button type="primary" :disabled="!state.binaryFile" @click="flashIt">{{ $t('tool.write') }}</a-button>
+              <a-button type="primary" :disabled="state.matrix.length < 64" @click="flashIt">{{ $t('tool.write') }}</a-button>
             </a-space>
           </a-card>
         </a-spin>
@@ -28,10 +35,14 @@ const appStore = useAppStore();
 
 const state : {
   binaryFile: any,
-  loading: boolean
+  loading: boolean,
+  matrix: any,
+  mousedown: boolean
 } = reactive({
   binaryFile: undefined,
-  loading: false
+  loading: false,
+  matrix: [],
+  mousedown: false
 })
 
 const route = useRoute();
@@ -41,6 +52,14 @@ onMounted(()=>{
     useImg(route.query.url)
   }
 })
+
+const changePixel = (x: int, y: int) => {
+  if(state.mousedown){
+    const matrix = state.matrix
+    matrix[y][x] = state.matrix[y][x] == '#fff' ? '#000' : '#fff'
+    state.matrix = matrix
+  }
+}
 
 const useImg = (url: string) => {
     const canvas = document.createElement("canvas");
@@ -62,37 +81,18 @@ const useImg = (url: string) => {
           return imageData[i] + imageData[i + 1] + imageData[i + 2] > 128 * 3 ? 0 : 1;
       }
 
-      const ctx2 = canvas2.getContext('2d');
-      const imageData2 = ctx2.getImageData(0, 0, canvas2.width, canvas2.height);
+      const matrix = [];
+
       for (let y = 0; y < 64; y++) {
+          matrix.push([])
+          matrix[y] = []
           for (let x = 0; x < 128; x++) {
-              const index = y * 128 + x;
-              const i = index * 4;
               const pixel = !getPixel(x, y);
-              imageData2.data[i] = pixel * 255;
-              imageData2.data[i + 1] = pixel * 255;
-              imageData2.data[i + 2] = pixel * 255;
-              imageData2.data[i + 3] = 255;
-          }
-      }
-      ctx2.putImageData(imageData2, 0, 0);
-
-      const outputArray = new Uint8Array(1024);
-      // getPixel(i) outputs the pixel value for any x y coordinate. 0 = black, 1 = white.
-      // the outputArray is 1024 bytes, where each byte is 8 pixels IN VERTICAL ORDER.
-
-      let i = 0;
-      for (let y = 0; y < 64; y += 8) {
-          for (let x = 0; x < 128; x++) {
-              let byte = 0;
-              for (let i = 0; i < 8; i++) {
-                  byte |= getPixel(x, y + i) << i;
-              }
-              outputArray[i++] = byte;
+              matrix[y][x] = pixel ? '#fff' : '#000';
           }
       }
 
-      state.binaryFile = outputArray;
+      state.matrix = matrix
     }
 }
 
@@ -121,44 +121,41 @@ const selectFile = () => {
           const i = index * 4;
           return imageData[i] + imageData[i + 1] + imageData[i + 2] > 128 * 3 ? 0 : 1;
       }
+      
+      const matrix = [];
 
-      const ctx2 = canvas2.getContext('2d');
-      const imageData2 = ctx2.getImageData(0, 0, canvas2.width, canvas2.height);
       for (let y = 0; y < 64; y++) {
+          matrix.push([])
+          matrix[y] = []
           for (let x = 0; x < 128; x++) {
-              const index = y * 128 + x;
-              const i = index * 4;
               const pixel = !getPixel(x, y);
-              imageData2.data[i] = pixel * 255;
-              imageData2.data[i + 1] = pixel * 255;
-              imageData2.data[i + 2] = pixel * 255;
-              imageData2.data[i + 3] = 255;
-          }
-      }
-      ctx2.putImageData(imageData2, 0, 0);
-
-      const outputArray = new Uint8Array(1024);
-      // getPixel(i) outputs the pixel value for any x y coordinate. 0 = black, 1 = white.
-      // the outputArray is 1024 bytes, where each byte is 8 pixels IN VERTICAL ORDER.
-
-      let i = 0;
-      for (let y = 0; y < 64; y += 8) {
-          for (let x = 0; x < 128; x++) {
-              let byte = 0;
-              for (let i = 0; i < 8; i++) {
-                  byte |= getPixel(x, y + i) << i;
-              }
-              outputArray[i++] = byte;
+              matrix[y][x] = pixel ? '#fff' : '#000';
           }
       }
 
-      state.binaryFile = outputArray;
+      state.matrix = matrix
     }
   };
   input.click();
 }
 
 const flashIt = async () => {
+    const outputArray = new Uint8Array(1024);
+    // getPixel(i) outputs the pixel value for any x y coordinate. 0 = black, 1 = white.
+    // the outputArray is 1024 bytes, where each byte is 8 pixels IN VERTICAL ORDER.
+
+    let i = 0;
+    for (let y = 0; y < 64; y += 8) {
+        for (let x = 0; x < 128; x++) {
+            let byte = 0;
+            for (let i = 0; i < 8; i++) {
+              byte |= (state.matrix[y + i][x] == '#000' ? 1 : 0 ) << i;
+            }
+            outputArray[i++] = byte;
+        }
+    }
+
+    state.binaryFile = outputArray;
   if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
   if(appStore.configuration?.uart == "official"){
     alert(sessionStorage.getItem('noticeVersionNoSupport'));
