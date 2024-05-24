@@ -58,7 +58,7 @@ export default {
   'menu.flash': '固件升级',
   'menu.image': '开机图片',
   'menu.font': '字库写入',
-  'menu.satellite': '多普勒写入',
+  'menu.satellite': '星历写入',
   'global.onStart': '（手台应在开机状态下）',
   'global.onBoot': '（手台应在刷机模式下）',
   'cps.onDeviceRead': '从设备读取',
