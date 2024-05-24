@@ -28,6 +28,8 @@ const useUserStore = defineStore('user', {
     accountId: undefined,
     certification: undefined,
     role: '',
+    showLogin: false,
+    showRegister: false
   }),
 
   getters: {

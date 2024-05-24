@@ -1,5 +1,75 @@
 <template>
   <a-layout class="layout" :class="{ mobile: appStore.hideMenu }">
+    <t-dialog
+      v-model:visible="userStore.showLogin"
+      attach="body"
+      header="登录"
+      destroy-on-close
+      :footer="false"
+    >
+      <template #body>
+        <t-form ref="form" :data="formData" :colon="true" :label-width="0" @submit="onLogin">
+          <t-form-item name="account">
+            <t-input v-model="formData.account" clearable placeholder="请输入账户名">
+              <template #prefix-icon>
+                <desktop-icon />
+              </template>
+            </t-input>
+          </t-form-item>
+
+          <t-form-item name="password">
+            <t-input v-model="formData.password" type="password" clearable placeholder="请输入密码">
+              <template #prefix-icon>
+                <lock-on-icon />
+              </template>
+            </t-input>
+          </t-form-item>
+
+          <t-form-item>
+            <t-button theme="primary" type="submit" block>登录</t-button>
+          </t-form-item>
+        </t-form>
+      </template>
+    </t-dialog>
+    <t-dialog
+      v-model:visible="userStore.showRegister"
+      attach="body"
+      header="注册"
+      destroy-on-close
+      :footer="false"
+    >
+      <template #body>
+        <t-form ref="form" :data="formData" :colon="true" :label-width="0" @submit="onRegister">
+          <t-form-item name="account">
+            <t-input v-model="formData.account" clearable placeholder="请输入账户名">
+              <template #prefix-icon>
+                <desktop-icon />
+              </template>
+            </t-input>
+          </t-form-item>
+
+          <t-form-item name="password">
+            <t-input v-model="formData.password" type="password" clearable placeholder="请输入密码">
+              <template #prefix-icon>
+                <lock-on-icon />
+              </template>
+            </t-input>
+          </t-form-item>
+
+          <t-form-item name="password2">
+            <t-input v-model="formData.password2" type="password" clearable placeholder="请再次输入密码">
+              <template #prefix-icon>
+                <lock-on-icon />
+              </template>
+            </t-input>
+          </t-form-item>
+
+          <t-form-item>
+            <t-button theme="primary" type="submit" block>登录</t-button>
+          </t-form-item>
+        </t-form>
+      </template>
+    </t-dialog>
     <div v-if="navbar" class="layout-navbar">
       <NavBar />
     </div>
@@ -46,7 +116,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, computed, watch, provide, onMounted } from 'vue';
+  import { ref, computed, watch, provide, onMounted, reactive } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
   import { useAppStore, useUserStore } from '@/store';
   import NavBar from '@/components/navbar/index.vue';
@@ -56,6 +126,24 @@
   import usePermission from '@/hooks/permission';
   import useResponsive from '@/hooks/responsive';
   import PageLayout from './page-layout.vue';
+
+  const formData = reactive({
+    account: '',
+    password: '',
+    password2: ''
+  });
+
+  const onLogin = () => {
+    console.log(formData)
+    userStore.setInfo({
+      showLogin: false,
+      name: '开发中'
+    })
+  }
+
+  const onRegister = () => {
+    console.log(formData)
+  }
 
   const isInit = ref(false);
   const appStore = useAppStore();

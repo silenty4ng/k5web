@@ -16,4 +16,6 @@ export interface UserState {
   accountId?: string;
   certification?: number;
   role: RoleType;
+  showLogin: boolean;
+  showRegister: boolean;
 }

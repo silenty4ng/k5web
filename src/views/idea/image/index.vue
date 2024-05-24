@@ -4,14 +4,18 @@
       <a-row :gutter="20" align="stretch">
         <a-col :span="24">
             <a-card class="general-card" :title="$t('menu.image')">
-                <!-- <template #extra>
-                    <div style="margin-right: 20px;">
-                        <a-link>&nbsp;&nbsp;登录&nbsp;&nbsp;</a-link>
-                        <a-link>&nbsp;&nbsp;注册&nbsp;&nbsp;</a-link>
-                        <a-link>&nbsp;&nbsp;用户名&nbsp;&nbsp;</a-link>
-                        <a-link>&nbsp;&nbsp;退出&nbsp;&nbsp;</a-link>
-                    </div>
-                </template> -->
+              <template #extra>
+                  <div style="margin-right: 20px;">
+                      <template v-if="userStore.name">
+                        <a-link>&nbsp;&nbsp;{{ userStore.name }}&nbsp;&nbsp;</a-link>
+                        <a-link @click="userStore.logout()">&nbsp;&nbsp;退出&nbsp;&nbsp;</a-link>
+                      </template>
+                      <template v-else>
+                        <a-link @click="userStore.setInfo({ showLogin: true })">&nbsp;&nbsp;登录&nbsp;&nbsp;</a-link>
+                        <a-link @click="userStore.setInfo({ showRegister: true })">&nbsp;&nbsp;注册&nbsp;&nbsp;</a-link>
+                      </template>
+                  </div>
+              </template>
               <a-row :gutter="20">
                 <a-col :span="4" v-for="i in [
                   { name: '罗狮虎', url: '/img1.png'},
@@ -52,10 +56,11 @@
   <script lang="ts" setup>
   import { ThumbUpIcon, CheckDoubleIcon } from 'tdesign-icons-vue-next';
   import { reactive, nextTick } from 'vue';
-  import { useAppStore } from '@/store';
+  import { useAppStore, useUserStore } from '@/store';
   import { useRouter } from 'vue-router';
   
   const appStore = useAppStore();
+  const userStore = useUserStore();
   
   const router = useRouter()
 
