@@ -39,7 +39,7 @@
                   </t-card>
                 </a-col>
               </a-row>
-              <t-pagination @change="loadit" style="margin: 10px;" :total="state.total" :current="state.page" :pageSize="12" showPageNumber :showPageSize="false" />
+              <t-pagination @change="loadit" style="margin: 10px;" :total="state.total" :current="state.page" :pageSize="24" showPageNumber :showPageSize="false" />
             </a-card>
         </a-col>
       </a-row>
@@ -145,7 +145,7 @@
 
   const loadit = async (page: any) => {
     state.page = page.current
-    const resp : any = await axios.get("https://k5.vicicode.com/wsapi/list?type=1&limit=12&page=" + page.current + "&t=" + Date.now())
+    const resp : any = await axios.get("https://k5.vicicode.com/wsapi/list?type=1&limit=24&page=" + page.current + "&t=" + Date.now())
     state.total = resp.total
     state.nowpage = resp.data
   }
