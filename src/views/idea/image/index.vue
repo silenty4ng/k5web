@@ -39,7 +39,7 @@
                   </t-card>
                 </a-col>
               </a-row>
-              <t-pagination style="margin: 10px;" :total="6" showPageNumber :showPageSize="false" />
+              <t-pagination style="margin: 10px;" :total="state.total" :current="state.page" :pageSize="12" showPageNumber :showPageSize="false" />
             </a-card>
         </a-col>
       </a-row>
@@ -140,7 +140,7 @@
   })
 
   onMounted(async ()=>{
-    const resp : any = await axios.get("https://k5.vicicode.com/wsapi/list?type=1&page=" + state.page + "&t=" + Date.now())
+    const resp : any = await axios.get("https://k5.vicicode.com/wsapi/list?type=1&limit=12&page=" + state.page + "&t=" + Date.now())
     state.total = resp.total
     state.nowpage = resp.data
   })
@@ -207,7 +207,7 @@
 
   watch(state, async (n, o)=>{
     if(n.page != o.page){
-      const resp : any = await axios.get("https://k5.vicicode.com/wsapi/list?type=1&page=" + state.page + "&t=" + Date.now())
+      const resp : any = await axios.get("https://k5.vicicode.com/wsapi/list?type=1&limit=12&page=" + state.page + "&t=" + Date.now())
       state.total = resp.total
       state.nowpage = resp.data
     }
