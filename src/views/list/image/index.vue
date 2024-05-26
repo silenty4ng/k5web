@@ -47,9 +47,12 @@ const state : {
 
 const route = useRoute();
 
-onMounted(()=>{
+onMounted(async ()=>{
   if(route.query.url){
-    useImg(route.query.url)
+    const img = await fetch(route.query.url, {
+      responseType: 'blob'
+    });
+    useImg(window.URL.createObjectURL(await img.blob()))
   }
 })
 

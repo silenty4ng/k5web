@@ -8,67 +8,28 @@
                     <div style="margin-right: 20px;">
                         <template v-if="userStore.name">
                           <a-link @click="showPanel">&nbsp;&nbsp;{{ userStore.name }}&nbsp;&nbsp;</a-link>
-                          <a-link @click="userStore.logout()">&nbsp;&nbsp;退出&nbsp;&nbsp;</a-link>
+                          <a-link @click="userStore.logout()">&nbsp;&nbsp;{{ $t('global.logout') }}&nbsp;&nbsp;</a-link>
                         </template>
                         <template v-else>
-                          <a-link @click="userStore.setInfo({ showLogin: true })">&nbsp;&nbsp;登录&nbsp;&nbsp;</a-link>
-                          <a-link @click="userStore.setInfo({ showRegister: true })">&nbsp;&nbsp;注册&nbsp;&nbsp;</a-link>
+                          <a-link @click="userStore.setInfo({ showLogin: true })">&nbsp;&nbsp;{{ $t('global.login') }}&nbsp;&nbsp;</a-link>
+                          <a-link @click="userStore.setInfo({ showRegister: true })">&nbsp;&nbsp;{{ $t('global.register') }}&nbsp;&nbsp;</a-link>
                         </template>
                     </div>
                 </template>
                 <a-list>
-                    <a-list-item style="width: 100%;">
+                    <a-list-item style="width: 100%;" v-for="item in state.nowpage">
                         <a-list-item-meta
-                            title="LOSEHU126.bin"
-                            description="https://github.com/losehu/uv-k5-firmware-custom"
+                            :title="item.title"
+                            :description="item.desc"
                         >
                         </a-list-item-meta>
                         <template #actions>
-                            <a-link @click="useFirmware('/LOSEHU126.bin')">{{$t('global.use')}}</a-link>
-                        </template>
-                    </a-list-item>
-                    <a-list-item style="width: 100%;">
-                        <a-list-item-meta
-                            title="LOSEHU126K.bin"
-                            description="https://github.com/losehu/uv-k5-firmware-custom"
-                        >
-                        </a-list-item-meta>
-                        <template #actions>
-                            <a-link @click="useFirmware('/LOSEHU126K.bin')">{{$t('global.use')}}</a-link>
-                        </template>
-                    </a-list-item>
-                    <a-list-item style="width: 100%;">
-                        <a-list-item-meta
-                            title="LOSEHU126H.bin"
-                            description="https://github.com/losehu/uv-k5-firmware-custom"
-                        >
-                        </a-list-item-meta>
-                        <template #actions>
-                            <a-link @click="useFirmware('/LOSEHU126H.bin')">{{$t('global.use')}}</a-link>
-                        </template>
-                    </a-list-item>
-                    <a-list-item style="width: 100%;">
-                        <a-list-item-meta
-                            title="LOSEHU117P6（我基于 LOSEHU117 修改的固件）"
-                            description="https://github.com/silenty4ng/uv-k5-firmware-chinese-lts"
-                        >
-                        </a-list-item-meta>
-                        <template #actions>
-                            <a-link @click="useFirmware('/LOSEHU117P6.bin')">{{$t('global.use')}}</a-link>
-                        </template>
-                    </a-list-item>
-                    <a-list-item style="width: 100%;">
-                        <a-list-item-meta
-                            title="LOSEHU117P6K（我基于 LOSEHU117K 修改的固件）"
-                            description="https://github.com/silenty4ng/uv-k5-firmware-chinese-lts"
-                        >
-                        </a-list-item-meta>
-                        <template #actions>
-                            <a-link @click="useFirmware('/LOSEHU117P6K.bin')">{{$t('global.use')}}</a-link>
+                            <a-link @click="onStar(item.id)">👍</a-link>
+                            <a-link @click="useFirmware('https://k5.vicicode.com/wsapi/download?id=' + item.id)">{{$t('global.use')}}</a-link>
                         </template>
                     </a-list-item>
                 </a-list>
-                <t-pagination style="margin: 10px;" :total="5" showPageNumber :showPageSize="false" />
+                <t-pagination style="margin: 10px;" :total="state.total" :current="state.page" showPageNumber :showPageSize="false" />
             </a-card>
         </a-col>
       </a-row>
@@ -80,16 +41,16 @@
           </t-button>
         </div>
         <t-list :split="true">
-          <t-list-item v-for="item in 20">
+          <t-list-item v-for="item in state.myList">
             <div style="display: flex; width: 100%;">
               <div style="width: 90%;">
-                <t-tag theme="primary" variant="outline">审核中</t-tag>
-                固件名称
+                <t-tag theme="primary" variant="outline">{{ item.audit ? '已审核' : '审核中' }}</t-tag>
+                {{ item.title }}
                 <br>
-                固件描述固件描述固件描述固件描述固件描述固件描述固件描述固件描述固件描述固件描述固件描述固件描述固件描述固件描述固件描述固件描述固件描述固件描述固件描述
+                {{ item.desc }}
               </div>
               <div style="width: 10%; margin: auto; text-align: center;">
-                <t-link theme="primary" hover="color">删除</t-link>
+                <t-link theme="primary" hover="color" @click="onDT(item.id)">删除</t-link>
               </div>
             </div>
           </t-list-item>
@@ -111,7 +72,7 @@
           <t-form-item label="固件文件" name="firmware" label-align="top">
             <t-upload
               v-model="formData.firmware"
-              action="https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo"
+              action="https://k5.vicicode.com/wsapi/base64"
               :abridge-name="[8, 6]"
               theme="file-input"
               placeholder="未选择文件"
@@ -126,10 +87,12 @@
   </template>
   
   <script lang="ts" setup>
-  import { reactive, nextTick } from 'vue';
+  import { reactive, nextTick, onMounted, watch } from 'vue';
   import { useAppStore, useUserStore } from '@/store';
   import { useRouter } from 'vue-router';
   import { RefreshIcon } from 'tdesign-icons-vue-next';
+  import axios from 'axios';
+  import { Message } from '@arco-design/web-vue';
 
   const appStore = useAppStore();
   const userStore = useUserStore();
@@ -141,13 +104,21 @@
     loading: boolean,
     showPanel: boolean,
     showUpload: boolean,
-    refLoading: boolean
+    refLoading: boolean,
+    myList: any,
+    total: number,
+    page: number,
+    nowpage: any
   } = reactive({
     binaryFile: undefined,
     loading: false,
     showPanel: false,
     showUpload: false,
-    refLoading: false
+    refLoading: false,
+    myList: [],
+    total: 0,
+    page: 1,
+    nowpage: []
   })
 
   const formData = reactive({
@@ -156,8 +127,29 @@
     firmware: []
   })
 
-  const showPanel = () => {
+  onMounted(async ()=>{
+    const resp : any = await axios.get("https://k5.vicicode.com/wsapi/list?type=0&page=" + state.page + "&t=" + Date.now())
+    state.total = resp.total
+    state.nowpage = resp.data
+  })
+
+  watch(state, async (n, o)=>{
+    if(n.page != o.page){
+      const resp : any = await axios.get("https://k5.vicicode.com/wsapi/list?type=0&page=" + state.page + "&t=" + Date.now())
+      state.total = resp.total
+      state.nowpage = resp.data
+    }
+  })
+
+  const showPanel = async () => {
+    state.refLoading = true;
     state.showPanel = true
+    const resp : any = await axios.post("https://k5.vicicode.com/wsapi/my_list", {
+      'type': 0,
+      'token': userStore.accountId
+    })
+    state.myList = resp.data
+    state.refLoading = false;
   }
 
   const showUpload = () => {
@@ -167,16 +159,45 @@
     state.showUpload = true
   }
 
-  const onUF = () => {
-    console.log(formData)
+  const onUF = async () => {
+    if(formData.title == "" || formData.firmware.length == 0){
+      Message.error({
+        content: '未填写名称及上传文件',
+        duration: 5 * 1000,
+      });
+      return;
+    }
+    await axios.post("https://k5.vicicode.com/wsapi/upload", {
+      'type': 0,
+      'token': userStore.accountId,
+      'title': formData.title,
+      'desc': formData.desc,
+      'data': formData.firmware[0].url
+    })
     state.showUpload = false;
+    showPanel()
+  }
+
+  const onDT = async (id: any) => {
+    await axios.post("https://k5.vicicode.com/wsapi/delete", {
+      'id': id,
+      'token': userStore.accountId,
+    })
+    showPanel()
+  }
+
+  const onStar = async (id: any) => {
+    await axios.post("https://k5.vicicode.com/wsapi/star", {
+      'id': id
+    })
+    Message.success({
+      content: '点赞成功',
+      duration: 5 * 1000,
+    });
   }
 
   const refit = () => {
-    state.refLoading = true;
-    setTimeout(() => {
-      state.refLoading = false;
-    }, 1000);
+    showPanel()
   }
   
   const useFirmware = (url: string) => {

@@ -3,14 +3,14 @@
     <t-dialog
       v-model:visible="userStore.showLogin"
       attach="body"
-      header="登录"
+      :header="$t('global.login')"
       destroy-on-close
       :footer="false"
     >
       <template #body>
         <t-form ref="form" :data="formData" :colon="true" :label-width="0" @submit="onLogin">
           <t-form-item name="account">
-            <t-input v-model="formData.account" clearable placeholder="请输入账户名">
+            <t-input v-model="formData.account" clearable :placeholder="$t('global.username')">
               <template #prefix-icon>
                 <desktop-icon />
               </template>
@@ -18,7 +18,7 @@
           </t-form-item>
 
           <t-form-item name="password">
-            <t-input v-model="formData.password" type="password" clearable placeholder="请输入密码">
+            <t-input v-model="formData.password" type="password" clearable :placeholder="$t('global.password')">
               <template #prefix-icon>
                 <lock-on-icon />
               </template>
@@ -26,7 +26,7 @@
           </t-form-item>
 
           <t-form-item>
-            <t-button theme="primary" type="submit" block>登录</t-button>
+            <t-button theme="primary" type="submit" block>{{$t('global.login')}}</t-button>
           </t-form-item>
         </t-form>
       </template>
@@ -34,14 +34,14 @@
     <t-dialog
       v-model:visible="userStore.showRegister"
       attach="body"
-      header="注册"
+      :header="$t('global.register')"
       destroy-on-close
       :footer="false"
     >
       <template #body>
         <t-form ref="form" :data="formData" :colon="true" :label-width="0" @submit="onRegister">
           <t-form-item name="account">
-            <t-input v-model="formData.account" clearable placeholder="请输入账户名">
+            <t-input v-model="formData.account" clearable :placeholder="$t('global.username')">
               <template #prefix-icon>
                 <desktop-icon />
               </template>
@@ -49,7 +49,7 @@
           </t-form-item>
 
           <t-form-item name="password">
-            <t-input v-model="formData.password" type="password" clearable placeholder="请输入密码">
+            <t-input v-model="formData.password" type="password" clearable :placeholder="$t('global.password')">
               <template #prefix-icon>
                 <lock-on-icon />
               </template>
@@ -57,7 +57,7 @@
           </t-form-item>
 
           <t-form-item name="password2">
-            <t-input v-model="formData.password2" type="password" clearable placeholder="请再次输入密码">
+            <t-input v-model="formData.password2" type="password" clearable :placeholder="$t('global.password2')">
               <template #prefix-icon>
                 <lock-on-icon />
               </template>
@@ -65,7 +65,7 @@
           </t-form-item>
 
           <t-form-item>
-            <t-button theme="primary" type="submit" block>登录</t-button>
+            <t-button theme="primary" type="submit" block>{{$t('global.register')}}</t-button>
           </t-form-item>
         </t-form>
       </template>
@@ -126,6 +126,8 @@
   import usePermission from '@/hooks/permission';
   import useResponsive from '@/hooks/responsive';
   import PageLayout from './page-layout.vue';
+  import axios from 'axios';
+  import { Message } from '@arco-design/web-vue';
 
   const formData = reactive({
     account: '',
@@ -133,16 +135,45 @@
     password2: ''
   });
 
-  const onLogin = () => {
-    console.log(formData)
-    userStore.setInfo({
-      showLogin: false,
-      name: '开发中'
+  const onLogin = async () => {
+    const resp : any = await axios.post("https://k5.vicicode.com/wsapi/login", {
+      'username': formData.account,
+      'password': formData.password
     })
+    if(resp.code == 200){
+      userStore.setInfo({
+        showLogin: false,
+        name: formData.account,
+        accountId: resp.token
+      })
+    }
   }
 
-  const onRegister = () => {
-    console.log(formData)
+  const onRegister = async () => {
+    if(formData.password == '' || formData.account == ''){
+      Message.error({
+        content: '用户名及密码不能为空',
+        duration: 5 * 1000,
+      });
+      return;
+    }
+    if(formData.password != formData.password2){
+      Message.error({
+        content: '两次输入密码不一致',
+        duration: 5 * 1000,
+      });
+      return;
+    }
+    const resp : any = await axios.post("https://k5.vicicode.com/wsapi/register", {
+      'username': formData.account,
+      'password': formData.password
+    })
+    if(resp.code == 200){
+      userStore.setInfo({
+        showRegister: false,
+        showLogin: true
+      })
+    }
   }
 
   const isInit = ref(false);
