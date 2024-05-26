@@ -20,7 +20,7 @@
                 <a-col :span="4" v-for="i in state.nowpage">
                   <t-card :style="{ width: '100%', marginBottom: '10px' }">
                     <template #cover>
-                      <img :title="i.title" :src="'https://k5.vicicode.com/wsapi/download?id=' + i.id">
+                      <img style="height: 6.75vw;" :title="i.title" :src="'https://k5.vicicode.com/wsapi/download?id=' + i.id">
                     </template>
                     <template #footer>
                       <t-row :align="'middle'" justify="center" style="gap: 24px">
