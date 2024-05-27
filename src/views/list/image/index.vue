@@ -16,6 +16,7 @@
             <br>
             <a-space>
               <a-button @click="selectFile">{{ $t('tool.selectImage') }}</a-button>
+              <a-button :disabled="state.matrix.length < 64" @click="saveIt">保存</a-button>
               <a-button type="primary" :disabled="state.matrix.length < 64" @click="flashIt">{{ $t('tool.write') }}</a-button>
             </a-space>
           </a-card>
@@ -108,10 +109,6 @@ const selectFile = () => {
     const canvas = document.createElement("canvas");
     canvas.width = 128;
     canvas.height = 64;
-    const canvas2 = canvas.cloneNode();
-    const canvasDiv = document.getElementById('canvasDiv');
-    canvasDiv.innerHTML = "";
-    canvasDiv?.append(canvas, canvas2);
     
     const img = new Image()
     img.src = file;
@@ -140,6 +137,32 @@ const selectFile = () => {
     }
   };
   input.click();
+}
+
+const saveIt = async () => {
+  const matrix = state.matrix
+  const canvas = document.createElement("canvas");
+  canvas.width = 128;
+  canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  if(ctx){
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#000";
+  }
+  for (let y = 0; y < 64; y++) {
+    for (let x = 0; x < 128; x++) {
+      if(matrix[y][x] == '#000'){
+        ctx?.beginPath();
+        ctx?.rect(x, y, 1, 1);
+        ctx?.fill();
+      }
+    }
+  }
+  const el = document.createElement('a');
+  el.href = canvas.toDataURL("image/jpeg", 1.0);
+  el.download = 'image.jpg';
+  el.click()
 }
 
 const flashIt = async () => {
