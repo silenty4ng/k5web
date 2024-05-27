@@ -20,7 +20,7 @@
                 <a-col :span="4" v-for="i in state.nowpage">
                   <t-card :style="{ width: '100%', marginBottom: '10px' }">
                     <template #cover>
-                      <img style="height: 6.75vw;" :title="i.title" :src="'https://k5.vicicode.com/wsapi/download?id=' + i.id">
+                      <img style="height: 6.75vw;" :title="i.title" :src="'https://k5.vicicode.com/wsapi/download?id=' + i.id + '&n=' + i.title + '.jpg'">
                     </template>
                     <template #footer>
                       <t-row :align="'middle'" justify="center" style="gap: 24px">
@@ -30,7 +30,7 @@
                           </t-button>
                         </t-col>
                         <t-col flex="auto" style="display: inline-flex; justify-content: center">
-                          <t-button variant="text" shape="square" @click="useImg('https://k5.vicicode.com/wsapi/download?id=' + i.id)">
+                          <t-button variant="text" shape="square" @click="useImg('https://k5.vicicode.com/wsapi/download?id=' + i.id + '&n=' + i.title + '.jpg')">
                             <check-double-icon />
                           </t-button>
                         </t-col>

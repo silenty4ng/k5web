@@ -25,7 +25,7 @@
                         </a-list-item-meta>
                         <template #actions>
                             <a-link @click="onStar(item.id)">👍</a-link>
-                            <a-link @click="useFirmware('https://k5.vicicode.com/wsapi/download?id=' + item.id)">{{$t('global.use')}}</a-link>
+                            <a-link @click="useFirmware('https://k5.vicicode.com/wsapi/download?id=' + item.id + '&n=/' + item.title)">{{$t('global.use')}}</a-link>
                         </template>
                     </a-list-item>
                 </a-list>
