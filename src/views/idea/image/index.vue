@@ -43,7 +43,7 @@
             </a-card>
         </a-col>
       </a-row>
-      <t-drawer v-model:visible="state.showPanel" size="50%" header="我的图片" :footer="false">
+      <t-drawer v-model:visible="state.showPanel" size="50%" header="我的图片" :footer="false" @dragenter="dragEnter" @dragleave="dragLeave" @dragover="dragOver" @drop="dropFile">
         <div style="display: flex; align-items: center; justify-content: space-between;">
           <t-button style="margin: 10px" @click="showUpload">上传新图片</t-button>
           <t-button :loading="state.refLoading" shape="circle" theme="outline" @click="refit">
@@ -119,7 +119,8 @@
     myList: any,
     total: number,
     page: number,
-    nowpage: any
+    nowpage: any,
+    dropzoneActive: boolean
   } = reactive({
     binaryFile: undefined,
     loading: false,
@@ -129,9 +130,49 @@
     myList: [],
     total: 0,
     page: 1,
-    nowpage: []
+    nowpage: [],
+    dropzoneActive: false
   })
 
+  const dragEnter = (event: any) => {
+    event.preventDefault();
+    state.dropzoneActive = true;
+  }
+
+  const dragLeave = (event: any) => {
+      event.preventDefault();
+      state.dropzoneActive = false;
+  }
+
+  const dragOver = (event: any) => {
+      event.preventDefault();
+  }
+
+  const fileToBase64Async = (file: any) => {
+    return new Promise((resolve, reject) => {
+      let reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (e) => {
+        resolve(e.target.result);
+      };
+    });
+  }
+
+  const dropFile = async (event: any) => {
+      event.preventDefault();
+      state.dropzoneActive = false;
+      const files = event.dataTransfer.files;
+      for(let i=0;i<files.length;i++){
+        await axios.post("https://k5.vicicode.com/wsapi/upload", {
+          'type': 1,
+          'token': userStore.accountId,
+          'title': files[i].name,
+          'desc': '',
+          'data': (await fileToBase64Async(files[i]))?.split(',')[1]
+        })
+        showPanel()
+      }
+  }
   
   const formData = reactive({
     title: '',

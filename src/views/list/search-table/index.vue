@@ -863,6 +863,15 @@
 </script>
 
 <style scoped lang="less">
+  :deep(::-webkit-scrollbar-thumb){
+    border-radius: 0 !important;
+  }
+  :deep(.scrollbar::-webkit-scrollbar) {
+    height: 10px;
+  }
+  :deep(.t-table__content::-webkit-scrollbar) {
+    height: 15px;
+  }
   .container {
     padding: 0 20px 20px 20px;
   }
