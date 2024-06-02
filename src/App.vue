@@ -1,5 +1,12 @@
 <template>
-  <t-config-provider v-if="reloadLang" :global-config="locale">
+  <div v-if="isWeixin || isQQ" style="text-align: center;">
+    <div style="height: 75vh; display: flex; flex-direction: column; align-items: center;">
+      <div style="padding: 20px; padding-top: 35vh; font-size: 1.5rem;">如需浏览，请长按网址复制后使用浏览器访问</div>
+      <p style="padding: 20px; background-color: #F1F1F1;">{{ link }}</p>
+    </div>
+    <div style="color: #AAAAAA;">{{ ua }}</div>
+  </div>
+  <t-config-provider v-if="reloadLang && !isWeixin && !isQQ" :global-config="locale">
     <a-config-provider :locale="locale">
       <router-view />
       <global-setting />
@@ -37,22 +44,14 @@
     shynet.src = "https://shynet.vicicode.com/ingress/4c1dcea4-75c5-45e2-a641-25f211adbad6/script.js";
     document.body.append(shynet);
   }
-
-  const renderQa = () => {
-    return h("img", { src: '/qrcode_1714310463601.jpg', height: 440 });
-  }
-
-  const renderPopup = () => {
-    return h("img", { src: '/1714006925783.jpg', height: 440 });
-  }
-
-  const renderShang = () => {
-    return h("img", { src: '/mm_facetoface_collect_qrcode_1714392837792.png', height: 440 });
-  }
-
+  
   const { currentLocale } = useLocale();
 
   const reloadLang = ref(true);
+  const ua = navigator.userAgent;
+  const isWeixin = ua.indexOf('MicroMessenger') != -1 ? true : false;
+  const isQQ = ua.indexOf('QQ/') != -1 ? true : false;
+  const link = location.href;
 
   const locale = computed(() => {
     let lang = undefined;
