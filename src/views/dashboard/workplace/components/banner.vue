@@ -10,7 +10,7 @@
       <a-card v-show="appStore.connectState" :style="{ marginTop: '2em', marginBottom: '2em' }" :title="$t('workplace.info')">
           {{ $t('workplace.current') }}{{ appStore.firmwareVersion }} <br />
           {{ $t('workplace.writeconfig') }}{{ appStore.configuration?.name }} <br />
-          {{ $t('workplace.eepromSize') }}{{ state.eepromSize }} <a-button size="mini" type="primary" @click="checkEeprom">{{ $t('workplace.checkIt') }}</a-button>
+          {{ $t('workplace.eepromSize') }}{{ state.eepromSize }} {{ state.eepromSize != t('workplace.clickCheck') &&  appStore.configuration?.uart == 'official' ? t('workplace.clickNotice') : ''}} <a-button size="mini" type="primary" @click="checkEeprom">{{ $t('workplace.checkIt') }}</a-button>
       </a-card>
     </a-space>
     <div>

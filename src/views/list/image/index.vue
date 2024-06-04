@@ -16,7 +16,8 @@
             <br>
             <a-space>
               <a-button @click="selectFile">{{ $t('tool.selectImage') }}</a-button>
-              <a-button :disabled="state.matrix.length < 64" @click="saveIt">保存</a-button>
+              <a-button :disabled="state.matrix.length < 64" @click="negativeIt">{{ $t('image.negative') }}</a-button>
+              <a-button :disabled="state.matrix.length < 64" @click="saveIt">{{ $t('cps.save') }}</a-button>
               <a-button type="primary" :disabled="state.matrix.length < 64" @click="flashIt">{{ $t('tool.write') }}</a-button>
             </a-space>
           </a-card>
@@ -56,6 +57,16 @@ onMounted(async ()=>{
     useImg(window.URL.createObjectURL(await img.blob()))
   }
 })
+
+const negativeIt = () => {
+  const matrix = state.matrix
+  matrix.map((y: any, yi: any)=>{
+    y.map((x: any, xi: any)=>{
+      matrix[yi][xi] = x == '#fff' ? '#000' : '#fff'
+    })
+  })
+  state.matrix = matrix
+}
 
 const changePixel = (x: int, y: int) => {
   if(state.mousedown){

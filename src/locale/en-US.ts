@@ -147,6 +147,8 @@ export default {
   'global.username': 'Username',
   'global.password': 'Password',
   'global.password2': 'Retype password ',
+  'image.negative': 'Negative',
+  'workplace.clickNotice': ' (Official firmware can only detect 8KB/64Kbit)',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

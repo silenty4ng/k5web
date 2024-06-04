@@ -147,6 +147,8 @@ export default {
   'global.username': '请输入用户名',
   'global.password': '请输入密码',
   'global.password2': '请再次输入密码',
+  'image.negative': '反色',
+  'workplace.clickNotice': '（官方固件只能检测 8KB/64Kbit）',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,
