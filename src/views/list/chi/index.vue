@@ -95,7 +95,7 @@ const restore = async(type: any = 1) => {
   }
   if(type == 5){
     const eepromSize = await check_eeprom(appStore.connectPort, appStore.configuration?.uart);
-    if(eepromSize != 0x40000 && eepromSize != 0x40000){
+    if(eepromSize != 0x40000 && eepromSize != 0x80000){
       state.status = state.status + "只支持 2Mbit 以上 EEPROM 写入<br/>";
       return
     }
