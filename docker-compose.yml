@@ -5,7 +5,7 @@ services:
     container_name: k5web
     network_mode: "bridge"
     ports:
-      - "5173:5173"
+      - "5173:80"
     environment:
       - TZ=Asia/Shanghai
     restart: always
