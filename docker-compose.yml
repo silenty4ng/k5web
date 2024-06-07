@@ -1,0 +1,10 @@
+version: "3.5"
+services:
+  k5web:
+    build: .
+    container_name: k5web
+    ports:
+      - "5173:5173"
+    environment:
+      - TZ=Asia/Shanghai
+    restart: always
