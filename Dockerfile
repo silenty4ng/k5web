@@ -1,4 +1,4 @@
-FROM node:22
+FROM node:22 AS build-yarn
 
 WORKDIR /app
 
@@ -8,6 +8,10 @@ RUN yarn install
 
 COPY . .
 
-EXPOSE 5173
+RUN yarn build
 
-CMD ["yarn", "dev", "--host", "0.0.0.0"]
+FROM nginx:latest AS runtime
+
+COPY dist/  /usr/share/nginx/html/
+
+EXPOSE 80
