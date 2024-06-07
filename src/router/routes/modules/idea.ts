@@ -31,7 +31,17 @@ const IDEA: AppRouteRecordRaw = {
         requiresAuth: true,
         roles: ['*'],
       },
-    }
+    },
+    {
+      path: 'losehu',
+      name: 'ideaLosehu',
+      component: () => import('@/views/idea/losehu/index.vue'),
+      meta: {
+        locale: '自定义萝卜固件',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
   ],
 };
 
