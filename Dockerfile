@@ -12,6 +12,6 @@ RUN yarn build
 
 FROM nginx:latest AS runtime
 
-COPY dist/  /usr/share/nginx/html/
+COPY --from=build-yarn /app/dist/  /usr/share/nginx/html/
 
 EXPOSE 80
