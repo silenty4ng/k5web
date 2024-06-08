@@ -1,9 +1,9 @@
 <template>
     <div class="container">
-      <Breadcrumb :items="[$t('menu.dashboard'), $t('menu.cps.radio')]" />
+      <Breadcrumb :items="[$t('menu.dashboard'), $t('menu.cps.mdc')]" />
       <a-card class="general-card">
         <template #title>
-          <span @click="()=>{istate.showHide += 1}">{{ $t('menu.cps.radio') + $t('global.onStart') }}</span>
+          <span @click="()=>{istate.showHide += 1}">{{ $t('menu.cps.mdc') + $t('global.onStart') }}</span>
         </template>
         <a-row style="margin-bottom: 16px">
           <a-col :span="12">
@@ -22,19 +22,6 @@
               </a-button>
             </a-space>
           </a-col>
-          <!-- <a-col :span="12" style="text-align: right;">
-            <a-space>
-              <a-button type="text" @click="downloadExcelTemplate">
-                {{ $t('cps.downloadImportTemplate') }}
-              </a-button>
-              <a-button type="primary" @click="restoreExcelChannel">
-                {{ $t('cps.import') }}
-              </a-button>
-              <a-button @click="saveExcelChannel">
-                {{ $t('cps.export') }}
-              </a-button>
-            </a-space>
-          </a-col> -->
         </a-row>
         <t-table
           class="ttable"
@@ -76,7 +63,7 @@
     import { computed, reactive, watch } from 'vue';
     import { Input } from 'tdesign-vue-next';
     import useLoading from '@/hooks/loading';
-    import { eeprom_read, uint8ArrayToHexReverseString, hexReverseStringToUint8Array, eeprom_write, eeprom_reboot, eeprom_init } from '@/utils/serial.js';
+    import { eeprom_read, uint8ArrayToHexReverseString, hexReverseStringToUint8Array, stringToUint8Array, uint8ArrayToString, eeprom_write, eeprom_reboot, eeprom_init } from '@/utils/serial.js';
     import { useAppStore } from '@/store';
     import { MoveIcon } from 'tdesign-icons-vue-next';
     import { useI18n } from 'vue-i18n';
@@ -91,8 +78,8 @@
       pageSize: number,
       nowPage: number
     } = reactive({
-      renderData: Array.from({length: 20}).map(e=>{return {}}),
-      pageSize: 50,
+      renderData: Array.from({length: 16}).map(e=>{return {}}),
+      pageSize: 16,
       nowPage: 1,
     })
   
@@ -117,18 +104,36 @@
         width: 100
       },
       {
-        title: t('cps.rx'),
-        colKey: 'rx',
+        title: t('cps.contact'),
+        colKey: 'name',
+        width: 250,
         align: 'left',
-        width: 200,
-        cell: (h, { row }) => parseFloat(row.rx) ? parseFloat(row.rx).toFixed(2) : undefined,
+        cell: (h, { row }) => row.name ? row.name.replace(/[^a-z0-9_]/g, '') : undefined,
         edit: {
           component: Input,
           props: {
             clearable: true
           },
           onEdited: (context: any) => {
-            context.newRowData.rx = context.newRowData.rx ? context.newRowData.rx : undefined
+            const newData = [...cstate.renderData];
+            newData.splice((cstate.nowPage - 1) * cstate.pageSize + context.rowIndex, 1, context.newRowData);
+            cstate.renderData = newData;
+          },
+        },
+      },
+      {
+        title: t('cps.mdcid'),
+        colKey: 'mdcid',
+        align: 'left',
+        width: 200,
+        cell: (h, { row }) => parseInt(row.mdcid, 16) <= 65535 ? parseInt(row.mdcid, 16).toString(16) : undefined,
+        edit: {
+          component: Input,
+          props: {
+            clearable: true
+          },
+          onEdited: (context: any) => {
+            context.newRowData.mdcid = context.newRowData.mdcid ? context.newRowData.mdcid : undefined
             const newData = [...cstate.renderData];
             newData.splice((cstate.nowPage - 1) * cstate.pageSize + context.rowIndex, 1, context.newRowData);
             cstate.renderData = newData;
@@ -147,66 +152,60 @@
       if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
       await eeprom_init(appStore.connectPort);
       setLoading(true)
-      if(appStore.configuration?.fm30){
-        let rawEEPROM = new Uint8Array(0x03C);
-        for (let i = 0x1FFC0; i < 0x1FFF1; i += 0x08) {
-          const _data = await eeprom_read(appStore.connectPort, i, 0x08, appStore.configuration?.uart)
-          rawEEPROM.set(_data, i - 0x1FFC0)
-        }
-        const _renderData : any = [];
-        for (let i = 0; i < 0x03C; i += 0x02) {
-          const rx = uint8ArrayToHexReverseString(rawEEPROM.subarray(i, i + 0x02))
-          if(rx != 'ffff'){
-            _renderData.push({
-              rx: parseInt(rx, 16) / 10
-            })
-          }else{
-            _renderData.push({})
-          }
-        }
-        cstate.renderData = _renderData;
-      }else{
-        let rawEEPROM = new Uint8Array(0x028);
-        for (let i = 0x0E40; i < 0x0E61; i += 0x08) {
-          const _data = await eeprom_read(appStore.connectPort, i, 0x08, appStore.configuration?.uart)
-          rawEEPROM.set(_data, i - 0x0E40)
-        }
-        const _renderData : any = [];
-        for (let i = 0; i < 0x028; i += 0x02) {
-          const rx = uint8ArrayToHexReverseString(rawEEPROM.subarray(i, i + 0x02))
-          if(rx != 'ffff'){
-            _renderData.push({
-              rx: parseInt(rx, 16) / 10
-            })
-          }else{
-            _renderData.push({})
-          }
-        }
-        cstate.renderData = _renderData;
+      let rawEEPROM = new Uint8Array(0x100);
+      for (let i = 0x1D00; i < 0x1E00; i += 0x10) {
+        const _data = await eeprom_read(appStore.connectPort, i, 0x10, appStore.configuration?.uart)
+        rawEEPROM.set(_data, i - 0x1D00)
       }
+      const _renderData : any = [];
+      for (let i = 0; i < 0x100; i += 0x10) {
+        if(uint8ArrayToHexReverseString(rawEEPROM.subarray(i, i + 0x02)) != 'ffff'){
+          _renderData.push({
+            name: uint8ArrayToString(rawEEPROM.subarray(i + 0x02, i + 0x10), appStore.configuration?.charset),
+            mdcid: uint8ArrayToHexReverseString(rawEEPROM.subarray(i, i + 0x02))
+          })
+        }else{
+          _renderData.push({})
+        }
+      }
+      cstate.renderData = _renderData;
       setLoading(false)
     }
     const writeChannel = async() =>{
       if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
       await eeprom_init(appStore.connectPort);
       setLoading(true)
-      if(appStore.configuration?.fm30){
-        for (let i = 0; i < 0x03C; i += 0x02) {
-          if(cstate.renderData[i / 0x02].rx){
-            await eeprom_write(appStore.connectPort, i + 0x1FFC0, hexReverseStringToUint8Array((parseInt(cstate.renderData[i / 0x02].rx * 10)).toString(16).padStart(4, '0')), 0x02, appStore.configuration?.uart);
-          }else{
-            await eeprom_write(appStore.connectPort, i + 0x1FFC0, hexReverseStringToUint8Array('0000'), 0x02, appStore.configuration?.uart);
-          }
-        }
-      }else{
-        for (let i = 0; i < 0x028; i += 0x02) {
-          if(cstate.renderData[i / 0x02].rx){
-            await eeprom_write(appStore.connectPort, i + 0x0E40, hexReverseStringToUint8Array((parseInt(cstate.renderData[i / 0x02].rx * 10)).toString(16).padStart(4, '0')), 0x02, appStore.configuration?.uart);
-          }else{
-            await eeprom_write(appStore.connectPort, i + 0x0E40, hexReverseStringToUint8Array('0000'), 0x02, appStore.configuration?.uart);
-          }
+      for (let i = 0; i < 0x100; i += 0x10) {
+        if(cstate.renderData[i / 0x10].mdcid){
+          const _data = new Uint8Array(0x10).fill(0x20)
+          _data.set(hexReverseStringToUint8Array(cstate.renderData[i / 0x10].mdcid.padStart(4, '0')))
+          _data.set(stringToUint8Array(cstate.renderData[i / 0x10].name), 0x02)
+          await eeprom_write(
+            appStore.connectPort,
+            i + 0x1D00,
+            _data,
+            0x10,
+            appStore.configuration?.uart
+          );
+        }else{
+          await eeprom_write(
+            appStore.connectPort,
+            i + 0x1D00,
+            hexReverseStringToUint8Array('ffffffffffffffffffffffffffffffff'),
+            0x10,
+            appStore.configuration?.uart
+          );
         }
       }
+      const _tmp = await eeprom_read(appStore.connectPort, 0x1FF0, 0x10, appStore.configuration?.uart)
+      _tmp.set([0x10], 0x10 - 1)
+      await eeprom_write(
+            appStore.connectPort,
+            0x1FF0,
+            _tmp,
+            0x10,
+            appStore.configuration?.uart
+          );
       await eeprom_reboot(appStore.connectPort);
       setLoading(false)
     }

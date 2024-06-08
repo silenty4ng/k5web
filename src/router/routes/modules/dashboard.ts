@@ -43,6 +43,16 @@ const DASHBOARD: AppRouteRecordRaw = {
       },
     },
     {
+      path: 'mdc',
+      name: 'Mdc',
+      component: () => import('@/views/list/mdc/index.vue'),
+      meta: {
+        locale: 'menu.cps.mdc',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
+    {
       path: 'settings',
       name: 'Settings',
       component: () => import('@/views/list/settings/index.vue'),
