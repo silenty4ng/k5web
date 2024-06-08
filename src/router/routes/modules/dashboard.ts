@@ -33,6 +33,16 @@ const DASHBOARD: AppRouteRecordRaw = {
       },
     },
     {
+      path: 'radio',
+      name: 'Radio',
+      component: () => import('@/views/list/radio/index.vue'),
+      meta: {
+        locale: 'menu.cps.radio',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
+    {
       path: 'settings',
       name: 'Settings',
       component: () => import('@/views/list/settings/index.vue'),

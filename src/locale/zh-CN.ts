@@ -149,6 +149,7 @@ export default {
   'global.password2': '请再次输入密码',
   'image.negative': '反色',
   'workplace.clickNotice': '（官方固件只能检测 8KB/64Kbit）',
+  'menu.cps.radio': '收音机',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,
