@@ -162,7 +162,7 @@
         if(uint8ArrayToHexReverseString(rawEEPROM.subarray(i, i + 0x02)) != 'ffff'){
           _renderData.push({
             name: uint8ArrayToString(rawEEPROM.subarray(i + 0x02, i + 0x10), appStore.configuration?.charset),
-            mdcid: uint8ArrayToHexReverseString(rawEEPROM.subarray(i, i + 0x02))
+            mdcid: uint8ArrayToHexReverseString(rawEEPROM.subarray(i, i + 0x01)) + uint8ArrayToHexReverseString(rawEEPROM.subarray(i + 0x01, i + 0x02))
           })
         }else{
           _renderData.push({})
@@ -178,7 +178,8 @@
       for (let i = 0; i < 0x100; i += 0x10) {
         if(cstate.renderData[i / 0x10].mdcid){
           const _data = new Uint8Array(0x10).fill(0x20)
-          _data.set(hexReverseStringToUint8Array(cstate.renderData[i / 0x10].mdcid.padStart(4, '0')))
+          _data.set(hexReverseStringToUint8Array(cstate.renderData[i / 0x10].mdcid.padStart(4, '0').substring(0, 2)))
+          _data.set(hexReverseStringToUint8Array(cstate.renderData[i / 0x10].mdcid.padStart(4, '0').substring(2, 4)), 0x01)
           _data.set(stringToUint8Array(cstate.renderData[i / 0x10].name), 0x02)
           await eeprom_write(
             appStore.connectPort,
