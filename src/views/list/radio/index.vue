@@ -73,7 +73,7 @@
   </template>
   
   <script lang="ts" setup>
-    import { computed, reactive } from 'vue';
+    import { computed, reactive, watch } from 'vue';
     import { Input } from 'tdesign-vue-next';
     import useLoading from '@/hooks/loading';
     import { eeprom_read, uint8ArrayToHexReverseString, hexReverseStringToUint8Array, eeprom_write, eeprom_reboot, eeprom_init } from '@/utils/serial.js';
@@ -92,7 +92,7 @@
       nowPage: number
     } = reactive({
       renderData: Array.from({length: 20}).map(e=>{return {scanlist: []}}),
-      pageSize: 20,
+      pageSize: 50,
       nowPage: 1,
     })
   
@@ -147,35 +147,64 @@
       if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
       await eeprom_init(appStore.connectPort);
       setLoading(true)
-      let rawEEPROM = new Uint8Array(0x028);
-      for (let i = 0x0E40; i < 0x0E61; i += 0x08) {
-        const _data = await eeprom_read(appStore.connectPort, i, 0x08, appStore.configuration?.uart)
-        rawEEPROM.set(_data, i - 0x0E40)
-      }
-      const _renderData : any = [];
-      for (let i = 0; i < 0x028; i += 0x02) {
-        const rx = uint8ArrayToHexReverseString(rawEEPROM.subarray(i, i + 0x02))
-        if(rx != 'ffff'){
-          _renderData.push({
-            rx: parseInt(rx, 16) / 10
-          })
-        }else{
-          _renderData.push({})
+      if(appStore.configuration?.fm30){
+        let rawEEPROM = new Uint8Array(0x03C);
+        for (let i = 0x1FFC0; i < 0x1FFF1; i += 0x08) {
+          const _data = await eeprom_read(appStore.connectPort, i, 0x08, appStore.configuration?.uart)
+          rawEEPROM.set(_data, i - 0x1FFC0)
         }
+        const _renderData : any = [];
+        for (let i = 0; i < 0x03C; i += 0x02) {
+          const rx = uint8ArrayToHexReverseString(rawEEPROM.subarray(i, i + 0x02))
+          if(rx != 'ffff'){
+            _renderData.push({
+              rx: parseInt(rx, 16) / 10
+            })
+          }else{
+            _renderData.push({})
+          }
+        }
+        cstate.renderData = _renderData;
+      }else{
+        let rawEEPROM = new Uint8Array(0x028);
+        for (let i = 0x0E40; i < 0x0E61; i += 0x08) {
+          const _data = await eeprom_read(appStore.connectPort, i, 0x08, appStore.configuration?.uart)
+          rawEEPROM.set(_data, i - 0x0E40)
+        }
+        const _renderData : any = [];
+        for (let i = 0; i < 0x028; i += 0x02) {
+          const rx = uint8ArrayToHexReverseString(rawEEPROM.subarray(i, i + 0x02))
+          if(rx != 'ffff'){
+            _renderData.push({
+              rx: parseInt(rx, 16) / 10
+            })
+          }else{
+            _renderData.push({})
+          }
+        }
+        cstate.renderData = _renderData;
       }
-      cstate.renderData = _renderData;
-      console.log(rawEEPROM)
       setLoading(false)
     }
     const writeChannel = async() =>{
       if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
       await eeprom_init(appStore.connectPort);
       setLoading(true)
-      for (let i = 0; i < 0x028; i += 0x02) {
-        if(cstate.renderData[i / 0x02].rx){
-          await eeprom_write(appStore.connectPort, i + 0x0E40, hexReverseStringToUint8Array((parseInt(cstate.renderData[i / 0x02].rx * 10)).toString(16).padStart(4, '0')), 0x02, appStore.configuration?.uart);
-        }else{
-          await eeprom_write(appStore.connectPort, i + 0x0E40, hexReverseStringToUint8Array('0000'), 0x02, appStore.configuration?.uart);
+      if(appStore.configuration?.fm30){
+        for (let i = 0; i < 0x03C; i += 0x02) {
+          if(cstate.renderData[i / 0x02].rx){
+            await eeprom_write(appStore.connectPort, i + 0x1FFC0, hexReverseStringToUint8Array((parseInt(cstate.renderData[i / 0x02].rx * 10)).toString(16).padStart(4, '0')), 0x02, appStore.configuration?.uart);
+          }else{
+            await eeprom_write(appStore.connectPort, i + 0x1FFC0, hexReverseStringToUint8Array('0000'), 0x02, appStore.configuration?.uart);
+          }
+        }
+      }else{
+        for (let i = 0; i < 0x028; i += 0x02) {
+          if(cstate.renderData[i / 0x02].rx){
+            await eeprom_write(appStore.connectPort, i + 0x0E40, hexReverseStringToUint8Array((parseInt(cstate.renderData[i / 0x02].rx * 10)).toString(16).padStart(4, '0')), 0x02, appStore.configuration?.uart);
+          }else{
+            await eeprom_write(appStore.connectPort, i + 0x0E40, hexReverseStringToUint8Array('0000'), 0x02, appStore.configuration?.uart);
+          }
         }
       }
       await eeprom_reboot(appStore.connectPort);

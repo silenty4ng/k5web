@@ -282,7 +282,8 @@
         "H": false,
         "localmdc": false,
         "sat": false,
-        "newpinyin": false
+        "newpinyin": false,
+        'fm30': false
       }
 
       Object.keys(configuration_list).some(e=>{
