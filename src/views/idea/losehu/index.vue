@@ -28,7 +28,7 @@
                     </a-radio-group>
                     <a-radio-group v-model="state.flag[5]" type="button">
                         <a-radio value="0" :disabled="state.disMatrix[5]['0']">停用输入法</a-radio>
-                        <a-radio value="1" :disabled="state.disMatrix[4]['1']">开启输入法</a-radio>
+                        <a-radio value="1" :disabled="state.disMatrix[5]['1']">开启输入法</a-radio>
                     </a-radio-group>
                     <a-radio-group v-model="state.flag[6]" type="button">
                         <a-radio value="0" :disabled="state.disMatrix[6]['0']">停用频谱仪</a-radio>
@@ -44,7 +44,6 @@
   
   <script lang="ts" setup>
   import { reactive, onMounted, watch } from 'vue';
-  import { useAppStore, useUserStore } from '@/store';
   import { useRouter } from 'vue-router';
   
   const router = useRouter()
@@ -58,7 +57,11 @@
     });
   }
 
-  const state = reactive({
+  const state : {
+    versions: any,
+    flag: any,
+    disMatrix: any
+  } = reactive({
     versions: [],
     flag: ['0','0','0','0','0','0','0'],
     disMatrix: [
@@ -73,8 +76,8 @@
   })
   
   watch(state.flag, ()=>{
-    state.flag.map((e,i)=>{
-        Object.keys(state.disMatrix[i]).map((ex)=>{
+    state.flag.map((e: any,i: any)=>{
+        Object.keys(state.disMatrix[i]).map((ex: any)=>{
             if(state.versions.indexOf('LOSEHU' + state.flag.join('').substring(0, i) + ex + state.flag.join('').substring(i+1) + '.bin') == -1){
                 state.disMatrix[i][ex] = true
             }else{
@@ -83,10 +86,6 @@
         })
     })
   })
-
-  const updateMatrix = () => {
-    
-  }
   
   onMounted(async ()=>{
     const versions = await (await fetch('/diy/version.json')).text()
