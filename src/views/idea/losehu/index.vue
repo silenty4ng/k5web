@@ -75,7 +75,9 @@
     ]
   })
   
-  watch(state.flag, ()=>{
+  watch(state.flag, ()=>{ updateMatrix() })
+
+  const updateMatrix = () => {
     state.flag.map((e: any,i: any)=>{
         Object.keys(state.disMatrix[i]).map((ex: any)=>{
             if(state.versions.indexOf('LOSEHU' + state.flag.join('').substring(0, i) + ex + state.flag.join('').substring(i+1) + '.bin') == -1){
@@ -85,11 +87,12 @@
             }
         })
     })
-  })
+  }
   
   onMounted(async ()=>{
     const versions = await (await fetch('/diy/version.json')).text()
     state.versions = JSON.parse(versions)
+    updateMatrix()
   })
   
   </script>
