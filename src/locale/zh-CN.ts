@@ -153,6 +153,7 @@ export default {
   'menu.cps.mdc': 'MDC 联系人',
   'cps.contact': '联系人',
   'cps.mdcid': 'MDC ID',
+  'idea.diy': '自定义萝卜固件',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

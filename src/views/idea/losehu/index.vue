@@ -1,9 +1,9 @@
 <template>
     <div class="container">
-        <Breadcrumb :items="[$t('menu.workshop'), '自定义萝卜固件']" />
+        <Breadcrumb :items="[$t('menu.workshop'), $t('idea.diy')]" />
         <a-row :gutter="20" align="stretch">
             <a-col :span="24">
-                <a-card class="general-card" title="自定义萝卜固件" :loading="loading">
+                <a-card class="general-card" :title="$t('idea.diy')" :loading="loading">
                     <t-space direction="vertical">
                         <a-radio-group v-for="item in state.showSort" v-model="state.flag[item]" type="button">
                             <a-radio v-for="subItem in state.disMatrix[item]" :value="subItem[0]"
@@ -38,13 +38,15 @@ const state: {
     flag: any,
     disMatrix: any,
     disName: any,
+    disEng: any,
     showSort: any
 } = reactive({
     versions: [],
     flag: [],
     disMatrix: [],
     disName: [],
-    showSort: []
+    showSort: [],
+    disEng: []
 })
 
 watch(() => [...state.flag], () => { updateMatrix() })

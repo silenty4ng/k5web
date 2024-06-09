@@ -153,6 +153,7 @@ export default {
   'menu.cps.mdc': 'MDC Contact',
   'cps.contact': 'Name',
   'cps.mdcid': 'MDC ID',
+  'idea.diy': 'LOSEHU DIY',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,
