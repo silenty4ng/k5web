@@ -56,7 +56,7 @@
     router.push({
       path: '/tool/flash',
       query: {
-        url: 'https://k5.vicicode.com/diyapi/LOSEHU' + state.flag.join('') + '.bin'
+        url: 'https://k5.vicicode.com/diyapi/LOSEHU' + state.flag.join('') + '.bin?v=' + (new Date()).getTime()
       }
     });
   }
