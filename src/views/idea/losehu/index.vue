@@ -9,7 +9,7 @@
                             <a-radio v-for="subItem in state.disMatrix[item]" :value="subItem[0]"
                                 :disabled="subItem[1]">{{ state.disName[item].get(subItem[0]) }}</a-radio>
                         </a-radio-group>
-                        <a-button type="primary" @click="useFirmware">生成</a-button>
+                        <a-button type="primary" @click="useFirmware">{{ $t('diy.generate') }}</a-button>
                     </t-space>
                 </a-card>
             </a-col>

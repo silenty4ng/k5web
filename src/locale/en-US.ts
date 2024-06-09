@@ -154,6 +154,7 @@ export default {
   'cps.contact': 'Name',
   'cps.mdcid': 'MDC ID',
   'idea.diy': 'LOSEHU DIY',
+  'diy.generate': 'Generate',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

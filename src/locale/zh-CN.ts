@@ -154,6 +154,7 @@ export default {
   'cps.contact': '联系人',
   'cps.mdcid': 'MDC ID',
   'idea.diy': '自定义萝卜固件',
+  'diy.generate': '生成',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,
