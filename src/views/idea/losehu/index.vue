@@ -70,7 +70,7 @@ onMounted(async () => {
     let functions = await (await fetch('https://k5.vicicode.com/diyapi/function.json?v=' + (new Date()).getTime())).text()
     functions = JSON.parse(functions)
     let _newfunc: any = []
-    let _showSort = []
+    let _showSort: any = []
     functions.map((e: any) => {
         _newfunc[e[e.length - 1] - 1] = e
         _showSort.push(e[e.length - 1] - 1)
