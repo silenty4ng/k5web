@@ -54,7 +54,6 @@ const updateMatrix = () => {
     state.flag.map((e: any, i: any) => {
         state.disMatrix[i].forEach((value: any, key: any) => {
             if(state.versions.indexOf('LOSEHU' + state.flag.join('').substring(0, i) + key + state.flag.join('').substring(i+1) + '.bin') == -1){
-                console.log(111)
                 state.disMatrix[i].set(key, true)
             }else{
                 state.disMatrix[i].set(key, false)
