@@ -21,8 +21,10 @@
 import { reactive, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import useLoading from '@/hooks/loading';
+import { useI18n } from 'vue-i18n';
 
 const router = useRouter()
+const { t } = useI18n();
 
 const useFirmware = () => {
     router.push({
@@ -38,7 +40,6 @@ const state: {
     flag: any,
     disMatrix: any,
     disName: any,
-    disEng: any,
     showSort: any
 } = reactive({
     versions: [],
@@ -46,7 +47,6 @@ const state: {
     disMatrix: [],
     disName: [],
     showSort: [],
-    disEng: []
 })
 
 watch(() => [...state.flag], () => { updateMatrix() })
@@ -81,9 +81,13 @@ onMounted(async () => {
     functions.map((e: any) => {
         let _conf: any = new Map()
         let _confName: any = new Map();
-        for (let i = e[0] + 1; i < e[0] * 2 + 1; i++) {
+        for (let i = e[0] * 2 + 1; i < e[0] * 3 + 1; i++) {
             _conf.set(e[i], false)
-            _confName.set(e[i], e[i - e[0]])
+            if(t('idea.diy') !== 'LOSEHU DIY'){
+                _confName.set(e[i], e[i - e[0] - e[0]])
+            }else{
+                _confName.set(e[i], e[i - e[0]])
+            }
         }
         disMatrix.push(_conf)
         disName.push(_confName)
@@ -102,7 +106,7 @@ onMounted(async () => {
 
 <script lang="ts">
 export default {
-    name: 'Backup',
+    name: 'DIY',
 };
 </script>
 
