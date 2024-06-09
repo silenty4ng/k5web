@@ -108,7 +108,7 @@
         colKey: 'name',
         width: 250,
         align: 'left',
-        cell: (h, { row }) => row.name ? row.name.replace(/[^a-z0-9_]/g, '') : undefined,
+        cell: (h, { row }) => row.name ? row.name.replace(/[^a-zA-Z0-9_]/g, '') : undefined,
         edit: {
           component: Input,
           props: {
@@ -161,7 +161,7 @@
       for (let i = 0; i < 0x100; i += 0x10) {
         if(uint8ArrayToHexReverseString(rawEEPROM.subarray(i, i + 0x02)) != 'ffff'){
           _renderData.push({
-            name: uint8ArrayToString(rawEEPROM.subarray(i + 0x02, i + 0x10), appStore.configuration?.charset),
+            name: uint8ArrayToString(rawEEPROM.subarray(i + 0x02, i + 0x10), appStore.configuration?.charset).trim(),
             mdcid: uint8ArrayToHexReverseString(rawEEPROM.subarray(i, i + 0x01)) + uint8ArrayToHexReverseString(rawEEPROM.subarray(i + 0x01, i + 0x02))
           })
         }else{
