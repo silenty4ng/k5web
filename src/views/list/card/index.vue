@@ -105,7 +105,7 @@ const checkEeprom = async () => {
 const clearEEPROM = async () => {
   if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
   const eepromSize = await check_eeprom(appStore.connectPort, appStore.configuration?.uart);
-  let rawEEPROM = new Uint8Array(0x80);
+  let rawEEPROM = new Uint8Array(0x80).fill(0xff);
   for (let i = 0; i < eepromSize; i += 0x80) {
     await eeprom_write(appStore.connectPort, i, rawEEPROM, 0x80, appStore.configuration?.uart);
     state.status = state.status + "清空进度：" + (((i - 0) / eepromSize) * 100).toFixed(1) + "%<br/>";
