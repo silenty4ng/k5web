@@ -155,6 +155,7 @@ export default {
   'cps.mdcid': 'MDC ID',
   'idea.diy': '自定义萝卜固件',
   'diy.generate': '生成',
+  'cps.dtmfid': 'DTMF ID',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

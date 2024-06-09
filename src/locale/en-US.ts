@@ -155,6 +155,7 @@ export default {
   'cps.mdcid': 'MDC ID',
   'idea.diy': 'LOSEHU DIY',
   'diy.generate': 'Generate',
+  'cps.dtmfid': 'DTMF ID',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

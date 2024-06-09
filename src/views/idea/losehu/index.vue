@@ -5,7 +5,7 @@
             <a-col :span="24">
                 <a-card class="general-card" :title="$t('idea.diy')" :loading="loading">
                     <t-space direction="vertical">
-                        <div>操作说明：<a href="https://github.com/losehu/uv-k5-firmware-custom?tab=readme-ov-file#%E6%93%8D%E4%BD%9C%E8%AF%B4%E6%98%8E%E5%BF%85%E8%AF%BB" target="_blank">https://github.com/losehu/uv-k5-firmware-custom</a></div>
+                        <div>操作说明：<t-link theme="primary" href="https://github.com/losehu/uv-k5-firmware-custom" target="_blank">https://github.com/losehu/uv-k5-firmware-custom</t-link></div>
                         <a-radio-group v-for="item in state.showSort" v-model="state.flag[item]" type="button">
                             <a-radio v-for="subItem in state.disMatrix[item]" :value="subItem[0]"
                                 :disabled="subItem[1]">{{ state.disName[item].get(subItem[0]) }}</a-radio>

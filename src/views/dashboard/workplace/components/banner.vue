@@ -14,7 +14,15 @@
       </a-card>
     </a-space>
     <div>
-      <img style="margin-bottom: 10px;" width="600px" src="/gy.png" />
+      <a-typography-title :heading="5">说明：</a-typography-title>
+      <a-typography-text>◆ 使用应第一时间<t-link theme="primary" href="/#/tool/backup">备份</t-link>配置及校准数据。</a-typography-text><br>
+      <a-typography-text>◆ 除“固件升级”功能手台应处于刷机模式点击更新按钮选择设备更新，其余功能手台均需要在正常模式连接。</a-typography-text><br>
+      <a-typography-text>◆ 萝卜（LOSEHU）固件相关问题请移步：<t-link theme="primary" href="https://github.com/losehu/uv-k5-firmware-custom" target="_blank">https://github.com/losehu/uv-k5-firmware-custom</t-link> 。</a-typography-text><br>
+      <a-typography-text>◆ K5Web 使用视频教程（BG7QJV）：<t-link theme="primary" href="https://www.douyin.com/video/7378314511419313458" target="_blank">https://www.douyin.com/video/7378314511419313458</t-link> 。</a-typography-text>
+    </div>
+    <div>
+      <a-typography-title :heading="5">希望工程1+1助学行动：</a-typography-title>
+      <img class="tencent" style="margin-bottom: 10px;" width="200px" src="/gy.png" />
     </div>
   </a-col>
 </template>
@@ -101,5 +109,11 @@
 
   :deep(.arco-icon-home) {
     margin-right: 6px;
+  }
+
+  body[arco-theme='dark'] { 
+    .tencent {
+      filter: invert(1) hue-rotate(180deg);
+    }
   }
 </style>
