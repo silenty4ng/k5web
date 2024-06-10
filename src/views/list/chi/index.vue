@@ -10,9 +10,15 @@
           <a-space>
             <t-card bordered>
               <template #header>
-                {{ $t('tool.fontwrite') }}
+                {{ $t('tool.fontwrite') }} 
               </template>
               <a-button @click="restore(1)">{{ $t('tool.writefontwrite') }}</a-button>
+            </t-card>
+            <t-card bordered v-show="state.showHide >= 5">
+              <template #header>
+                {{ $t('tool.fontwrite') }}（繁體）
+              </template>
+              <a-button @click="restore(6)">{{ $t('tool.writefontwrite') }}</a-button>
             </t-card>
             <t-card bordered>
               <template #header>
@@ -143,6 +149,25 @@ const restore = async(type: any = 1) => {
       const binary = new Uint8Array(chunks)
       await restoreRange(0x02480, binary)
       return;
+    }
+  }
+  if(type == 6){
+    if(appStore.configuration?.charset == "gb2312"){
+      fontPacket = await fetch('/new_font_k_f.bin')
+      const reader = fontPacket.body.getReader();
+      const chunks = [];
+      while(true) {
+        const {done, value} = await reader.read();
+        if (done) {
+          break;
+        }
+        chunks.push(...value)
+      }
+      const binary = new Uint8Array(chunks)
+      await restoreRange(0x02480, binary)
+      return;
+    }else{
+      alert('不支持的版本')
     }
   }
 }
