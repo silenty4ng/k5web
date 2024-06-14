@@ -714,7 +714,11 @@
         const _tx = _channel.tx && _channel.rx ? Math.abs(parseInt((_channel.tx * 100000).toFixed(0)) - parseInt((_channel.rx * 100000).toFixed(0))) : NaN
         _channelhex += !Number.isNaN(_tx) ? _tx.toString(16).padStart(8, '0') : '00000000'
         _channelhex += parseInt((_channel.rx * 100000).toFixed(0)).toString(16).padStart(8, '0')
-
+        
+        if(_channelhex.indexOf('-1') != -1){
+          _channelhex = _channelhex.replace(/^(.{10})(.{6})(.*)$/, '$1000000$3');
+        }
+        
         console.log(_channelhex)
         rawEEPROM.set(hexReverseStringToUint8Array(_channelhex), i)
 
