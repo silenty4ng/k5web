@@ -7,6 +7,11 @@
 
 K5Web 用于对兼容业余无线电台 UV-K5 写频、更新固件、写入星历等。
 
+## Discussion
+- QQ 群：957225277  （K5Web相关）
+- QQ 群：201308015  （固件相关）
+- Telegram Group: https://t.me/losehu
+
 ## 功能列表
 
 - 固件版本检测
@@ -19,6 +24,9 @@ K5Web 用于对兼容业余无线电台 UV-K5 写频、更新固件、写入星�
 - 开机图片（LOSEHU 固件）
 - 字库写入（LOSEHU 固件）
 - 星历写入（LOSEHU 固件）
+- DTMF ID 设置
+- 收音机频道管理
+- MDC 联系人管理（LOSEHU 固件）
 
 ## 开发
 ### 安装依赖
