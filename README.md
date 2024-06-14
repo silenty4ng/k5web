@@ -11,6 +11,7 @@ K5Web 用于对兼容业余无线电台 UV-K5 写频、更新固件、写入星�
 - QQ 群：957225277  （K5Web相关）
 - QQ 群：201308015  （固件相关）
 - Telegram Group: https://t.me/losehu
+- Matrix Group: https://matrix.to/#/#losehu:mozilla.org
 
 ## 功能列表
 
