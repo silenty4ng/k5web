@@ -13,6 +13,18 @@ import App from './App.vue';
 import '@/assets/style/global.less';
 import '@/api/interceptor';
 import 'tdesign-vue-next/es/style/index.css';
+import Updater from "./utils/AutoUpdate.js";
+
+
+const AutoUpdate = new Updater()
+AutoUpdate.on('update',()=>{
+  setTimeout(async()=>{
+      const result = confirm('当前网站有更新，请点击确定刷新页面体验');
+      if(result){
+        location.reload();
+      }
+  },500)
+})
 
 const app = createApp(App);
 
