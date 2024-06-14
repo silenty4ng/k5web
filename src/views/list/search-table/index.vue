@@ -102,7 +102,8 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, computed, reactive } from 'vue';
+  import { ref, computed, reactive, onMounted } from 'vue';
+  import { useRoute } from 'vue-router';
   import { Input, Select } from 'tdesign-vue-next';
   import useLoading from '@/hooks/loading';
   import { eeprom_read, uint8ArrayToHexReverseString, uint8ArrayToString, hexReverseStringToUint8Array, stringToUint8Array, eeprom_write, eeprom_reboot, eeprom_init } from '@/utils/serial.js';
@@ -160,6 +161,93 @@
   const onDragSort = (params: any) => {
     cstate.renderData = params.newData
   }
+
+  const route = useRoute();
+
+  onMounted(async ()=>{
+    if(route.query.url){
+      const packet = await fetch(route.query.url)
+      const reader = packet?.body?.getReader();
+      if(reader){
+        const chunks = [];
+        while(true) {
+          const {done, value} = await reader.read();
+          if (done) {
+            break;
+          }
+          chunks.push(...value)
+        }
+        const binary = new Uint8Array(chunks)
+        var workbook = xlsxRead(binary);
+        const renderData : any = Array.from({length: 200}).map(e=>{return {scanlist: []}})
+        for(let i = 2; i < 202; i++){
+          if(workbook.Sheets.Sheet1['B' + i]?.w){
+            renderData[i - 2]['name'] = workbook.Sheets.Sheet1['B' + i]?.w
+          }
+          if(workbook.Sheets.Sheet1['C' + i]?.w){
+            renderData[i - 2]['bandwidth'] = Object.keys(state.bandwidthOption).find(key=>state.bandwidthOption[key]==workbook.Sheets.Sheet1['C' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['D' + i]?.w){
+            renderData[i - 2]['rx'] = workbook.Sheets.Sheet1['D' + i]?.w
+          }
+          if(workbook.Sheets.Sheet1['E' + i]?.w){
+            renderData[i - 2]['tx'] = workbook.Sheets.Sheet1['E' + i]?.w
+          }
+          if(workbook.Sheets.Sheet1['F' + i]?.w){
+            renderData[i - 2]['power'] = Object.keys(state.powerOption).find(key=>state.powerOption[key]==workbook.Sheets.Sheet1['F' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['G' + i]?.w){
+            renderData[i - 2]['rxTone'] = Object.keys(state.toneOption).find(key=>state.toneOption[key]==workbook.Sheets.Sheet1['G' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['H' + i]?.w){
+            renderData[i - 2]['rxCTCSS'] = parseFloat(workbook.Sheets.Sheet1['H' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['I' + i]?.w){
+            renderData[i - 2]['rxDCS'] = parseFloat(workbook.Sheets.Sheet1['I' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['J' + i]?.w){
+            renderData[i - 2]['txTone'] = Object.keys(state.toneOption).find(key=>state.toneOption[key]==workbook.Sheets.Sheet1['J' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['K' + i]?.w){
+            renderData[i - 2]['txCTCSS'] = parseFloat(workbook.Sheets.Sheet1['K' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['L' + i]?.w){
+            renderData[i - 2]['txDCS'] = parseFloat(workbook.Sheets.Sheet1['L' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['M' + i]?.w){
+            renderData[i - 2]['step'] = parseFloat(workbook.Sheets.Sheet1['M' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['N' + i]?.w){
+            renderData[i - 2]['reverse'] = workbook.Sheets.Sheet1['N' + i]?.w == '开' ? true : false
+          }
+          if(workbook.Sheets.Sheet1['O' + i]?.w){
+            renderData[i - 2]['scramb'] = parseFloat(workbook.Sheets.Sheet1['O' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['P' + i]?.w){
+            renderData[i - 2]['busy'] = workbook.Sheets.Sheet1['P' + i]?.w == '开' ? true : false
+          }
+          if(workbook.Sheets.Sheet1['Q' + i]?.w){
+            renderData[i - 2]['pttid'] = workbook.Sheets.Sheet1['Q' + i]?.w
+          }
+          if(workbook.Sheets.Sheet1['R' + i]?.w){
+            renderData[i - 2]['mode'] = Object.keys(state.modeOption).find(key=>state.modeOption[key]==workbook.Sheets.Sheet1['R' + i]?.w)
+          }
+          if(workbook.Sheets.Sheet1['S' + i]?.w){
+            renderData[i - 2]['dtmf'] = workbook.Sheets.Sheet1['S' + i]?.w == '开' ? true : false
+          }
+          if(workbook.Sheets.Sheet1['T' + i]?.w){
+            if(workbook.Sheets.Sheet1['T' + i]?.w.split(',').indexOf('I') >= 0){
+              renderData[i - 2]['scanlist'].push('I')
+            }
+            if(workbook.Sheets.Sheet1['T' + i]?.w.split(',').indexOf('II') >= 0){
+              renderData[i - 2]['scanlist'].push('II')
+            }
+          }
+        }
+        cstate.renderData = renderData
+      }
+    }
+  })
 
   const columns = computed(() => [
     {
@@ -774,6 +862,7 @@
     }
     xlsxWrite(workbook, 'K5Channel.xlsx');
   }
+
   const restoreExcelChannel = () => {
     const input = document.createElement('input');
     input.type = 'file';

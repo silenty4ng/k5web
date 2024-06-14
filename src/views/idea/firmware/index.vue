@@ -19,9 +19,11 @@
                 <a-list>
                     <a-list-item style="width: 100%;" v-for="item in state.nowpage">
                         <a-list-item-meta
-                            :title="item.title"
                             :description="item.desc"
                         >
+                          <template #title>
+                            <t-tag theme="primary" variant="outline">{{ item.upload }}</t-tag> {{ item.title }}
+                          </template>
                         </a-list-item-meta>
                         <template #actions>
                             <a-link @click="onStar(item.id)">👍</a-link>
@@ -67,7 +69,7 @@
             <t-input v-model="formData.title"></t-input>
           </t-form-item>
           <t-form-item label="固件描述" name="desc" label-align="top">
-            <t-textarea :autosize="{ minRows: 5, maxRows: 10 }" v-model="formData.desc" placeholder="请输入" clearable />
+            <t-textarea :autosize="{ minRows: 5, maxRows: 10 }" v-model="formData.desc" clearable />
           </t-form-item>
           <t-form-item label="固件文件" name="firmware" label-align="top">
             <t-upload
