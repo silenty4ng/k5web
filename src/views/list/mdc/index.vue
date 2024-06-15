@@ -133,7 +133,7 @@
             clearable: true
           },
           onEdited: (context: any) => {
-            context.newRowData.mdcid = context.newRowData.mdcid ? context.newRowData.mdcid : undefined
+            context.newRowData.mdcid = context.newRowData.mdcid ? context.newRowData.mdcid.toLowerCase() : undefined
             const newData = [...cstate.renderData];
             newData.splice((cstate.nowPage - 1) * cstate.pageSize + context.rowIndex, 1, context.newRowData);
             cstate.renderData = newData;
