@@ -8,17 +8,20 @@
             <span @click="()=>{state.showHide += 1}">{{ $t('menu.font') + $t('global.onStart') }}</span>
           </template>
           <a-space>
-            <t-card bordered>
+            <t-card bordered style="width: 420px;">
               <template #header>
-                {{ $t('tool.fontwrite') }} 
+                {{ $t('tool.fontwrite') }}
+                <div>
+                  <a-radio-group type="button" size="mini" v-model="state.lang">
+                    <a-radio value="Simplified_Chinese">{{$t('tool.Simplified_Chinese')}}</a-radio>
+                    <a-radio value="Traditional_Chinese">{{$t('tool.Traditional_Chinese')}}</a-radio>
+                  </a-radio-group>
+                </div>
               </template>
-              <a-button @click="restore(1)">{{ $t('tool.writefontwrite') }}</a-button>
-            </t-card>
-            <t-card bordered v-show="state.showHide >= 5">
-              <template #header>
-                {{ $t('tool.fontwrite') }}（繁體）
-              </template>
-              <a-button @click="restore(6)">{{ $t('tool.writefontwrite') }}</a-button>
+              <div>
+                <a-button v-show="state.lang == 'Simplified_Chinese'" @click="restore(1)">{{ $t('tool.writefontwrite') }}</a-button>
+                <a-button v-show="state.lang == 'Traditional_Chinese'" @click="restore(6)">{{ $t('tool.writefontwrite') }}</a-button>
+              </div>
             </t-card>
             <t-card bordered>
               <template #header>
@@ -55,7 +58,8 @@ const appStore = useAppStore();
 const state = reactive({
   status: "点击写入按钮写入字库到设备<br/><br/>",
   eepromType: "",
-  showHide: 0
+  showHide: 0,
+  lang: 'Simplified_Chinese'
 })
 
 const restoreRange = async (start: any = 0, uint8Array: any) => {

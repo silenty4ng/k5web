@@ -115,6 +115,8 @@ export default {
   'tool.fontwrite': 'LOSEHU 固件字库写入',
   'tool.pinyinwrite': 'LOSEHU H 版固件拼音索引表',
   'tool.writefontwrite': '自动写入字库',
+  'tool.Simplified_Chinese': '简体',
+  'tool.Traditional_Chinese': '繁体',
   'tool.writepinyin': '写入拼音检索表',
   'tool.brtime': '浏览器时间',
   'tool.selectSatellite': '选择卫星',
