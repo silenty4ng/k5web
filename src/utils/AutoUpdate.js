@@ -22,7 +22,7 @@ class Updater {
     };
  
     async getHtml() {
-        const html = await fetch('/?v=' + (new Date()).getTime() ).then(res => res.text());//读取index html
+        const html = await fetch('/').then(res => res.text());//读取index html
         return html
     };
  
