@@ -40,6 +40,7 @@ if(location.hostname == 'k5.vicicode.com' || location.hostname == 'k5.lhw711.cn'
   app.use(VueMatomo, {
     host: '//analytics.vicicode.com',
     siteId: 2,
+    router: router
   })
 }
 
