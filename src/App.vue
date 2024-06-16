@@ -39,10 +39,6 @@
         spa: true, // spa 应用页面跳转的时候开启 pv 计算
         hostUrl: 'https://rumt-zh.com'
     });
-    const shynet = document.createElement('script');
-    shynet.defer;
-    shynet.src = "https://shynet.vicicode.com/ingress/4c1dcea4-75c5-45e2-a641-25f211adbad6/script.js";
-    document.body.append(shynet);
   }
   
   const { currentLocale } = useLocale();

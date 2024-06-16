@@ -14,7 +14,7 @@ import '@/assets/style/global.less';
 import '@/api/interceptor';
 import 'tdesign-vue-next/es/style/index.css';
 import Updater from "./utils/AutoUpdate.js";
-
+import VueMatomo from 'vue-matomo';
 
 const AutoUpdate = new Updater()
 AutoUpdate.on('update',()=>{
@@ -35,5 +35,12 @@ app.use(store);
 app.use(i18n);
 app.use(globalComponents);
 app.use(directive);
+
+if(location.hostname == 'k5.vicicode.com' || location.hostname == 'k5.lhw711.cn' || location.hostname == 'mm.md' || location.hostname == 'k5.mm.md'){
+  app.use(VueMatomo, {
+    host: '//analytics.vicicode.com/',
+    siteId: 2,
+  })
+}
 
 app.mount('#app');
