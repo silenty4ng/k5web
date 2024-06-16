@@ -24,7 +24,7 @@
           <t-link href="https://txc.qq.com/products/647342" target="_blank">{{ $t('navbar.qa') }}</t-link>
         </li>
         <li>
-          <a-button type="primary" @click="connectIt">{{ appStore.connectState ? $t('navbar.disconnect') : $t('navbar.connect') }}</a-button>
+          <a-button v-show="route.path !== '/tool/flash'" type="primary" @click="connectIt">{{ appStore.connectState ? $t('navbar.disconnect') : $t('navbar.connect') }}</a-button>
         </li>
         <li>
           <a-tooltip :content="$t('settings.language')">
