@@ -159,6 +159,8 @@ export default {
   'idea.diy': 'LOSEHU DIY',
   'diy.generate': 'Generate',
   'cps.dtmfid': 'DTMF ID',
+  'global.upload': 'Upload',
+  'global.loginUpload': '(Login to upload and share)',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

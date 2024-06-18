@@ -159,6 +159,8 @@ export default {
   'idea.diy': '自定义萝卜固件',
   'diy.generate': '生成',
   'cps.dtmfid': 'DTMF ID',
+  'global.upload': '上传',
+  'global.loginUpload': '（登录可上传分享）',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,
