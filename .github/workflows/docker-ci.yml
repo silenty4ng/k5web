@@ -63,3 +63,4 @@ jobs:
             ghcr.io/${{ env.GHCR_REPOSITORY }}:${{ env.SHORT_SHA }}
         provenance: true
         sbom: true
+        push: true
