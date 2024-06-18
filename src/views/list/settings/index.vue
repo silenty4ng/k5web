@@ -21,16 +21,6 @@
                 </a-button>
               </a-space>
             </a-col>
-            <!-- <a-col :span="12" style="text-align: right;">
-              <a-space>
-                <a-button type="primary" @click="saveChannel">
-                  {{ $t('cps.save') }}
-                </a-button>
-                <a-button @click="restoreChannel">
-                  {{ $t('cps.load') }}
-                </a-button>
-              </a-space>
-            </a-col> -->
           </a-row>
           <a-spin :loading="loading" style="width: 100%;">
             <a-form-item :label-col-style="{width: '25%'}" field="logo_line1" :label="$t('cps.line1')">
@@ -39,7 +29,10 @@
             <a-form-item :label-col-style="{width: '25%'}" field="logo_line2" :label="$t('cps.line2')">
               <a-input v-model="state.logo_line2" />
             </a-form-item>
-            <a-form-item :label-col-style="{width: '25%'}" field="logo_line2" :label="$t('cps.mdclocplay')">
+            <a-form-item :label-col-style="{width: '25%'}" field="dtmfid" :label="$t('cps.dtmfid')">
+              <a-input v-model="state.dtmfid" />
+            </a-form-item>
+            <a-form-item :label-col-style="{width: '25%'}" field="mdclocplay" :label="$t('cps.mdclocplay')">
               <a-switch v-model="state.mdc_audio_local" type="round"/>
             </a-form-item>
           </a-spin>
@@ -61,7 +54,8 @@ const { loading, setLoading } = useLoading(false);
 const state = reactive({
   logo_line1: '',
   logo_line2: '',
-  mdc_audio_local: true
+  mdc_audio_local: true,
+  dtmfid: ''
 })
 
 const readChannel = async() => {
@@ -84,6 +78,9 @@ const readChannel = async() => {
     state.logo_line1 = uint8ArrayToString(logo.subarray(0, 0x10), appStore.configuration?.charset)
     state.logo_line2 = uint8ArrayToString(logo.subarray(0x10, 0x20), appStore.configuration?.charset)
   }
+
+  const dtmfid = await eeprom_read(appStore.connectPort, 0xEE0, 0x03, appStore.configuration?.uart)
+  state.dtmfid = uint8ArrayToString(dtmfid)
 
   if(parseInt(await eeprom_read(appStore.connectPort, 0x01FFD, 0x01, appStore.configuration?.uart)) == 0){
     state.mdc_audio_local = false
@@ -116,21 +113,21 @@ const writeChannel = async() => {
     logo.set(stringToUint8Array(state.logo_line2, appStore.configuration?.charset).subarray(0, 0x10), 0x10);
     await eeprom_write(appStore.connectPort, 0xEB0, logo, 0x20, appStore.configuration?.uart);
   }
+  if(state.dtmfid == ''){
+    await eeprom_write(appStore.connectPort, 0xEE0, new Uint8Array([0xff, 0xff, 0xff]), 0x03, appStore.configuration?.uart);
+  }else{
+    await eeprom_write(appStore.connectPort, 0xEE0, new Uint8Array([
+        stringToUint8Array(state.dtmfid.padStart(3, '0').split('')[0]),
+        stringToUint8Array(state.dtmfid.padStart(3, '0').split('')[1]), 
+        stringToUint8Array(state.dtmfid.padStart(3, '0').split('')[2])
+      ]), 0x03, appStore.configuration?.uart);
+  }
   if(appStore.configuration?.localmdc){
     await eeprom_write(appStore.connectPort, 0x01FFD, new Uint8Array([state.mdc_audio_local ? 1 : 0]), 0x01, appStore.configuration?.uart);
   }
   await eeprom_reboot(appStore.connectPort);
   setLoading(false)
 }
-
-const saveChannel = async() => {
-
-}
-
-const restoreChannel = async() => {
-
-}
-
 </script>
 
 <script lang="ts">

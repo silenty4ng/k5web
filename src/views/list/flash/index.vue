@@ -52,7 +52,7 @@ onMounted(async ()=>{
       }
       const binary = new Uint8Array(chunks)
       state.binaryFile = binary
-      state.binaryName = route.query.url.substring(route.query.url.lastIndexOf('/') + 1)
+      state.binaryName = route.query.url.substring(route.query.url.lastIndexOf('/') + 1).split('?')[0] + ' '
     }
   }
 })

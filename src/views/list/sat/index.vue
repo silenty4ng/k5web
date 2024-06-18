@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <a-modal v-model:visible="state.visible" @ok="handleOk" ok-text="Scanned and uploaded">
+    <a-modal v-model:visible="state.visible" @ok="handleOk" :ok-text="$t('tool.scaned')">
       <template #title>
         {{ $t('tool.scanqr') }}
       </template>
@@ -47,7 +47,7 @@
               <a-space>
                 <a-button @click="getLocation">{{ $t('tool.brlonlat') }}</a-button>
                 <a-button @click="scanLocation">{{ $t('tool.phonelonlat') }}</a-button>
-                <a-button @click="getPass">{{ $t('tool.satpasstime') }}</a-button>
+                <a-button type="primary" @click="getPass">{{ $t('tool.satpasstime') }}</a-button>
               </a-space>
             </a-form-item>
             <a-form-item :label-col-style="{ width: '25%' }" field="pass" :label="$t('tool.selectPassTime')">
@@ -84,7 +84,7 @@
               </a-select>
             </a-form-item>
             <a-form-item :label-col-style="{ width: '25%' }" label="">
-              <a-button @click="writeIt">{{ $t('tool.writeData') }}</a-button>
+              <a-button type="primary" @click="writeIt">{{ $t('tool.writeData') }}</a-button>
             </a-form-item>
             <a-divider />
             <div id="statusArea"

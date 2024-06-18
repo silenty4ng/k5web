@@ -3,5 +3,6 @@
     "uart": "losehu",
     "charset": "losehu",
     "K": true,
-    "localmdc": true
+    "localmdc": true,
+    "fm30": true
 }

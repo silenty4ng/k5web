@@ -24,7 +24,7 @@
           <t-link href="https://txc.qq.com/products/647342" target="_blank">{{ $t('navbar.qa') }}</t-link>
         </li>
         <li>
-          <a-button type="primary" @click="connectIt">{{ appStore.connectState ? $t('navbar.disconnect') : $t('navbar.connect') }}</a-button>
+          <a-button v-show="route.path !== '/tool/flash'" type="primary" @click="connectIt">{{ appStore.connectState ? $t('navbar.disconnect') : $t('navbar.connect') }}</a-button>
         </li>
         <li>
           <a-tooltip :content="$t('settings.language')">
@@ -226,6 +226,11 @@
   const configuration_list : any = {
     "LOSEHU.*P.*K"       : "ltsk.json",
     "LOSEHU.*P.*"        : "lts.json",
+    "LOSEHU13[0-9].*HS"   : "losehu124h.json",
+    "LOSEHU13[0-9].*H"   : "losehu124h.json",
+    "LOSEHU13[0-9].*KS"   : "losehu120k.json",
+    "LOSEHU13[0-9].*K"   : "losehu120k.json",
+    "LOSEHU13[0-9].*"    : "losehu118.json",
     "LOSEHU12[4-9].*HS"   : "losehu124h.json",
     "LOSEHU12[4-9].*H"   : "losehu124h.json",
     "LOSEHU12[0-3].*H"   : "losehu118h.json",
@@ -282,7 +287,8 @@
         "H": false,
         "localmdc": false,
         "sat": false,
-        "newpinyin": false
+        "newpinyin": false,
+        'fm30': false
       }
 
       Object.keys(configuration_list).some(e=>{
