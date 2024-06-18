@@ -81,11 +81,12 @@ const useUserStore = defineStore('user', {
     },
     // Logout
     async logout() {
-      try {
-        await userLogout();
-      } finally {
-        this.logoutCallBack();
-      }
+      // try {
+      //   await userLogout();
+      // } finally {
+      //   this.logoutCallBack();
+      // }
+      this.logoutCallBack();
     },
   },
 });
