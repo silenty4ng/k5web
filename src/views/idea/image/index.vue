@@ -8,11 +8,13 @@
                     <div style="margin-right: 20px;">
                         <template v-if="userStore.name">
                           <a-link @click="showPanel">&nbsp;&nbsp;{{ userStore.name }}&nbsp;&nbsp;</a-link>
+                          <a-link @click="showPanel">&nbsp;&nbsp;{{ $t('global.upload') }}&nbsp;&nbsp;</a-link>
                           <a-link @click="userStore.logout()">&nbsp;&nbsp;{{ $t('global.logout') }}&nbsp;&nbsp;</a-link>
                         </template>
                         <template v-else>
                           <a-link @click="userStore.setInfo({ showLogin: true })">&nbsp;&nbsp;{{ $t('global.login') }}&nbsp;&nbsp;</a-link>
                           <a-link @click="userStore.setInfo({ showRegister: true })">&nbsp;&nbsp;{{ $t('global.register') }}&nbsp;&nbsp;</a-link>
+                          <span style="color: #373737; margin: 10px;">{{ $t('global.loginUpload') }}</span>
                         </template>
                     </div>
               </template>
