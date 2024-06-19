@@ -60,6 +60,7 @@ jobs:
           org.opencontainers.image.revision=${{ github.sha }}
         tags: |
             ghcr.io/${{ env.GHCR_REPOSITORY }}:${{ env.SHORT_SHA }}
+            ghcr.io/${{ env.GHCR_REPOSITORY }}:${{ env.TAG }}
         provenance: true
         sbom: true
         push: true
