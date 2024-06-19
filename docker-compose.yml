@@ -1,7 +1,7 @@
 version: "3.5"
 services:
   k5web:
-    build: .
+    image: ghcr.io/silenty4ng/k5web:latest
     container_name: k5web
     network_mode: "bridge"
     ports:
