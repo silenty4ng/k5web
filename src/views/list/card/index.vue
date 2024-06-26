@@ -150,6 +150,7 @@ const restoreRange = async (start: any = 0) => {
   await eeprom_init(appStore.connectPort);
   const input = document.createElement('input');
   input.type = 'file';
+  input.accept = '.bin';
   input.onchange = async() => {
     const blob = new Blob([input.files[0]], {type: 'application/octet-stream' });
     const rawEEPROM = new Uint8Array(await blob.arrayBuffer());
