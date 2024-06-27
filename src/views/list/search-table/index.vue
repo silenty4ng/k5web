@@ -110,7 +110,7 @@
   import { useAppStore } from '@/store';
   import { MoveIcon } from 'tdesign-icons-vue-next';
   import Chinese from 'chinese-s2t';
-  import { read as xlsxRead, writeFile as xlsxWrite, utils as xlsxUtils } from "xlsx";
+  import { read as xlsxRead, writeXLSX } from "xlsx";
   import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
 
@@ -864,7 +864,13 @@
         worksheet['T' + i].v = cstate.renderData[i - 2]?.scanlist.join(',')
       }
     }
-    xlsxWrite(workbook, 'K5Channel.xlsx');
+    const blob = new Blob([writeXLSX(workbook, { type: 'buffer' })], { type: 'application/octet-stream' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'K5Channel.xlsx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 
   const restoreExcelChannel = () => {
