@@ -19,10 +19,13 @@ import VueMatomo from 'vue-matomo';
 const AutoUpdate = new Updater()
 AutoUpdate.on('update',()=>{
   setTimeout(async()=>{
-      const result = confirm('当前网站有更新，请点击确定刷新页面体验');
-      if(result){
-        location.reload();
-      }
+    if(process.env.NODE_ENV == 'development'){
+      return
+    }
+    const result = confirm('当前网站有更新，请点击确定刷新页面体验');
+    if(result){
+      location.reload();
+    }
   },500)
 })
 
