@@ -224,6 +224,7 @@
   const toggleDrawerMenu = inject('toggleDrawerMenu') as () => void;
 
   const configuration_list : any = {
+    "L_BL[0-9][0-9][0-9]": "losehubl.json",
     "LOSEHU.*P.*K"       : "ltsk.json",
     "LOSEHU.*P.*"        : "lts.json",
     "LOSEHU13[0-9].*HS"   : "losehu124h.json",
