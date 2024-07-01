@@ -93,8 +93,6 @@ const flashIt = async () => {
   await readPacket(_connect, 0x18, 1000);
   const rawVersion = unpackVersion(state.binaryFile);
   const _data = new Uint8Array([0x30, 0x5, rawVersion.length, 0x0, ...rawVersion]);
-  await sendPacket(_connect, _data);
-  await readPacket(_connect, 0x18)
 
   if(state.protocol == 'Official'){
     await sendPacket(_connect, _data);
