@@ -954,6 +954,74 @@ async function readPacket(port, expectedData, timeout = 1000) {
 
 
 /**
+ * Waits for a packet from the radio. The packet data is returned as a Uint8Array. 
+ * @param {SerialPort} port - The serial port to read from.
+ * @param {number} timeout - The timeout in milliseconds.
+ * @returns {Promise<Uint8Array>} - A promise that resolves with the received packet or gets rejected on timeout.
+ */
+async function readPacketNoVerify(port, timeout = 1000) {
+    // Create a reader to read data from the serial port
+    const reader = port.readable.getReader();
+    let buffer = new Uint8Array();
+    let timeoutId; // Store the timeout ID to clear it later
+
+    try {
+        return await new Promise((resolve, reject) => {
+            // Event listener to handle incoming data
+            function handleData({ value, done }) {
+                if (done) {
+                    // If `done` is true, then the reader has been cancelled
+                    reject('Reader has been cancelled.');
+                    console.log('Reader has been cancelled. Current Buffer:', buffer, uint8ArrayToHexString(buffer));
+                    return;
+                }
+
+                // Append the new data to the buffer
+                buffer = new Uint8Array([...buffer, ...value]);
+
+                // Strip the beginning of the buffer until the first 0xAB byte
+                // This is done to ensure that the buffer does not contain any incomplete packets
+                while (buffer.length > 0 && buffer.indexOf(0xAB) != -1 && buffer.indexOf(0xCD) != -1) {
+                    resolve(true);
+                    return;
+                }
+
+                // Continue reading data
+                reader.read().then(handleData).catch(error => {
+                    console.error('Error reading data from the serial port:', error);
+                    reject(error);
+                    return;
+                });
+            }
+
+            // Subscribe to the data event to start listening for incoming data
+            reader.read().then(handleData).catch(error_1 => {
+                console.error('Error reading data from the serial port:', error_1);
+                reject(error_1);
+                return;
+            });
+
+            // Set the timeout to reject the Promise if the packet is not received within the specified time
+            timeoutId = setTimeout(() => {
+                reader.cancel().then(() => {
+                    reject('Timeout: Packet not received within the specified time.');
+                    return;
+                }).catch(error_2 => {
+                    console.error('Error cancelling reader:', error_2);
+                    reject(error_2);
+                    return;
+                });
+            }, timeout);
+        });
+    } finally {
+        // Clear the timeout when the promise is settled (resolved or rejected)
+        clearTimeout(timeoutId);
+        // Release the reader in the finally block to ensure it is always released
+        reader.releaseLock();
+    }
+}
+
+/**
  * Sends a packet to the radio.
  * @param {SerialPort} port - The serial port to write to.
  * @param {Uint8Array} data - The packet data to send.
@@ -1427,5 +1495,6 @@ export {
     flash_flashFirmware,
     flash_generateCommand,
     unpackVersion,
-    unpack
+    unpack,
+    readPacketNoVerify
 }
