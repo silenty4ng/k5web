@@ -95,6 +95,12 @@ const flashIt = async () => {
   const _data = new Uint8Array([0x30, 0x5, rawVersion.length, 0x0, ...rawVersion]);
   await sendPacket(_connect, _data);
   await readPacket(_connect, 0x18)
+
+  if(state.protocol == 'Official'){
+    await sendPacket(_connect, _data);
+    await readPacket(_connect, 0x18);
+  }
+  
   const firmware = unpack(state.binaryFile);
   
   if (firmware.length > 0xefff) throw new Error('Last resort boundary check failed. Whoever touched the code is an idiot.');
