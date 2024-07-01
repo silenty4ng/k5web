@@ -90,7 +90,9 @@ const flashIt = async () => {
     await disconnect(appStore.connectPort);
   }
   let _connect = await connect();
-  await readPacket(_connect, 0x18, 1000);
+  if(state.protocol == 'Official'){
+    await readPacket(_connect, 0x18, 1000);
+  }
   const rawVersion = unpackVersion(state.binaryFile);
   const _data = new Uint8Array([0x30, 0x5, rawVersion.length, 0x0, ...rawVersion]);
 
