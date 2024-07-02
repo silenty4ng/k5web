@@ -10,6 +10,8 @@ import Components from 'unplugin-vue-components/vite';
 import { TDesignResolver } from 'unplugin-vue-components/resolvers';
 import { ArcoResolver } from 'unplugin-vue-components/resolvers';
 
+import htmlPlugin from "vite-plugin-html-config";
+
 export default defineConfig({
   base: './',
   plugins: [
@@ -27,6 +29,14 @@ export default defineConfig({
         library: 'vue-next'
       }), ArcoResolver()],
     }),
+    htmlPlugin({
+      metas: [
+        {
+          name: "builtTime",
+          content: Math.ceil(parseInt(new Date().toISOString().replace(/[.:TZ-]/g, '')) / 1000).toString()
+        },
+      ]
+    })
   ],
   resolve: {
     alias: [
