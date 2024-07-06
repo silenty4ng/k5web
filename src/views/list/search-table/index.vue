@@ -102,7 +102,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, computed, reactive, onMounted } from 'vue';
+  import { ref, computed, reactive, onMounted, onBeforeMount } from 'vue';
   import { useRoute } from 'vue-router';
   import { Input, Select } from 'tdesign-vue-next';
   import useLoading from '@/hooks/loading';
@@ -120,7 +120,9 @@
   const state = {
     bandwidthOption: {'0': '25KHz', '1': '12.5KHz'},
     modeOption: {'0': 'FM', '1': 'AM', '2': 'USB'},
+    powerOptionEng: {'0': 'Low', '1': 'Med', '2': 'High'},
     powerOption: {'0': '低', '1': '中', '2': '高'},
+    toneOptionEng: {'1':'Tone','2':'DTCS(N)','3':'DTCS(I)'},
     toneOption: {'1':'亚音频','2':'数字亚音','3':'反向数字亚音'},
     CTCSSOption: [67.0, 69.3, 71.9, 74.4, 77.0, 79.7, 82.5, 85.4,
     88.5, 91.5, 94.8, 97.4, 100.0, 103.5, 107.2, 110.9,
@@ -141,6 +143,7 @@
     731, 732, 734, 743, 754],
     stepOption: [2.50, 5.00, 6.25, 10.00, 12.50, 25.00, 8.33, 0.01, 0.05, 0.10, 0.25, 0.50, 1.00, 1.25, 9.00, 15.00, 20.00, 30.00, 50.00, 100.00, 125.00, 200.00, 250.00, 500.00],
     scrambOption: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+    pttidOptionEng: ['UP CODE', 'DOWW CODE', 'UP+DOWN Code', 'APOLLO QUINDAR'],
     pttidOption: ['上线码', '下线码', '上线+下线码', 'Quindar码']
   }
 
@@ -163,6 +166,14 @@
   }
 
   const route = useRoute();
+
+  onBeforeMount(()=>{
+    if(t('menu.dashboard') == 'CPS'){
+      state.powerOption = state.powerOptionEng
+      state.toneOption = state.toneOptionEng
+      state.pttidOption = state.pttidOptionEng
+    }
+  })
 
   onMounted(async ()=>{
     if(route.query.url){
@@ -218,13 +229,13 @@
             renderData[i - 2]['step'] = parseFloat(workbook.Sheets.Sheet1['M' + i]?.w)
           }
           if(workbook.Sheets.Sheet1['N' + i]?.w){
-            renderData[i - 2]['reverse'] = workbook.Sheets.Sheet1['N' + i]?.w == '开' ? true : false
+            renderData[i - 2]['reverse'] = workbook.Sheets.Sheet1['N' + i]?.w == t('On') ? true : false
           }
           if(workbook.Sheets.Sheet1['O' + i]?.w){
             renderData[i - 2]['scramb'] = parseFloat(workbook.Sheets.Sheet1['O' + i]?.w)
           }
           if(workbook.Sheets.Sheet1['P' + i]?.w){
-            renderData[i - 2]['busy'] = workbook.Sheets.Sheet1['P' + i]?.w == '开' ? true : false
+            renderData[i - 2]['busy'] = workbook.Sheets.Sheet1['P' + i]?.w == t('On') ? true : false
           }
           if(workbook.Sheets.Sheet1['Q' + i]?.w){
             renderData[i - 2]['pttid'] = workbook.Sheets.Sheet1['Q' + i]?.w
@@ -233,7 +244,7 @@
             renderData[i - 2]['mode'] = Object.keys(state.modeOption).find(key=>state.modeOption[key]==workbook.Sheets.Sheet1['R' + i]?.w)
           }
           if(workbook.Sheets.Sheet1['S' + i]?.w){
-            renderData[i - 2]['dtmf'] = workbook.Sheets.Sheet1['S' + i]?.w == '开' ? true : false
+            renderData[i - 2]['dtmf'] = workbook.Sheets.Sheet1['S' + i]?.w == t('On') ? true : false
           }
           if(workbook.Sheets.Sheet1['T' + i]?.w){
             if(workbook.Sheets.Sheet1['T' + i]?.w.split(',').indexOf('I') >= 0){
@@ -777,13 +788,21 @@
   const downloadExcelTemplate = () => {
     const a = document.createElement('a');
     a.href = '/K5Channel.xlsx';
+    if(t('menu.dashboard') == 'CPS'){
+      a.href = '/K5Channel_EN.xlsx';
+    }
     a.download = 'K5Channel.xlsx';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
   };
   const saveExcelChannel = async () => {
-    const template = await fetch('/K5Channel.xlsx');
+    let template = undefined;
+    if(t('menu.dashboard') == 'CPS'){
+      template = await fetch('/K5Channel_EN.xlsx');
+    }else{
+      template = await fetch('/K5Channel.xlsx');
+    }
     const workbook = xlsxRead(await template.arrayBuffer());
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
     for(let i = 2; i < 202; i++){
@@ -837,7 +856,7 @@
       }
       if(cstate.renderData[i - 2]?.reverse){
         worksheet['N' + i] = {}
-        worksheet['N' + i].v = cstate.renderData[i - 2]?.reverse == true ? '开' : '关'
+        worksheet['N' + i].v = cstate.renderData[i - 2]?.reverse == true ? t('On') : t('Off')
       }
       if(cstate.renderData[i - 2]?.scramb){
         worksheet['O' + i] = {}
@@ -845,7 +864,7 @@
       }
       if(cstate.renderData[i - 2]?.busy){
         worksheet['P' + i] = {}
-        worksheet['P' + i].v = cstate.renderData[i - 2]?.busy == true ? '开' : '关'
+        worksheet['P' + i].v = cstate.renderData[i - 2]?.busy == true ? t('On') : t('Off')
       }
       if(cstate.renderData[i - 2]?.pttid){
         worksheet['Q' + i] = {}
@@ -857,7 +876,7 @@
       }
       if(cstate.renderData[i - 2]?.dtmf){
         worksheet['S' + i] = {}
-        worksheet['S' + i].v = cstate.renderData[i - 2]?.dtmf == true ? '开' : '关'
+        worksheet['S' + i].v = cstate.renderData[i - 2]?.dtmf == true ? t('On') : t('Off')
       }
       if(cstate.renderData[i - 2]?.scanlist){
         worksheet['T' + i] = {}
@@ -921,13 +940,13 @@
             renderData[i - 2]['step'] = parseFloat(workbook.Sheets.Sheet1['M' + i]?.w)
           }
           if(workbook.Sheets.Sheet1['N' + i]?.w){
-            renderData[i - 2]['reverse'] = workbook.Sheets.Sheet1['N' + i]?.w == '开' ? true : false
+            renderData[i - 2]['reverse'] = workbook.Sheets.Sheet1['N' + i]?.w == t('On') ? true : false
           }
           if(workbook.Sheets.Sheet1['O' + i]?.w){
             renderData[i - 2]['scramb'] = parseFloat(workbook.Sheets.Sheet1['O' + i]?.w)
           }
           if(workbook.Sheets.Sheet1['P' + i]?.w){
-            renderData[i - 2]['busy'] = workbook.Sheets.Sheet1['P' + i]?.w == '开' ? true : false
+            renderData[i - 2]['busy'] = workbook.Sheets.Sheet1['P' + i]?.w == t('On') ? true : false
           }
           if(workbook.Sheets.Sheet1['Q' + i]?.w){
             renderData[i - 2]['pttid'] = workbook.Sheets.Sheet1['Q' + i]?.w
@@ -936,7 +955,7 @@
             renderData[i - 2]['mode'] = Object.keys(state.modeOption).find(key=>state.modeOption[key]==workbook.Sheets.Sheet1['R' + i]?.w)
           }
           if(workbook.Sheets.Sheet1['S' + i]?.w){
-            renderData[i - 2]['dtmf'] = workbook.Sheets.Sheet1['S' + i]?.w == '开' ? true : false
+            renderData[i - 2]['dtmf'] = workbook.Sheets.Sheet1['S' + i]?.w == t('On') ? true : false
           }
           if(workbook.Sheets.Sheet1['T' + i]?.w){
             if(workbook.Sheets.Sheet1['T' + i]?.w.split(',').indexOf('I') >= 0){

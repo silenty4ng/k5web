@@ -29,6 +29,8 @@ import localeUserSetting from '@/views/user/setting/locale/en-US';
 import localeSettings from './en-US/settings';
 
 export default {
+  'On': 'On',
+  'Off': 'Off',
   'menu.dashboard': 'CPS',
   'menu.cps.channel': 'Channel',
   'menu.cps.settings': 'Settings',

@@ -29,6 +29,8 @@ import localeUserSetting from '@/views/user/setting/locale/zh-CN';
 import localeSettings from './zh-CN/settings';
 
 export default {
+  'On': '开',
+  'Off': '关',
   'menu.dashboard': '写频',
   'menu.cps.channel': '信道管理',
   'menu.cps.settings': '设置管理',
