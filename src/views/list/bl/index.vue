@@ -78,6 +78,7 @@
     calendar: [],
     rom: [],
     bl: undefined,
+    blName: '',
     nowDrag: -1,
     showAdd: '',
     status: ''
@@ -125,7 +126,9 @@
   })
 
   const loadBL = async() => {
-    const fontPacket = await fetch('/L_BL001.bin')
+    const latestVersion = JSON.parse(await (await fetch('https://k5.vicicode.com/diyapi/bl.json')).text())!.latest;
+    state.blName = latestVersion;
+    const fontPacket = await fetch('https://k5.vicicode.com/diyapi/' + latestVersion);
     if(fontPacket.body){
       const reader = fontPacket.body.getReader();
       const chunks = [];
@@ -174,7 +177,7 @@
     await writeRange(0x40000, new Uint8Array([firmware.length]), '固件数量');
 
     const _name_bl_array = new Uint8Array(8);
-    _name_bl_array.set(stringToUint8Array("L_BL001"))
+    _name_bl_array.set(stringToUint8Array(state.blName.split('.')[0]))
     await writeRange(0X40008, _name_bl_array, '引导程序版本')
 
     const writeMeta: any = [];
@@ -194,6 +197,7 @@
     }
 
     await eeprom_reboot(appStore.connectPort);
+    state.status = state.status + "写入完成<br/>";
     setLoading(false);
   }
 
