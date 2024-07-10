@@ -14,7 +14,7 @@
             <div>
               <a-radio-group type="button" size="mini" v-model="state.protocol">
                 <a-radio value="Official">Official</a-radio>
-                <a-radio value="Losehu">Losehu</a-radio>
+                <!-- <a-radio value="Losehu">Losehu</a-radio> -->
               </a-radio-group>
             </div>
           </div>
