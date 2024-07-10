@@ -185,7 +185,7 @@
       const _meta_name = new Uint8Array(16)
       const _meta_address_start = new Uint8Array(4)
       const _meta_address_end = new Uint8Array(4)
-      _meta_name.set(stringToUint8Array(item.binaryName))
+      _meta_name.set(stringToUint8Array(item.binaryName.replace(/[^\x00-\xff]/g, '')))
       _meta_address_start.set(hexReverseStringToUint8Array((item.start).toString(16)));
       _meta_address_end.set(hexReverseStringToUint8Array((item.end).toString(16)));
       writeMeta.push(..._meta_name, ..._meta_address_start, ..._meta_address_end, ...new Uint8Array(8))
@@ -212,7 +212,7 @@
           const rawEEPROM = new Uint8Array(await blob.arrayBuffer());
           const firmware = {
             binaryFile: unpack(rawEEPROM),
-            binaryName: input.files[i].name,
+            binaryName: input.files[i].name.replace(/[^\x00-\xff]/g, ''),
             color: getColor()
           }
           state.rom.push(firmware)
