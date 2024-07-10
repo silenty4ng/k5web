@@ -65,7 +65,7 @@ const state = reactive({
 const restoreRange = async (start: any = 0, uint8Array: any) => {
   await eeprom_init(appStore.connectPort);
   for (let i = start; i < uint8Array.length + start; i += 0x80) {
-    await eeprom_write(appStore.connectPort, i, uint8Array.slice(i - start, i - start + 0x80), 0x80, appStore.configuration?.uart);
+    await eeprom_write(appStore.connectPort, i, uint8Array.slice(i - start, i - start + 0x80), uint8Array.slice(i - start, i - start + 0x80).length, appStore.configuration?.uart);
     state.status = state.status + "写入进度：" + (((i - start) / uint8Array.length) * 100).toFixed(1) + "%<br/>";
     nextTick(()=>{
       const textarea = document?.getElementById('statusArea');

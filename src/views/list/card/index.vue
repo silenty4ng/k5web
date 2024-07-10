@@ -155,7 +155,7 @@ const restoreRange = async (start: any = 0) => {
     const blob = new Blob([input.files[0]], {type: 'application/octet-stream' });
     const rawEEPROM = new Uint8Array(await blob.arrayBuffer());
     for (let i = start; i < input.files[0].size + start; i += 0x80) {
-      await eeprom_write(appStore.connectPort, i, rawEEPROM.slice(i - start, i - start + 0x80), 0x80, appStore.configuration?.uart);
+      await eeprom_write(appStore.connectPort, i, rawEEPROM.slice(i - start, i - start + 0x80), rawEEPROM.slice(i - start, i - start + 0x80).length, appStore.configuration?.uart);
       state.status = state.status + "恢复进度：" + (((i - start) / input.files[0].size) * 100).toFixed(1) + "%<br/>";
       nextTick(()=>{
         const textarea = document?.getElementById('statusArea');
