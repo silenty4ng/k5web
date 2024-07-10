@@ -204,16 +204,19 @@
   const selectFile = () => {
     const input = document.createElement('input');
     input.type = 'file';
+    input.multiple = true;
     input.onchange = async () => {
       if(input.files){
-        const blob = new Blob([input.files[0]], { type: 'application/octet-stream' });
-        const rawEEPROM = new Uint8Array(await blob.arrayBuffer());
-        const firmware = {
-          binaryFile: unpack(rawEEPROM),
-          binaryName: input.files[0].name,
-          color: getColor()
+        for(let i = 0; i < input.files.length; i++){
+          const blob = new Blob([input.files[i]], { type: 'application/octet-stream' });
+          const rawEEPROM = new Uint8Array(await blob.arrayBuffer());
+          const firmware = {
+            binaryFile: unpack(rawEEPROM),
+            binaryName: input.files[i].name,
+            color: getColor()
+          }
+          state.rom.push(firmware)
         }
-        state.rom.push(firmware)
       }
     };
     input.click();
@@ -293,7 +296,7 @@
   }
 
   const changeName = (val: any) => {
-    state.rom[val].binaryName = state.rom[val].binaryName.replace(/[^\a-\z\A-\Z0-9.]/g, '')
+    state.rom[val].binaryName = state.rom[val].binaryName.replace(/[^\x00-\xff]/g, '')
   };
   </script>
   
