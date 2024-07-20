@@ -26,6 +26,7 @@
   import { encodingIndexes } from "@zxing/text-encoding/es2015/encoding-indexes";
   import { TextEncoder, TextDecoder } from "@zxing/text-encoding";
   import { useRoute } from 'vue-router';
+  import { DialogPlugin } from 'tdesign-vue-next';
 
   const route = useRoute();
 
@@ -71,4 +72,25 @@
     }, 1000);
     return lang;
   });
+
+  fetch('https://myip.ipip.net/json').then(e=>e.json()).then(e=>{
+    if(e.data.location[0] == '中国' && location.hostname != 'k5.vicicode.cn'){
+      if(!(localStorage.getItem('cnNotice') && parseInt(localStorage.getItem('cnNotice') ?? '') > new Date().getTime() - 604800000)){
+        DialogPlugin.confirm({
+          header: '提示',
+          body: '🚀 国内用户推荐访问国内镜像以获得极速体验～',
+          className: 't-dialog-new-class1 t-dialog-new-class2',
+          style: 'color: rgba(0, 0, 0, 0.6)',
+          cancelBtn: '7 天内不再显示',
+          confirmBtn: '🚀 立刻前往',
+          onConfirm: () => {
+            location.href = 'https://k5.vicicode.cn'
+          },
+          onCancel: () => {
+            localStorage.setItem('cnNotice', new Date().getTime().toString());
+          }
+        })
+      }
+    }
+  })
 </script>
