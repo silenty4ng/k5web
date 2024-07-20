@@ -29,7 +29,7 @@
                         </a-list-item-meta>
                         <template #actions>
                             <a-link @click="onStar(item.id)">👍</a-link>
-                            <a-link @click="useFirmware('https://k5.vicicode.com/wsapi/download?id=' + item.id)">{{$t('global.use')}}</a-link>
+                            <a-link @click="useFirmware('https://k5.vicicode.cn/wsapi/download?id=' + item.id)">{{$t('global.use')}}</a-link>
                         </template>
                     </a-list-item>
                 </a-list>
@@ -76,7 +76,7 @@
           <t-form-item label="信道文件" name="firmware" label-align="top">
             <t-upload
               v-model="formData.firmware"
-              action="https://k5.vicicode.com/wsapi/base64"
+              action="https://k5.vicicode.cn/wsapi/base64"
               :abridge-name="[8, 6]"
               theme="file-input"
               placeholder="未选择文件"
@@ -137,7 +137,7 @@
 
   const loadit = async (page: any) => {
     state.page = page.current
-    const resp : any = await axios.get("https://k5.vicicode.com/wsapi/list?type=2&limit=12&page=" + page.current + "&t=" + Date.now())
+    const resp : any = await axios.get("https://k5.vicicode.cn/wsapi/list?type=2&limit=12&page=" + page.current + "&t=" + Date.now())
     state.total = resp.total
     state.nowpage = resp.data
   }
@@ -145,7 +145,7 @@
   const showPanel = async () => {
     state.refLoading = true;
     state.showPanel = true
-    const resp : any = await axios.post("https://k5.vicicode.com/wsapi/my_list", {
+    const resp : any = await axios.post("https://k5.vicicode.cn/wsapi/my_list", {
       'type': 2,
       'token': userStore.accountId
     })
@@ -168,7 +168,7 @@
       });
       return;
     }
-    await axios.post("https://k5.vicicode.com/wsapi/upload", {
+    await axios.post("https://k5.vicicode.cn/wsapi/upload", {
       'type': 2,
       'token': userStore.accountId,
       'title': formData.title,
@@ -180,7 +180,7 @@
   }
 
   const onDT = async (id: any) => {
-    await axios.post("https://k5.vicicode.com/wsapi/delete", {
+    await axios.post("https://k5.vicicode.cn/wsapi/delete", {
       'id': id,
       'token': userStore.accountId,
     })
@@ -188,7 +188,7 @@
   }
 
   const onStar = async (id: any) => {
-    await axios.post("https://k5.vicicode.com/wsapi/star", {
+    await axios.post("https://k5.vicicode.cn/wsapi/star", {
       'id': id
     })
     Message.success({

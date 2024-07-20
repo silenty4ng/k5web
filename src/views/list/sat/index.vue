@@ -273,7 +273,7 @@ const scanLocation = async () => {
 }
 
 const handleOk = async () => {
-  const lol = await (await fetch('https://k5.vicicode.com/api/lol', {
+  const lol = await (await fetch('https://k5.vicicode.cn/api/lol', {
     method: "POST",
     mode: "cors",
     headers: {
@@ -308,7 +308,7 @@ const restoreRange = async (start: any = 0, uint8Array: any) => {
 const getPass = async () => {
   if (!state.sat) { alert('请选择卫星！'); return; };
   setLoading(true)
-  const res = await (await fetch('https://k5.vicicode.com/api/pass', {
+  const res = await (await fetch('https://k5.vicicode.cn/api/pass', {
     method: "POST",
     mode: "cors",
     headers: {
@@ -356,7 +356,7 @@ const writeIt = async () => {
   }
   if (!state.pass) { alert('请选择过境时间！'); return; };
   setLoading(true)
-  const res = await (await fetch('https://k5.vicicode.com/api/doppler', {
+  const res = await (await fetch('https://k5.vicicode.cn/api/doppler', {
     method: "POST",
     mode: "cors",
     headers: {

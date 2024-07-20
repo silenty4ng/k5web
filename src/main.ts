@@ -39,7 +39,7 @@ app.use(i18n);
 app.use(globalComponents);
 app.use(directive);
 
-if(location.hostname == 'k5.vicicode.com' || location.hostname == 'k5.lhw711.cn' || location.hostname == 'mm.md' || location.hostname == 'k5.mm.md'){
+if(location.hostname == 'k5.vicicode.com' || location.hostname == 'k5.vicicode.cn' || location.hostname == 'k5.lhw711.cn' || location.hostname == 'mm.md' || location.hostname == 'k5.mm.md'){
   app.use(VueMatomo, {
     host: '//analytics.vicicode.com',
     siteId: 2,
