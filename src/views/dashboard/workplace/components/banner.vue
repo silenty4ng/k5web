@@ -25,6 +25,14 @@
       <a-typography-title :heading="5">希望工程1+1助学行动：</a-typography-title>
       <img class="tencent" style="margin-bottom: 10px;" width="200px" src="/gy.png" />
     </div>
+    <div>
+      <a-typography-title :heading="5">广告区：</a-typography-title>
+      <div style="padding: 20px; border: 1px dashed;">
+        <img class="tencent" height="200px" src="/jjgg.jpg" />
+      </div>
+    </div>
+    <br>
+    <br>
   </a-col>
 </template>
 
