@@ -27,8 +27,8 @@
     </div>
     <div>
       <a-typography-title :heading="5">广告区：</a-typography-title>
-      <div style="padding: 20px; border: 1px dashed;">
-        <img class="tencent" height="200px" src="/jjgg.jpg" />
+      <div style="border: 1px dashed; display: inline-block;">
+        <img style="margin: 20px; " class="tencent" height="200px" src="/jjgg.jpg" />
       </div>
     </div>
     <br>
