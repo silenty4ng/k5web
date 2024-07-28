@@ -35,13 +35,13 @@
               </a-select>
             </a-form-item>
             <a-form-item :label-col-style="{ width: '25%' }" field="lng" :label="$t('tool.longitude')">
-              <a-input-number :precision="6" v-model="state.lng" />
+              <a-input-number ref="lngRef" :precision="6" v-model="state.lng" />
             </a-form-item>
             <a-form-item :label-col-style="{ width: '25%' }" field="lat" :label="$t('tool.latitude')">
-              <a-input-number :precision="6" v-model="state.lat" />
+              <a-input-number ref="latRef" :precision="6" v-model="state.lat" />
             </a-form-item>
             <a-form-item :label-col-style="{ width: '25%' }" field="alt" :label="$t('tool.altitude')">
-              <a-input-number :precision="0" v-model="state.alt" />
+              <a-input-number ref="altRef" :precision="0" v-model="state.alt" />
             </a-form-item>
             <a-form-item :label-col-style="{ width: '25%' }" label="">
               <a-space>
@@ -98,7 +98,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, nextTick, onMounted, onUnmounted } from 'vue';
+import { ref, reactive, nextTick, onMounted, onUnmounted } from 'vue';
 import { useAppStore } from '@/store';
 import { eeprom_write, eeprom_reboot, eeprom_init, hexReverseStringToUint8Array, stringToUint8Array } from '@/utils/serial.js';
 import useLoading from '@/hooks/loading';
@@ -107,6 +107,10 @@ import QRCode from 'qrcode';
 const { loading, setLoading } = useLoading(true);
 
 const appStore = useAppStore();
+
+const lngRef : any = ref(null)
+const latRef : any = ref(null)
+const altRef : any = ref(null)
 
 const state: {
   uuid: string,
@@ -165,8 +169,23 @@ const state: {
 onMounted(async ()=>{
   const rst = await (await fetch('https://mirror.ghproxy.com/https://raw.githubusercontent.com/palewire/ham-satellite-database/main/data/amsat-active-frequencies.json')).text()
   state.freqDb = JSON.parse(rst)
+
+  state.lng = parseFloat(localStorage.getItem('myLng') || '0')
+  state.lat = parseFloat(localStorage.getItem('myLat') || '0')
+  state.alt = parseFloat(localStorage.getItem('myAlt') || '0')
+
+  await lngRef.value.$forceUpdate()
+  await latRef.value.$forceUpdate()
+  await altRef.value.$forceUpdate()
+  state.lng = parseFloat(lngRef.value.inputRef.modelValue || '0')
+  state.lat = parseFloat(latRef.value.inputRef.modelValue || '0')
+  state.alt = parseFloat(altRef.value.inputRef.modelValue || '0')
+
   state.timer = setInterval(()=>{
     state.dt = new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })
+    localStorage.setItem('myLng', state.lng.toString());
+    localStorage.setItem('myLat', state.lat.toString());
+    localStorage.setItem('myAlt', state.alt.toString());
   }, 1000)
 })
 
