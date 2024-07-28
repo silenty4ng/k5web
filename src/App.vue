@@ -73,9 +73,9 @@
     return lang;
   });
 
-  fetch('https://myip.ipip.net/json').then(e=>e.json()).then(e=>{
-    if(e.data.location[0] == '中国' && location.hostname != 'k5.vicicode.cn'){
-      if(!(localStorage.getItem('cnNotice') && parseInt(localStorage.getItem('cnNotice') ?? '') > new Date().getTime() - 604800000)){
+  if(location.hostname === 'k5.vicicode.com'){
+    fetch('/cdn-cgi/trace').then(e=>e.text()).then(e=>{
+      if(e.indexOf('loc=CN') !== -1){
         DialogPlugin.confirm({
           header: '提示',
           body: '🚀 国内用户推荐访问国内镜像以获得极速体验～',
@@ -91,6 +91,7 @@
           }
         })
       }
-    }
-  })
+    })
+  }
+
 </script>
