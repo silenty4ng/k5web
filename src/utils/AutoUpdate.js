@@ -59,7 +59,7 @@ class Updater {
             this.newScript = this.parserScript(newHtml);
             this.compare(this.oldScript, this.newScript)
             //这边给的是默认值15000,也可以自定义秒数
-        }, 15000);
+        }, 60000);
     };
 }
  
