@@ -35,7 +35,7 @@
   window.TextDecoder = TextDecoder;
 
   // 遥测
-  if(location.hostname == 'k5.vicicode.com' || location.hostname == 'k5.vicicode.cn' || location.hostname == 'k5.lhw711.cn' || location.hostname == 'mm.md' || location.hostname == 'k5.mm.md'){
+  if(import.meta.env.VITE_METER_SITE.split(',').indexOf(location.hostname) !== -1){
     const aegis = new Aegis({
         id: 'yr5DeslJkz3Qn20jg0', // 上报 id
         reportApiSpeed: true, // 接口测速
