@@ -22,7 +22,7 @@
       <a-typography-text>◆ K5Web 使用视频教程（BG3ODZ）：<t-link theme="primary" href="https://www.bilibili.com/video/BV1Q4421D75x" target="_blank">https://www.bilibili.com/video/BV1Q4421D75x</t-link> 。</a-typography-text>
     </div>
     <div>
-      <a-typography-title :heading="5">希望工程1+1助学行动：</a-typography-title>
+      <a-typography-title :heading="5">腾讯公益：</a-typography-title>
       <img class="tencent" style="margin-bottom: 10px;" width="200px" src="/gy.png" />
     </div>
     <div>
