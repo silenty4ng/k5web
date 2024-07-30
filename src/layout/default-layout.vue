@@ -136,7 +136,7 @@
   });
 
   const onLogin = async () => {
-    const resp : any = await axios.post("https://k5.vicicode.cn/wsapi/login", {
+    const resp : any = await axios.post("https://k6.vicicode.cn/wsapi/login", {
       'username': formData.account,
       'password': formData.password
     })
@@ -164,7 +164,7 @@
       });
       return;
     }
-    const resp : any = await axios.post("https://k5.vicicode.cn/wsapi/register", {
+    const resp : any = await axios.post("https://k6.vicicode.cn/wsapi/register", {
       'username': formData.account,
       'password': formData.password
     })
