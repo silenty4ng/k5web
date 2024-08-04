@@ -144,6 +144,7 @@ export default {
   'menu.firmware': '固件市场',
   'menu.channel': '信道分享',
   'global.use': '使用',
+  'global.download': '下载',
   'tool.ssbpatch': 'LOSEHU S 版固件 SI4732 单边带补丁',
   'tool.writessbpatch': '写入单边带补丁',
   'global.login': '登录',

@@ -144,6 +144,7 @@ export default {
   'menu.firmware': 'Firmware Store',
   'menu.channel': 'Channel Share',
   'global.use': 'Use',
+  'global.download': 'Download',
   'tool.ssbpatch': 'LOSEHU S Firmware SI4732 SSB Patch',
   'tool.writessbpatch': 'SSB Patch Write',
   'global.login': 'Login',

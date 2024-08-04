@@ -10,7 +10,10 @@
                             <a-radio v-for="subItem in state.disMatrix[item]" :value="subItem[0]"
                                 :disabled="subItem[1]">{{ state.disName[item].get(subItem[0]) }}</a-radio>
                         </a-radio-group>
-                        <a-button type="primary" @click="useFirmware">{{ $t('diy.generate') }}</a-button>
+                        <div>
+                            <a-button type="primary" @click="useFirmware">{{ $t('diy.generate') }}</a-button>&nbsp;&nbsp;
+                            <a-link @click="iDownload">{{$t('global.download')}}</a-link>
+                        </div>
                     </t-space>
                 </a-card>
             </a-col>
@@ -34,6 +37,18 @@ const useFirmware = () => {
             url: 'https://k6.vicicode.cn/diyapi/LOSEHU' + state.flag.join('') + '.bin?v=' + (new Date()).getTime()
         }
     });
+}
+
+const iDownload = () => {
+    fetch('https://k6.vicicode.cn/diyapi/LOSEHU' + state.flag.join('') + '.bin?v=' + (new Date()).getTime()).then(e=>e.blob()).then(blob=>{
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = "LOSEHU-CUSTOM-" + state.flag.join('') + ".bin";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    })
 }
 
 const state: {

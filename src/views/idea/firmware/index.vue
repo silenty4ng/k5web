@@ -29,6 +29,7 @@
                         </a-list-item-meta>
                         <template #actions>
                             <a-link @click="onStar(item.id)">👍</a-link>
+                            <a-link @click="iDownload('https://k6.vicicode.cn/wsapi/download?id=' + item.id, item.title)">{{$t('global.download')}}</a-link>
                             <a-link @click="useFirmware('https://k6.vicicode.cn/wsapi/download?id=' + item.id + '&n=/' + item.title)">{{$t('global.use')}}</a-link>
                         </template>
                     </a-list-item>
@@ -208,6 +209,18 @@
         url
       }
     });
+  }
+
+  const iDownload = (url: any, name: any) => {
+    fetch(url).then(e=>e.blob()).then(blob=>{
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    })
   }
 
   </script>
