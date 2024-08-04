@@ -21,15 +21,35 @@
       <a-typography-text>◆ K5Web 使用视频教程（BG7QJV）：<t-link theme="primary" href="https://www.douyin.com/video/7378314511419313458" target="_blank">https://www.douyin.com/video/7378314511419313458</t-link> 。</a-typography-text><br>
       <a-typography-text>◆ K5Web 使用视频教程（BG3ODZ）：<t-link theme="primary" href="https://www.bilibili.com/video/BV1Q4421D75x" target="_blank">https://www.bilibili.com/video/BV1Q4421D75x</t-link> 。</a-typography-text>
     </div>
+    <div style="margin-top: 50px;">&nbsp;</div>
     <div>
-      <a-typography-title :heading="5">腾讯公益：</a-typography-title>
-      <img class="tencent" style="margin-bottom: 10px;" width="200px" src="/gy.png" />
-    </div>
-    <div>
-      <a-typography-title :heading="5">广告区：</a-typography-title>
-      <div style="border: 1px dashed; display: inline-block;">
-        <img style="margin: 20px; " class="tencent" height="200px" src="/jjgg.jpg" />
-      </div>
+      <a-collapse :default-active-key="[1]" accordion>
+        <a-collapse-item header="广告区" :key="1">
+          <a-card hoverable :style="{ width: '600px' }">
+            <template #cover>
+              <div
+              >
+                <img
+                  :style="{ width: '100%' }"
+                  alt="ads"
+                  src="/jjgg.jpg"
+                />
+              </div>
+            </template>
+            <a-card-meta title="BG4IWE 投放">
+            </a-card-meta>
+          </a-card>
+        </a-collapse-item>
+        <a-collapse-item header="腾讯公益" :key="2">
+          <img class="tencent" style="margin-bottom: 10px;" width="200px" src="/gy.png" />
+        </a-collapse-item>
+        <a-collapse-item header="饿饿饭饭" :key="3">
+          <img width="300" src="/mm_facetoface_collect_qrcode_1714392837792.png" >
+          <img width="300" src="/1722745910257.jpg" >
+          <br><br>
+          TRON / TRX：TPaSnHJ2cRCQjjv7TyAFJDamb3mZSSz1At
+        </a-collapse-item>
+      </a-collapse>
     </div>
     <br>
     <br>
@@ -109,6 +129,12 @@
 </script>
 
 <style scoped lang="less">
+  :deep(.arco-collapse-item-content-expend){
+    background-color: var(--color-bg-2);
+  }
+  :deep(.arco-collapse-item-content-box){
+    background-color: var(--color-bg-2);
+  }
   .banner {
     width: 100%;
     padding: 20px 20px 0 20px;

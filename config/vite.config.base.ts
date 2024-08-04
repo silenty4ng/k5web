@@ -73,5 +73,21 @@ export default defineConfig({
         javascriptEnabled: true,
       },
     },
+    postcss: {
+      plugins: [
+        require('postcss-px-to-viewport')({
+          viewportWidth: 2560, // 视口宽度，对应设计稿宽度
+          viewporHeight: 1392, // 视口高度，对应设计稿高度
+          unitPrecision: 3, // 指定px转换之后的小数位数
+          viewportUnit: 'vw', // 转换的单位
+          fontViewportUnit: 'vw', // 字体使用的单位
+          replace: false, //  是否直接更换属性值，而不添加备用属性
+          selectorBlackList: ['.ignore', '.hairlines', '.arco', '.layout'], // 指定不转换的类
+          exclude: /(\/|\\)(node_modules)(\/|\\)/, //禁止更改第三方UI框架样式
+          minPixelValue: 15, // 小于或等于1px不转换
+          mediaQuery: true, // 允许在媒体查询中转换
+        })
+      ]
+    }
   },
 });

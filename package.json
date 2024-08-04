@@ -67,6 +67,7 @@
     "less": "^4.1.3",
     "mockjs": "^1.1.0",
     "postcss-html": "^1.5.0",
+    "postcss-px-to-viewport": "^1.1.1",
     "prettier": "^2.7.1",
     "rollup": "^3.9.1",
     "rollup-plugin-visualizer": "^5.8.2",
