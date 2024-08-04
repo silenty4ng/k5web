@@ -84,7 +84,6 @@ SOFTWARE.
 ```
 
 ## 要饭
-<img src="https://github.com/silenty4ng/k5web/blob/master/public/mm_facetoface_collect_qrcode_1714392837792.png?raw=true"  width="300" />
-<img src="https://github.com/silenty4ng/k5web/blob/master/public/1722745910257.jpg?raw=true"  width="300" />
+<img src="https://github.com/silenty4ng/k5web/blob/master/public/mm_facetoface_collect_qrcode_1714392837792.png?raw=true"  width="300" /> <img src="https://github.com/silenty4ng/k5web/blob/master/public/1722745910257.jpg?raw=true"  width="300" />
 
 TRON / TRX：TPaSnHJ2cRCQjjv7TyAFJDamb3mZSSz1At
