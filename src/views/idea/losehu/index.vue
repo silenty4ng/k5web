@@ -34,13 +34,13 @@ const useFirmware = () => {
     router.push({
         path: '/tool/flash',
         query: {
-            url: 'https://k6.vicicode.cn/diyapi/LOSEHU' + state.flag.join('') + '.bin?v=' + (new Date()).getTime()
+            url: 'https://k5.vicicode.cn/diyapi/LOSEHU' + state.flag.join('') + '.bin?v=' + (new Date()).getTime()
         }
     });
 }
 
 const iDownload = () => {
-    fetch('https://k6.vicicode.cn/diyapi/LOSEHU' + state.flag.join('') + '.bin?v=' + (new Date()).getTime()).then(e=>e.blob()).then(blob=>{
+    fetch('https://k5.vicicode.cn/diyapi/LOSEHU' + state.flag.join('') + '.bin?v=' + (new Date()).getTime()).then(e=>e.blob()).then(blob=>{
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -83,7 +83,7 @@ const { loading, setLoading } = useLoading(true);
 
 onMounted(async () => {
     setLoading(true)
-    let functions = await (await fetch('https://k6.vicicode.cn/diyapi/function.json?v=' + (new Date()).getTime())).text()
+    let functions = await (await fetch('https://k5.vicicode.cn/diyapi/function.json?v=' + (new Date()).getTime())).text()
     functions = JSON.parse(functions)
     let _newfunc: any = []
     let _showSort: any = []
@@ -112,7 +112,7 @@ onMounted(async () => {
     state.disName = disName
     state.disMatrix = disMatrix
     state.showSort = _showSort
-    const versions = await (await fetch('https://k6.vicicode.cn/diyapi/version.json?v=' + (new Date()).getTime())).text()
+    const versions = await (await fetch('https://k5.vicicode.cn/diyapi/version.json?v=' + (new Date()).getTime())).text()
     state.versions = JSON.parse(versions)
     updateMatrix()
     setLoading(false)

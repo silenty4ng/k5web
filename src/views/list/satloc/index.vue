@@ -57,7 +57,7 @@ onMounted(()=>{
 })
 
 const upload = async () => {
-    await fetch('https://k6.vicicode.cn/api/lol', {
+    await fetch('https://k5.vicicode.cn/api/lol', {
         method: "POST",
         mode: "cors",
         headers: {

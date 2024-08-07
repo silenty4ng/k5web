@@ -126,9 +126,9 @@
   })
 
   const loadBL = async() => {
-    const latestVersion = JSON.parse(await (await fetch('https://k6.vicicode.cn/diyapi/bl.json')).text())!.latest;
+    const latestVersion = JSON.parse(await (await fetch('https://k5.vicicode.cn/diyapi/bl.json')).text())!.latest;
     state.blName = latestVersion;
-    const fontPacket = await fetch('https://k6.vicicode.cn/diyapi/' + latestVersion);
+    const fontPacket = await fetch('https://k5.vicicode.cn/diyapi/' + latestVersion);
     if(fontPacket.body){
       const reader = fontPacket.body.getReader();
       const chunks = [];
