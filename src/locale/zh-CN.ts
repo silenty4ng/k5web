@@ -157,6 +157,7 @@ export default {
   'workplace.clickNotice': '（官方固件只能检测 8KB/64Kbit）',
   'menu.cps.radio': '收音机',
   'menu.cps.mdc': 'MDC 联系人',
+  'menu.cps.dtmf': 'DTMF 联系人',
   'cps.contact': '联系人',
   'cps.mdcid': 'MDC ID',
   'idea.diy': '自定义萝卜固件',
