@@ -159,6 +159,8 @@ export default {
   'menu.cps.mdc': 'MDC Contact',
   'cps.contact': 'Name',
   'cps.mdcid': 'MDC ID',
+  'cps.dtmf.up': 'DTMF Up Code',
+  'cps.dtmf.down': 'DTMF Down Code',
   'idea.diy': 'LOSEHU DIY',
   'diy.generate': 'Generate',
   'cps.dtmfid': 'DTMF ID',

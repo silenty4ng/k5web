@@ -30,7 +30,13 @@
               <a-input v-model="state.logo_line2" />
             </a-form-item>
             <a-form-item :label-col-style="{width: '25%'}" field="dtmfid" :label="$t('cps.dtmfid')">
-              <a-input v-model="state.dtmfid" />
+              <a-input v-model="state.dtmfid" max-length="8" placeholder="0-9,A-D,*,#"/>
+            </a-form-item>
+            <a-form-item :label-col-style="{width: '25%'}" field="dtmf_up_code" :label="$t('cps.dtmf.up')">
+              <a-input v-model="state.dtmf_up_code" max-length="16" placeholder="0-9,A-D,*,#"/>
+            </a-form-item>
+            <a-form-item :label-col-style="{width: '25%'}" field="dtmf_down_code" :label="$t('cps.dtmf.down')">
+              <a-input v-model="state.dtmf_down_code" max-length="16" placeholder="0-9,A-D,*,#"/>
             </a-form-item>
             <a-form-item :label-col-style="{width: '25%'}" field="mdclocplay" :label="$t('cps.mdclocplay')">
               <a-switch v-model="state.mdc_audio_local" type="round"/>
@@ -55,8 +61,54 @@ const state = reactive({
   logo_line1: '',
   logo_line2: '',
   mdc_audio_local: true,
-  dtmfid: ''
+  dtmfid: '',
+  dtmf_up_code: '',
+  dtmf_down_code: ''
 })
+
+function checkDtmfCode(code, size) {
+  if (code.length > size) {
+    return false;
+  }
+
+  for (let i = 0; i <code.length; i++) {
+    let char = code.charAt(i);
+    if ((char < '0' || char > '9') && (char < 'A' || char > 'D') && char != '*' && char != '#') {
+      return false;
+    }
+  }
+  return true;
+}
+
+const writeDtmfCode= async(code, addr, size) => {
+  code = code.trim();
+  let data;
+
+  if (code == '') {
+    let empty = [];
+    for (let i = 0; i < size; i++) {
+      empty.push(0x00);
+    }
+    data = new Uint8Array(empty);
+  } else {
+    if (checkDtmfCode(code, size)) {
+      data = stringToUint8Array(code);
+      if (data.length < size) {
+        let tmp = new Uint8Array(size);
+        tmp.set(data);
+        for (let i = data.length; i < size; i++) {
+          tmp.set[i] = 0x00;
+        }
+        data = tmp;
+      }
+    } else {
+      //alert("16,0-9,A-D,*,#");
+      return;
+    }
+  }
+
+  await eeprom_write(appStore.connectPort, addr, data, data.length, appStore.configuration?.uart);
+}
 
 const readChannel = async() => {
   if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
@@ -79,8 +131,14 @@ const readChannel = async() => {
     state.logo_line2 = uint8ArrayToString(logo.subarray(0x10, 0x20), appStore.configuration?.charset)
   }
 
-  const dtmfid = await eeprom_read(appStore.connectPort, 0xEE0, 0x03, appStore.configuration?.uart)
+  const dtmfid = await eeprom_read(appStore.connectPort, 0xEE0, 8, appStore.configuration?.uart)
   state.dtmfid = uint8ArrayToString(dtmfid)
+
+  const dtmf_up_code = await eeprom_read(appStore.connectPort, 0xEF8, 16, appStore.configuration?.uart)
+  state.dtmf_up_code = uint8ArrayToString(dtmf_up_code)
+
+  const dtmf_down_code = await eeprom_read(appStore.connectPort, 0xF08, 16, appStore.configuration?.uart)
+  state.dtmf_down_code = uint8ArrayToString(dtmf_down_code)
 
   if(parseInt(await eeprom_read(appStore.connectPort, 0x01FFD, 0x01, appStore.configuration?.uart)) == 0){
     state.mdc_audio_local = false
@@ -113,15 +171,11 @@ const writeChannel = async() => {
     logo.set(stringToUint8Array(state.logo_line2, appStore.configuration?.charset).subarray(0, 0x10), 0x10);
     await eeprom_write(appStore.connectPort, 0xEB0, logo, 0x20, appStore.configuration?.uart);
   }
-  if(state.dtmfid == ''){
-    await eeprom_write(appStore.connectPort, 0xEE0, new Uint8Array([0xff, 0xff, 0xff]), 0x03, appStore.configuration?.uart);
-  }else{
-    await eeprom_write(appStore.connectPort, 0xEE0, new Uint8Array([
-        stringToUint8Array(state.dtmfid.padStart(3, '0').split('')[0]),
-        stringToUint8Array(state.dtmfid.padStart(3, '0').split('')[1]), 
-        stringToUint8Array(state.dtmfid.padStart(3, '0').split('')[2])
-      ]), 0x03, appStore.configuration?.uart);
-  }
+
+  await writeDtmfCode(state.dtmfid, 0xEE0, 8);
+  await writeDtmfCode(state.dtmf_up_code, 0xEF8, 16);
+  await writeDtmfCode(state.dtmf_down_code, 0xF08, 16);
+
   if(appStore.configuration?.localmdc){
     await eeprom_write(appStore.connectPort, 0x01FFD, new Uint8Array([state.mdc_audio_local ? 1 : 0]), 0x01, appStore.configuration?.uart);
   }
