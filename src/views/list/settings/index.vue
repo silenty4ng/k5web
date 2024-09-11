@@ -96,9 +96,6 @@ const writeDtmfCode= async(code, addr, size) => {
       if (data.length < size) {
         let tmp = new Uint8Array(size);
         tmp.set(data);
-        for (let i = data.length; i < size; i++) {
-          tmp.set[i] = 0x00;
-        }
         data = tmp;
       }
     } else {

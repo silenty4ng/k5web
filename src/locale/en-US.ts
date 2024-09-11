@@ -157,6 +157,7 @@ export default {
   'workplace.clickNotice': ' (Official firmware can only detect 8KB/64Kbit)',
   'menu.cps.radio': 'Radio',
   'menu.cps.mdc': 'MDC Contact',
+  'menu.cps.dtmf': 'DTMF Contact',
   'cps.contact': 'Name',
   'cps.mdcid': 'MDC ID',
   'cps.dtmf.up': 'DTMF Up Code',

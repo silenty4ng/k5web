@@ -53,6 +53,16 @@ const DASHBOARD: AppRouteRecordRaw = {
       },
     },
     {
+      path: 'dtmf',
+      name: 'Dtmf',
+      component: () => import('@/views/list/dtmf/index.vue'),
+      meta: {
+        locale: 'menu.cps.dtmf',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
+    {
       path: 'settings',
       name: 'Settings',
       component: () => import('@/views/list/settings/index.vue'),
