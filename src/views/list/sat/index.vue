@@ -167,8 +167,11 @@ const state: {
 })
 
 onMounted(async ()=>{
-  const rst = await (await fetch('https://mirror.ghproxy.com/https://raw.githubusercontent.com/palewire/ham-satellite-database/main/data/amsat-active-frequencies.json')).text()
-  state.freqDb = JSON.parse(rst)
+  try{
+    const rst = await (await fetch('https://github.jobcher.com/gh/https://raw.githubusercontent.com/palewire/ham-satellite-database/main/data/amsat-active-frequencies.json')).text()
+    state.freqDb = JSON.parse(rst)
+  }
+  catch{}
 
   state.lng = parseFloat(localStorage.getItem('myLng') || '0')
   state.lat = parseFloat(localStorage.getItem('myLat') || '0')
