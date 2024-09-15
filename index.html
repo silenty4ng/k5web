@@ -133,6 +133,19 @@
     </div>
   </div>
   <script type="module" src="/src/main.ts"></script>
+  <script>
+    (async ()=>{
+      let wakeLock = null;
+      try {
+        wakeLock = await navigator.wakeLock.request("screen");
+      } catch {}
+      document.addEventListener("visibilitychange", async () => {
+        if (wakeLock !== null && document.visibilityState === "visible") {
+          wakeLock = await navigator.wakeLock.request("screen");
+        }
+      });
+    })();
+  </script>
 </body>
 
 </html>
