@@ -615,7 +615,7 @@
       const _scanlist  = uint8ArrayToHexReverseString(rawEEPROM2.subarray(i / 0x10, i / 0x10 + 0x01))
       const _channelData : any = {scanlist: []}
       _channelData.rx  = _channel.substr(24, 8) != "ffffffff" ? parseInt(_channel.substr(24, 8), 16) / 100000 : undefined
-      if(_channelData.rx && _scanlist != "ff"){
+      if(_channelData.rx && _scanlist != "ff" && _scanlist != "0f"){
         console.info(_channel)
         console.info(_scanlist)
         _channelData.offset     = _channel.substr(16, 8) != "00000000" ? parseInt(_channel.substr(16, 8), 16) / 100000 : undefined
