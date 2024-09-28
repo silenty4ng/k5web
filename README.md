@@ -83,6 +83,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=silenty4ng/k5web&type=Date)](https://star-history.com/#silenty4ng/k5web&Date)
+
 ## 饿饿饭饭
 <img src="https://github.com/silenty4ng/k5web/blob/master/public/mm_facetoface_collect_qrcode_1714392837792.png?raw=true"  width="300" /> <img src="https://github.com/silenty4ng/k5web/blob/master/public/1722745910257.jpg?raw=true"  width="300" />
 
