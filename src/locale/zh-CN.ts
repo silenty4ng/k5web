@@ -55,6 +55,7 @@ export default {
   'global.8kb': '8KB（64Kbit）',
   'global.128kb': '128KB（1Mbit）',
   'global.256kb': '256KB（2Mbit）',
+  'global.384kb': '384KB（3Mbit）',
   'global.512kb': '512KB（4Mbit）',
   'menu.rb': '备份/还原',
   'menu.flash': '固件升级',
