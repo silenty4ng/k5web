@@ -6,8 +6,8 @@
     </div>
     <div style="color: #AAAAAA;">{{ ua }}</div>
   </div>
-  <t-config-provider v-if="reloadLang && !((isWeixin || isQQ) && route.path !== '/satloc')" :global-config="locale">
-    <a-config-provider :locale="locale">
+  <t-config-provider v-if="reloadLang && !((isWeixin || isQQ) && route.path !== '/satloc')" :global-config="locale[0]">
+    <a-config-provider :locale="locale[1]">
       <router-view />
       <global-setting />
     </a-config-provider>
@@ -60,12 +60,12 @@
       case 'zh-CN':
         sessionStorage.setItem('noticeConnectK5', '请先连接手台！')
         sessionStorage.setItem('noticeVersionNoSupport', '固件版本不匹配')
-        lang = {...zhCN, ...tdesignZhCN};
+        lang = [tdesignZhCN, zhCN];
         break;
       default:
         sessionStorage.setItem('noticeConnectK5', 'Connect first!')
         sessionStorage.setItem('noticeVersionNoSupport', 'Firmware not supported')
-        lang = {...enUS, ...tdesignEnUS};
+        lang = [tdesignEnUS, enUS];
     }
     setTimeout(() => {
       reloadLang.value = true;

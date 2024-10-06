@@ -48,6 +48,14 @@
             </t-input>
           </t-form-item>
 
+          <t-form-item name="nickname">
+            <t-input v-model="formData.nickname" clearable :placeholder="$t('global.nickname')">
+              <template #prefix-icon>
+                <desktop-icon />
+              </template>
+            </t-input>
+          </t-form-item>
+
           <t-form-item name="password">
             <t-input v-model="formData.password" type="password" clearable :placeholder="$t('global.password')">
               <template #prefix-icon>
@@ -60,6 +68,14 @@
             <t-input v-model="formData.password2" type="password" clearable :placeholder="$t('global.password2')">
               <template #prefix-icon>
                 <lock-on-icon />
+              </template>
+            </t-input>
+          </t-form-item>
+
+          <t-form-item name="motto">
+            <t-input v-model="formData.motto" clearable :placeholder="$t('global.motto')">
+              <template #prefix-icon>
+                <desktop-icon />
               </template>
             </t-input>
           </t-form-item>
@@ -131,28 +147,32 @@
 
   const formData = reactive({
     account: '',
+    nickname: '',
     password: '',
-    password2: ''
+    password2: '',
+    motto: ''
   });
 
   const onLogin = async () => {
-    const resp : any = await axios.post("https://k5.vicicode.cn/wsapi/login", {
+    const resp : any = await axios.post("https://k5ws.vicicode.cn/api/user/checkIn?server=1", {
       'username': formData.account,
-      'password': formData.password
+      'password': formData.password,
+      'tab': 'login',
+      'keep': false
     })
-    if(resp.code == 200){
+    if(resp.code == 1){
       userStore.setInfo({
         showLogin: false,
-        name: formData.account,
-        accountId: resp.token
+        name: resp.data.userInfo.nickname,
+        accountId: resp.data.userInfo.token
       })
     }
   }
 
   const onRegister = async () => {
-    if(formData.password == '' || formData.account == ''){
+    if(formData.password == '' || formData.account == '' || formData.nickname == ''){
       Message.error({
-        content: '用户名及密码不能为空',
+        content: '用户名、昵称及密码不能为空',
         duration: 5 * 1000,
       });
       return;
@@ -164,14 +184,18 @@
       });
       return;
     }
-    const resp : any = await axios.post("https://k5.vicicode.cn/wsapi/register", {
+    const resp : any = await axios.post("https://k5ws.vicicode.cn/api/user/checkIn?server=1", {
       'username': formData.account,
-      'password': formData.password
+      'password': formData.password,
+      'nickname': formData.nickname,
+      'motto': formData.motto,
+      'tab': 'register',
     })
-    if(resp.code == 200){
+    if(resp.code == 1){
       userStore.setInfo({
         showRegister: false,
-        showLogin: true
+        name: formData.nickname,
+        accountId: resp.data.userInfo.token
       })
     }
   }
