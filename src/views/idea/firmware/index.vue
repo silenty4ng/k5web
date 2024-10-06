@@ -50,9 +50,9 @@
           <t-list-item v-for="item in state.myList">
             <div style="display: flex; width: 100%;">
               <div style="width: 90%;">
-                <t-tag theme="primary" variant="outline" v-if="item.status == 0">审核中</t-tag>
-                <t-tag theme="primary" variant="outline" v-else-if="item.status == 1">已审核</t-tag>
-                <t-tag theme="primary" variant="outline" v-else="item.status == 2">已驳回</t-tag>
+                <t-tag theme="primary" variant="outline" v-if="item.status == 0">审核中{{ item.remark && `（${item.remark}）` }}</t-tag>
+                <t-tag theme="primary" variant="outline" v-else-if="item.status == 1">已审核{{ item.remark && `（${item.remark}）` }}</t-tag>
+                <t-tag theme="primary" variant="outline" v-else="item.status == 2">已驳回{{ item.remark && `（${item.remark}）` }}</t-tag>
                 {{ item.title }}
                 <br>
                 {{ item.desc }}
