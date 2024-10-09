@@ -3,7 +3,17 @@
       <Breadcrumb :items="[$t('menu.workshop'), $t('menu.image')]" />
       <a-row :gutter="20" align="stretch">
         <a-col :span="24">
-            <a-card class="general-card" :title="$t('menu.image')">
+            <a-card class="general-card">
+              <template #title>
+                <div style="display: flex; gap: 1rem; align-items: flex-end;">
+                  {{ $t('menu.image') }}
+                  <t-input size="small" style="width: 200px;" v-model="state.title" @enter="searchIt">
+                    <template #suffixIcon>
+                      <search-icon :style="{ cursor: 'pointer' }" @click="searchIt"/>
+                    </template>
+                  </t-input>
+                </div>
+              </template>
               <template #extra>
                     <div style="margin-right: 20px;">
                         <template v-if="userStore.name">
@@ -115,6 +125,7 @@
   import axios from 'axios';
   import { Message } from '@arco-design/web-vue';
   import { RefreshIcon } from 'tdesign-icons-vue-next';
+  import { SearchIcon } from 'tdesign-icons-vue-next';
   
   const appStore = useAppStore();
   const userStore = useUserStore();
@@ -131,7 +142,8 @@
     total: number,
     page: number,
     nowpage: any,
-    dropzoneActive: boolean
+    dropzoneActive: boolean,
+    title: string
   } = reactive({
     binaryFile: undefined,
     loading: false,
@@ -142,7 +154,8 @@
     total: 0,
     page: 1,
     nowpage: [],
-    dropzoneActive: false
+    dropzoneActive: false,
+    title: ''
   })
 
   const dragEnter = (event: any) => {
@@ -196,7 +209,7 @@
 
   const loadit = async (page: any) => {
     state.page = page.current
-    const resp : any = await axios.get("https://k5ws.vicicode.cn/api/image/index?server=1&limit=24&page=" + page.current + "&t=" + Date.now())
+    const resp : any = await axios.get("https://k5ws.vicicode.cn/api/image/index?server=1&limit=24&page=" + page.current + "&title=" + state.title + "&t=" + Date.now())
     state.total = resp.data.total
     state.nowpage = resp.data.list
   }
@@ -275,6 +288,10 @@
       }
     });
   }
+
+const searchIt = () => {
+  loadit({current: 1})
+}
   </script>
   
   <script lang="ts">
