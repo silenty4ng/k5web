@@ -14,6 +14,8 @@
               </table>
             </div>
             <br>
+            色彩阈值：<t-slider v-model="state.threshold" :max="256" style="width: 200px;" @change-end="changeThreshold" />
+            <br>
             <a-space>
               <a-button @click="selectFile">{{ $t('tool.selectImage') }}</a-button>
               <a-button :disabled="state.matrix.length < 64" @click="negativeIt">{{ $t('image.negative') }}</a-button>
@@ -39,12 +41,16 @@ const state : {
   binaryFile: any,
   loading: boolean,
   matrix: any,
-  mousedown: boolean
+  mousedown: boolean,
+  threshold: number,
+  cache: any
 } = reactive({
   binaryFile: undefined,
   loading: false,
   matrix: [],
-  mousedown: false
+  mousedown: false,
+  threshold: 128,
+  cache: undefined
 })
 
 const route = useRoute();
@@ -90,10 +96,11 @@ const useImg = (url: string) => {
       const ctx = canvas.getContext('2d');
       ctx?.drawImage(img, 0, 0, 128, 64);
       const imageData = ctx?.getImageData(0, 0, canvas.width, canvas.height).data;
+      state.cache = imageData;
       function getPixel(x: any, y: any) {
           const index = y * 128 + x;
           const i = index * 4;
-          return imageData[i] + imageData[i + 1] + imageData[i + 2] > 128 * 3 ? 0 : 1;
+          return imageData[i] + imageData[i + 1] + imageData[i + 2] > state.threshold * 3 ? 0 : 1;
       }
 
       const matrix = [];
@@ -127,10 +134,11 @@ const selectFile = () => {
       const ctx = canvas.getContext('2d');
       ctx?.drawImage(img, 0, 0, 128, 64);
       const imageData = ctx?.getImageData(0, 0, canvas.width, canvas.height).data;
+      state.cache = imageData;
       function getPixel(x: any, y: any) {
           const index = y * 128 + x;
           const i = index * 4;
-          return imageData[i] + imageData[i + 1] + imageData[i + 2] > 128 * 3 ? 0 : 1;
+          return imageData[i] + imageData[i + 1] + imageData[i + 2] > state.threshold * 3 ? 0 : 1;
       }
       
       const matrix = [];
@@ -214,6 +222,27 @@ const flashIt = async () => {
   state.loading = false
 }
 
+const changeThreshold = () => {
+      const imageData = state.cache;
+      function getPixel(x: any, y: any) {
+          const index = y * 128 + x;
+          const i = index * 4;
+          return imageData[i] + imageData[i + 1] + imageData[i + 2] > state.threshold * 3 ? 0 : 1;
+      }
+      
+      const matrix = [];
+
+      for (let y = 0; y < 64; y++) {
+          matrix.push([])
+          matrix[y] = []
+          for (let x = 0; x < 128; x++) {
+              const pixel = !getPixel(x, y);
+              matrix[y][x] = pixel ? '#fff' : '#000';
+          }
+      }
+
+      state.matrix = matrix
+}
 </script>
 
 <script lang="ts">
