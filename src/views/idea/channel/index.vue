@@ -67,8 +67,9 @@
                 <br>
                 {{ item.desc }}
               </div>
-              <div style="width: 40%; margin: auto; text-align: center;">
+              <div style="width: 50%; margin: auto; text-align: center;">
                 <t-tag>{{ item.create_time_text }}</t-tag>&nbsp;
+                <t-link theme="primary" hover="color" @click="onET(item.id)">编辑</t-link>&nbsp;
                 <t-link theme="primary" hover="color" @click="onDT(item.id)">删除</t-link>
               </div>
             </div>
@@ -147,6 +148,7 @@
   })
 
   const formData = reactive({
+    id: 0,
     title: '',
     desc: '',
     firmware: []
@@ -176,6 +178,7 @@
   }
 
   const showUpload = () => {
+    formData.id = 0
     formData.title = ''
     formData.desc = ''
     formData.firmware = []
@@ -190,17 +193,44 @@
       });
       return;
     }
-    await axios.post("https://k5ws.vicicode.cn/api/channel/add?server=1", {
-      'title': formData.title,
-      'desc': formData.desc,
-      'data': formData.firmware[0].response.data.file.url
-    }, {
-      headers: {
-        'ba-user-token': userStore.accountId
-      }
-    })
+    if(formData.id === 0){
+      await axios.post("https://k5ws.vicicode.cn/api/channel/add?server=1", {
+        'title': formData.title,
+        'desc': formData.desc,
+        'data': formData.firmware[0].response.data.file.url
+      }, {
+        headers: {
+          'ba-user-token': userStore.accountId
+        }
+      })
+    }else{
+      await axios.post("https://k5ws.vicicode.cn/api/channel/edit?server=1", {
+        'id': formData.id,
+        'title': formData.title,
+        'desc': formData.desc,
+        'data': formData.firmware[0].url ?? formData.firmware[0].response.data.file.url
+      }, {
+        headers: {
+          'ba-user-token': userStore.accountId
+        }
+      })
+    }
     state.showUpload = false;
     showPanel()
+  }
+
+  const onET = async (id: any) => {
+    formData.id = id
+    formData.title = state.myList.filter((e: any)=>e.id == id)[0].title 
+    formData.desc = state.myList.filter((e: any)=>e.id == id)[0].desc
+    formData.firmware = [
+      {
+        name: state.myList.filter((e: any)=>e.id == id)[0].title,
+        status: 'success',
+        url: state.myList.filter((e: any)=>e.id == id)[0].file
+      }
+    ]
+    state.showUpload = true
   }
 
   const onDT = async (id: any) => {
