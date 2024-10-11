@@ -18,6 +18,11 @@
                 </a-card>
             </a-col>
         </a-row>
+        <a-row :gutter="20" align="stretch" style="margin-top: 10px;">
+            <a-col :span="24">
+                <a-card style="padding: 20px;" class="general-card" v-html="state.readme"></a-card>
+            </a-col>
+        </a-row>
     </div>
 </template>
 
@@ -26,6 +31,8 @@ import { reactive, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import useLoading from '@/hooks/loading';
 import { useI18n } from 'vue-i18n';
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 
 const router = useRouter()
 const { t } = useI18n();
@@ -56,13 +63,15 @@ const state: {
     flag: any,
     disMatrix: any,
     disName: any,
-    showSort: any
+    showSort: any,
+    readme: any
 } = reactive({
     versions: [],
     flag: [],
     disMatrix: [],
     disName: [],
     showSort: [],
+    readme: ''
 })
 
 watch(() => [...state.flag], () => { updateMatrix() })
@@ -116,6 +125,14 @@ onMounted(async () => {
     state.versions = JSON.parse(versions)
     updateMatrix()
     setLoading(false)
+    if(t('menu.dashboard') == 'CPS'){
+        state.readme = DOMPurify.sanitize(await marked.parse(await (await fetch('https://k5.vicicode.cn/diyapi/README_en.md?v=' + (new Date()).getTime())).text()))
+    }else{
+        state.readme = DOMPurify.sanitize(await marked.parse(await (await fetch('https://k5.vicicode.cn/diyapi/README.md?v=' + (new Date()).getTime())).text()))
+    }
+    state.readme = state.readme.replaceAll('href="./README_en.md"', '')
+    state.readme = state.readme.replaceAll('href="./README.md"', '')
+    state.readme = state.readme.replaceAll('losehu/uv-k5-firmware-chinese/blob/main/payment/show.png', 'losehu/uv-k5-firmware-chinese/blob/main/payment/show.png?raw=true')
 })
 
 </script>
