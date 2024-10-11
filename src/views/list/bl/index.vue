@@ -3,7 +3,12 @@
       <Breadcrumb :items="[$t('menu.list'), $t('bl')]" />
       <a-card class="general-card" :loading="loading">
         <template #title>
-          <div style="color: red; font-weight: bold;">⚠：实验性功能 使用可能会损坏手台</div>
+          <div style="color: red; font-weight: bold;">
+            ⚠：实验性功能 使用可能会损坏手台
+            <div style="height: 2rem;">⚠：使用说明：
+              <t-link theme="primary" href="https://github.com/losehu/uv-k5-bootloader-custom/releases" target="_blank">https://github.com/losehu/uv-k5-bootloader-custom/releases</t-link>
+            </div>
+          </div>
             {{ $t('bl') }} {{ $t('global.onStart') }}
         </template>
         <a-row style="margin-bottom: 16px">
