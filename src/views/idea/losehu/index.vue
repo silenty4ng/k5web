@@ -133,6 +133,11 @@ onMounted(async () => {
     state.readme = state.readme.replaceAll('href="./README_en.md"', '')
     state.readme = state.readme.replaceAll('href="./README.md"', '')
     state.readme = state.readme.replaceAll('losehu/uv-k5-firmware-chinese/blob/main/payment/show.png', 'losehu/uv-k5-firmware-chinese/blob/main/payment/show.png?raw=true')
+    state.readme = state.readme.replaceAll('/images/c1.JPG', 'https://github.com/losehu/uv-k5-firmware-custom/blob/main/images/c1.JPG?raw=true')
+    state.readme = state.readme.replaceAll('/images/c2.JPG', 'https://github.com/losehu/uv-k5-firmware-custom/blob/main/images/c2.JPG?raw=true')
+    state.readme = state.readme.replaceAll('/images/c3.JPG', 'https://github.com/losehu/uv-k5-firmware-custom/blob/main/images/c3.JPG?raw=true')
+    state.readme = state.readme.replaceAll('/images/c4.JPG', 'https://github.com/losehu/uv-k5-firmware-custom/blob/main/images/c4.JPG?raw=true')
+    state.readme = state.readme.replaceAll('a href', 'a target="_blank" href')
 })
 
 </script>
