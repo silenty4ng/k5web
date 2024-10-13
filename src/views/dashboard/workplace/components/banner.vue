@@ -19,12 +19,13 @@
       <a-typography-text>◆ 除“固件升级”功能手台应处于刷机模式点击更新按钮选择设备更新，其余功能手台均需要在正常模式连接。</a-typography-text><br>
       <a-typography-text>◆ 萝卜（LOSEHU）固件相关问题请移步：<t-link theme="primary" href="https://github.com/losehu/uv-k5-firmware-custom" target="_blank">https://github.com/losehu/uv-k5-firmware-custom</t-link> 。</a-typography-text><br>
       <a-typography-text>◆ K5Web 官扩刷中文教程（BG3ODZ）：<t-link theme="primary" href="https://www.bilibili.com/video/BV1Ab421p7rN" target="_blank">https://www.bilibili.com/video/BV1Ab421p7rN</t-link> 。</a-typography-text><br>
+      <a-typography-text>◆ K5Web 自扩刷中文教程（BG3ODZ）：<t-link theme="primary" href="https://www.bilibili.com/video/BV1Qk2BYDErN" target="_blank">https://www.bilibili.com/video/BV1Qk2BYDErN</t-link> 。</a-typography-text><br>
       <a-typography-text>◆ K5Web 使用视频教程（BG3ODZ）：<t-link theme="primary" href="https://www.bilibili.com/video/BV1Q4421D75x" target="_blank">https://www.bilibili.com/video/BV1Q4421D75x</t-link> 。</a-typography-text><br>
       <a-typography-text>◆ K5Web 使用视频教程（BG7QJV）：<t-link theme="primary" href="https://www.douyin.com/video/7378314511419313458" target="_blank">https://www.douyin.com/video/7378314511419313458</t-link> 。</a-typography-text>
     </div>
     <div style="margin-top: 50px;">&nbsp;</div>
     <div>
-      <a-collapse :default-active-key="[1]" accordion>
+      <a-collapse :default-active-key="state.activeKey" accordion @change="changeMainActive">
         <a-collapse-item header="广告区" :key="1">
           <a-card hoverable :style="{ width: '600px' }">
             <template #cover>
@@ -67,8 +68,13 @@
   const appStore = useAppStore();
 
   const state = reactive({
-    eepromSize: t('workplace.clickCheck')
+    eepromSize: t('workplace.clickCheck'),
+    activeKey: JSON.parse(localStorage.getItem('mainActiveKey') ?? "[2]")
   })
+
+  const changeMainActive = (e: any) => {
+    localStorage.setItem('mainActiveKey', JSON.stringify(e))
+  }
 
   const checkEeprom = async () => {
     let eepromSize = t('workplace.unk');
