@@ -39,9 +39,9 @@
                         </a-list-item-meta>
                         <template #actions>
                           <t-tag style="margin-left: 1rem;">{{ item.create_time_text }}</t-tag>
-                          <a-link @click="onStar(item.id)">👍（{{ item.star }}）</a-link>
-                          <a-link @click="iDownload('https://k5ws.vicicode.cn' + item.file, item.title)">{{$t('global.download')}}</a-link>
-                          <a-link @click="useFirmware('https://k5ws.vicicode.cn' + item.file + '?n=/' + item.title)">{{$t('global.use')}}</a-link>
+                          <a-link style="min-width: 100px;" @click="onStar(item.id)">👍（{{ item.star }}）</a-link>
+                          <a-link style="min-width: 70px;" @click="iDownload('https://k5ws.vicicode.cn' + item.file, item.title)">{{$t('global.download')}}</a-link>
+                          <a-link style="min-width: 70px;" @click="useFirmware('https://k5ws.vicicode.cn' + item.file + '?n=/' + item.title)">{{$t('global.use')}}</a-link>
                         </template>
                     </a-list-item>
                 </a-list>
