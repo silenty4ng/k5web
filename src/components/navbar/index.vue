@@ -21,7 +21,8 @@
     <ul class="right-side">
       <template v-if="!topMenu && appStore.device === 'mobile'">
         <li>
-          <t-link href="https://txc.qq.com/products/647342" target="_blank">{{ $t('navbar.qa') }}</t-link>
+          <t-link v-if="t('navbar.qa') == 'Feedback'" href="https://t.me/losehu" target="_blank">{{ $t('navbar.qa') }}</t-link>
+          <t-link v-else href="https://txc.qq.com/products/647342" target="_blank">{{ $t('navbar.qa') }}</t-link>
         </li>
         <li>
           <a-button v-show="route.path !== '/tool/flash'" type="primary" @click="connectIt">{{ appStore.connectState ? $t('navbar.disconnect') : $t('navbar.connect') }}</a-button>
@@ -79,7 +80,8 @@
       </template>
       <template v-else="appStore.device === 'mobile'">
         <li>
-          <t-link href="https://txc.qq.com/products/647342" target="_blank">{{ $t('navbar.qa') }}</t-link>
+          <t-link v-if="t('navbar.qa') == 'Feedback'" href="https://t.me/losehu" target="_blank">{{ $t('navbar.qa') }}</t-link>
+          <t-link v-else href="https://txc.qq.com/products/647342" target="_blank">{{ $t('navbar.qa') }}</t-link>
         </li>
         <li>
           <a-button v-show="route.path !== '/tool/flash'" type="primary" @click="connectIt">{{ appStore.connectState ? $t('navbar.disconnect') : $t('navbar.connect') }}</a-button>
