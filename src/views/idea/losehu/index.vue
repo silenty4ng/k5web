@@ -20,7 +20,7 @@
         </a-row>
         <a-row :gutter="20" align="stretch" style="margin-top: 10px;">
             <a-col :span="24">
-                <a-card style="padding: 20px;" class="general-card" v-html="state.readme"></a-card>
+                <a-card style="padding: 20px;" class="general-card readme" v-html="state.readme"></a-card>
             </a-col>
         </a-row>
     </div>
@@ -149,6 +149,10 @@ export default {
 </script>
 
 <style scoped lang="less">
+.readme {
+    background-color: var(--color-bg-1);
+    color: var(--color-text-1);
+}
 .container {
     padding: 0 20px 20px 20px;
 

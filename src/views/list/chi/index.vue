@@ -41,7 +41,7 @@
             </t-card>
           </a-space>
           <a-divider />
-          <div id="statusArea" style="height: 20em; background-color: azure; color: silver; overflow: auto; padding: 20px" v-html="state.status"></div>
+          <div id="statusArea" style="height: 20em; background-color: var(--color-bg-3); color: var(--color-text-3); overflow: auto; padding: 20px" v-html="state.status"></div>
         </a-card>
       </a-col>
     </a-row>

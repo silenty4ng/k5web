@@ -63,7 +63,7 @@
           </t-card>
         </t-space>
       </a-card>
-        <div id="statusArea" style="height: 20em; background-color: azure; color: silver; overflow: auto; padding: 20px; margin-top: 10px;"
+        <div id="statusArea" style="height: 20em; background-color: var(--color-bg-3); color: var(--color-text-3); overflow: auto; padding: 20px; margin-top: 10px;"
         v-html="state.status"></div>
     </div>
   </template>
