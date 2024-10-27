@@ -185,7 +185,7 @@ onMounted(async ()=>{
   state.alt = parseFloat(altRef.value.inputRef.modelValue || '0')
 
   state.timer = setInterval(()=>{
-    state.dt = new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })
+    state.dt = new Date().toLocaleString()
     localStorage.setItem('myLng', state.lng.toString());
     localStorage.setItem('myLat', state.lat.toString());
     localStorage.setItem('myAlt', state.alt.toString());
@@ -342,7 +342,8 @@ const getPass = async () => {
       sat_line_2: state.satData.find(e => e.name == state.sat).path[1],
       lat: state.lat,
       lng: state.lng,
-      alt: state.alt
+      alt: state.alt,
+      tz: Intl.DateTimeFormat().resolvedOptions().timeZone
     })
   })).json()
   const passOption = []
@@ -394,7 +395,8 @@ const writeIt = async () => {
       tx: state.tx,
       rx: state.rx,
       pass_time: state.pass.split('|')[0],
-      departure_time: state.pass.split('|')[1]
+      departure_time: state.pass.split('|')[1],
+      tz: Intl.DateTimeFormat().resolvedOptions().timeZone
     })
   })).json()
   
