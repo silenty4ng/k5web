@@ -239,6 +239,7 @@
   }
 
   const iDownload = (url: any, name: any) => {
+    if(name.split('.').reverse()[0] !== 'bin')name += '.bin';
     fetch(url).then(e=>e.blob()).then(blob=>{
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
