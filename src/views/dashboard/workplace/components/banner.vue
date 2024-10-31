@@ -27,6 +27,35 @@
     <div>
       <a-collapse :default-active-key="state.activeKey" accordion @change="changeMainActive">
         <a-collapse-item header="广告区" :key="1">
+          <a-space>
+            <a-card hoverable :style="{ width: '405px' }">
+            <template #cover>
+              <div
+                style="position: relative; display: block;"
+              >
+              <a class="adimg1" target="_blank" href="https://s.click.taobao.com/nnwRvJt" style="position: relative; display: block;">
+                <img
+                  :style="{ width: '100%', display: 'block', opacity: 0 }"
+                  alt="ads"
+                  src="/O1CN019Pat6v1ZuNgxL8CRt_!!6000000003254-0-tps-800-450.jpg"
+                />
+                <img
+                  :style="{ width: '100%', position: 'absolute', top: 0 }"
+                  alt="ads"
+                  src="/O1CN019Pat6v1ZuNgxL8CRt_!!6000000003254-0-tps-800-450.jpg"
+                />
+                <img
+                  class="adimg1c"
+                  :style="{ width: '30%', position: 'absolute', top: '25%', left: '63%', display: 'none' }"
+                  alt="ads"
+                  src="/adimg1c.png"
+                />
+              </a>
+              </div>
+            </template>
+            <a-card-meta title="BD8DFN 投放">
+            </a-card-meta>
+          </a-card>
           <a-card hoverable :style="{ width: '600px' }">
             <template #cover>
               <div
@@ -41,6 +70,7 @@
             <a-card-meta title="BG4IWE 投放">
             </a-card-meta>
           </a-card>
+          </a-space>
         </a-collapse-item>
         <a-collapse-item header="腾讯公益" :key="2">
           <img class="tencent" style="margin-bottom: 10px;" width="200px" src="/gy.png" />
@@ -82,7 +112,7 @@
 
   const state = reactive({
     eepromSize: t('workplace.clickCheck'),
-    activeKey: JSON.parse(localStorage.getItem('mainActiveKey') ?? "[2]")
+    activeKey: JSON.parse(localStorage.getItem('mainActiveKey') ?? "[1]")
   })
 
   const changeMainActive = (e: any) => {
@@ -383,6 +413,11 @@
     }
     100%{
       right:1px;
+    }
+  }
+  .adimg1:hover {
+    .adimg1c {
+      display: block !important;
     }
   }
 </style>
