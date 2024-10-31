@@ -4,8 +4,8 @@
       <a-card class="general-card" :loading="loading">
         <template #title>
           <div style="color: red; font-weight: bold;">
-            ⚠：实验性功能 使用可能会损坏手台
-            <span style="font-size: 0.9rem;">【使用说明：<t-link theme="primary" href="https://github.com/losehu/uv-k5-bootloader-custom/releases" target="_blank">https://github.com/losehu/uv-k5-bootloader-custom/releases</t-link>】</span>
+            {{ $t('bl.warning') }}
+            <span style="font-size: 0.9rem;">【{{ $t('bl.readme') }}<t-link theme="primary" href="https://github.com/losehu/uv-k5-bootloader-custom/releases" target="_blank">https://github.com/losehu/uv-k5-bootloader-custom/releases</t-link>】</span>
           </div>
             {{ $t('bl') }} {{ $t('global.onStart') }}
         </template>
@@ -23,7 +23,7 @@
                   <icon-plus />
                 </template>
                 {{ $t('cps.onDeviceWrite') }}
-              </a-button> （固件名称仅支持英文）
+              </a-button> （{{ $t('bl.onlyEnglish') }}）
             </a-space>
           </a-col>
         </a-row>
@@ -31,7 +31,7 @@
           <div>EEPROM：</div>
           <div>
             {{ state.showAdd }}
-            <t-button size="small" variant="outline" @click="clearAll(256)">清空</t-button>
+            <t-button size="small" variant="outline" @click="clearAll(256)">{{ $t('bl.clear') }}</t-button>
           </div>
         </div>
         <div style="width: 100%; overflow: scroll; user-select: none;">
@@ -41,7 +41,7 @@
               :ondragover="(event: any)=>{showAdd(index);event.preventDefault()}"
               :ondrop="()=>{targetOver(item, index)}"
               :title="
-                item == -2 ? '引导程序占用区' : (item != -1 ? state.rom[item].binaryName : 
+                item == -2 ? $t('bl.bootloader') : (item != -1 ? state.rom[item].binaryName : 
                 (index * 64 + 0x40000).toString(16).toUpperCase() + ' - ' + (index * 64 + 0x40000 + 63).toString(16).toUpperCase()
               )"
               :style="item == -1 ? 'background-color: white; border: 1px solid #ddd; height: 10px;' : (
@@ -52,7 +52,7 @@
             </div>
           </div>
         </div>
-        <a-button style="margin-bottom: 10px;" @click="selectFile">{{ state.binaryFile ? state.binaryName : $t('tool.selectFirmware') }}</a-button>（选择固件后将固件卡片拖拽到上方 EEPROM）
+        <a-button style="margin-bottom: 10px;" @click="selectFile">{{ state.binaryFile ? state.binaryName : $t('tool.selectFirmware') }}</a-button>（{{ $t('bl.drag') }}）
         <br>
         <t-space break-line>
           <t-card draggable="true" :ondragstart="()=>{state.nowDrag = index}" v-for="(item, index) in state.rom" :title="item.binaryName" :bordered="true" hover-shadow :style="{ width: '400px' }">
