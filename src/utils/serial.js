@@ -1021,6 +1021,19 @@ async function readPacketNoVerify(port, timeout = 1000) {
     }
 }
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function chunkUint8Array(inputArray, chunkSize) {
+    const result = [];
+    for (let i = 0; i < inputArray.length; i += chunkSize) {
+      // 将每一部分切割成新的Uint8Array
+      result.push(inputArray.slice(i, i + chunkSize));
+    }
+    return result;
+}
+
 /**
  * Sends a packet to the radio.
  * @param {SerialPort} port - The serial port to write to.
@@ -1041,7 +1054,12 @@ async function sendPacket(port, data) {
         // send packet
         //console.log('Sending packet:', packet);
 
-        await writer.write(packet);
+        const chunkedPacket = chunkUint8Array(packet, 64);
+        for(let i = 0; i < chunkedPacket.length; i++){
+            await writer.write(chunkedPacket[i]);
+            await sleep(1); // magic 
+        }
+
         // close writer
         writer.releaseLock();
     } catch (error) {

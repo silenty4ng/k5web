@@ -93,17 +93,20 @@ const flashIt = async () => {
   if(state.protocol == 'Official'){
     await readPacket(_connect, 0x18, 1000);
   }
-  const rawVersion = unpackVersion(state.binaryFile);
-  const _data = new Uint8Array([0x30, 0x5, rawVersion.length, 0x0, ...rawVersion]);
+  // const rawVersion = unpackVersion(state.binaryFile);
+  // const _data = new Uint8Array([0x30, 0x5, rawVersion.length, 0x0, ...rawVersion]);
 
   if(state.protocol == 'Official'){
-    await sendPacket(_connect, _data);
+    await sendPacket(_connect, [48,5,16,0,42,79,69,70,87,45,76,79,83,69,72,85,0,0,0,0]); // magic 
     await readPacket(_connect, 0x18);
   }
   
   const firmware = unpack(state.binaryFile);
   
-  if (firmware.length > 0xefff) throw new Error('Last resort boundary check failed. Whoever touched the code is an idiot.');
+  if (firmware.length > 0xf000) {
+    alert('最后的边界检查失败。不管是谁修改了代码，他都是个白痴。');
+    throw new Error('Last resort boundary check failed. Whoever touched the code is an idiot.');
+  }
 
   for (let i = 0; i < firmware.length; i += 0x100) {
       const data = firmware.slice(i, i + 0x100);
