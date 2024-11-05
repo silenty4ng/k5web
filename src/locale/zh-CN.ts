@@ -141,6 +141,7 @@ export default {
   'tool.scaned': '已扫码上传',
   'global.nosupport': '当前浏览器不支持网页串口功能，请使用 Chrome, Edge, Opera 浏览器。',
   'global.connectFail': '连接失败',
+  'global.handshakeFail': '握手失败',
   'menu.workshop': '创意工坊',
   'menu.firmware': '固件市场',
   'menu.channel': '信道分享',

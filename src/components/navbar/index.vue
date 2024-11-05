@@ -272,6 +272,7 @@
         alert(t('global.connectFail'));  
         return;
       }
+
       appStore.updateSettings({ connectPort: _connect });
 
       const driversList : any = {};
@@ -280,8 +281,15 @@
       })
 
       let _configuration = null;
-      
-      const version = await eeprom_init(_connect);
+      let version = "";
+      try{
+        version = await eeprom_init(_connect);
+      }catch{
+        await disconnect(_connect);
+        appStore.updateSettings({ connectState: false, connectPort: null, firmwareVersion: "" });
+        alert(t('global.handshakeFail'));
+        throw new Error(t('global.handshakeFail'));
+      }
       const config = {
         "name": "TODO",
         "uart": "official",
