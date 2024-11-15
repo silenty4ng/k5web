@@ -1,5 +1,15 @@
 <template>
   <div class="container">
+    <a-modal width="650px" v-model:visible="state.selfSatModal" @ok="addSelfSat">
+      <template #title>
+        {{ $t("sat.selfSatInfo") }}
+      </template>
+      <div>
+        <a-textarea v-model="state.selfSatInfo" style="height: 120px;"placeholder="ISS (ZARYA)             
+1 25544U 98067A   24320.36274227  .00015569  00000+0  28188-3 0  9999
+2 25544  51.6413 286.4173 0007936 217.3657 298.3197 15.49809951481990"/>
+      </div>
+    </a-modal>
     <a-modal v-model:visible="state.visible" @ok="handleOk" :ok-text="$t('tool.scaned')">
       <template #title>
         {{ $t('tool.scanqr') }}
@@ -30,9 +40,12 @@
               </div>
             </a-form-item>
             <a-form-item :label-col-style="{ width: '25%' }" field="sat" :label="$t('tool.selectSatellite')">
-              <a-select v-model="state.sat" @change="changeSat" :placeholder="$t('tool.selectSatellite') + '...'" allow-search allow-clear>
-                <a-option v-for="item in state.satData" :key="item.name" :value="item.name">{{ item.name }}</a-option>
-              </a-select>
+              <div style="width: 100%;">
+                <a-select v-model="state.sat" @change="changeSat" :placeholder="$t('tool.selectSatellite') + '...'" allow-search allow-clear>
+                  <a-option v-for="item in state.satData" :key="item.name" :value="item.name">{{ item.name }}</a-option>
+                </a-select>
+                <a-link @click="()=>{state.selfSatModal = true}" style="margin-top: 10px;">{{ $t("sat.addSelfSat") }}</a-link>
+              </div>
             </a-form-item>
             <a-form-item :label-col-style="{ width: '25%' }" field="lng" :label="$t('tool.longitude')">
               <a-input-number ref="lngRef" :precision="6" v-model="state.lng" />
@@ -135,6 +148,8 @@ const state: {
   dtCustom: any,
   freqDb: any,
   visible: boolean,
+  selfSatModal: boolean,
+  selfSatInfo: string,
 } = reactive({
   uuid: '',
   qrcode: '',
@@ -163,13 +178,20 @@ const state: {
   timer: undefined,
   passCustom: undefined,
   dtCustom: undefined,
-  freqDb: []
+  freqDb: [],
+  selfSatModal: false,
+  selfSatInfo: '',
 })
 
 onMounted(async ()=>{
   try{
-    const rst = await (await fetch('https://github.jobcher.com/gh/https://raw.githubusercontent.com/palewire/ham-satellite-database/main/data/amsat-active-frequencies.json')).text()
-    state.freqDb = JSON.parse(rst)
+    if(sessionStorage.getItem('satFrequenciesRst')){
+      state.freqDb = JSON.parse(sessionStorage.getItem('satFrequenciesRst') || "[]")
+    }else{
+      const rst = await (await fetch('https://github.jobcher.com/gh/https://raw.githubusercontent.com/palewire/ham-satellite-database/main/data/amsat-active-frequencies.json')).text()
+      state.freqDb = JSON.parse(rst)
+      sessionStorage.setItem("satFrequenciesRst", rst)
+    }
   }
   catch{}
 
@@ -254,7 +276,13 @@ const changeSat = async (sat: any) => {
 
 const initSat = async () => {
   setLoading(true)
-  const rst = await (await fetch('https://celestrak.org/NORAD/elements/amateur.txt')).text()
+  let rst = ''
+  if(sessionStorage.getItem('satRst')){
+    rst = sessionStorage.getItem('satRst') || ""
+  }else{
+    rst = await (await fetch('https://celestrak.org/NORAD/elements/amateur.txt')).text()
+    sessionStorage.setItem('satRst', rst)
+  }
   const lines = rst.split(/\r?\n/);
   const sat = [];
   let _sat: any = {};
@@ -470,6 +498,26 @@ const writeIt = async () => {
   await syncTime()
   await eeprom_reboot(appStore.connectPort);
   setLoading(false)
+}
+
+const addSelfSat = () => {
+  const lines = (state.selfSatInfo + "\n").split(/\r?\n/);
+  const sat = [];
+  let _sat: any = {};
+  for (let i = 0; i < lines.length; i++) {
+    if (Number.isNaN(parseInt(lines[i].substring(0, 1)))) {
+      if (_sat.name && _sat.name != '') {
+        sat.push(_sat)
+        _sat = {}
+      }
+      _sat.name = lines[i]
+    } else {
+      if (!_sat.path) { _sat.path = [] }
+      _sat.path.push(lines[i])
+    }
+  }
+  state.satData = sat.concat(state.satData)
+  state.selfSatInfo = ''
 }
 </script>
 

@@ -180,6 +180,8 @@ export default {
   'bl.onlyEnglish': 'Firmware names are supported in English only',
   'bl.drag': 'Select the firmware and drag the firmware card to the EEPROM grid',
   'bl.bootloader': 'Bootloader Use',
+  'sat.selfSatInfo': 'My satellite parameters',
+  'sat.addSelfSat': 'Add my satellite',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

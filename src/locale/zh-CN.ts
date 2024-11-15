@@ -180,6 +180,8 @@ export default {
   'bl.onlyEnglish': '固件名称仅支持英文',
   'bl.drag': '选择固件后将固件卡片拖拽到上方 EEPROM',
   'bl.bootloader': '引导程序占用区',
+  'sat.selfSatInfo': '我的卫星参数',
+  'sat.addSelfSat': '添加我的卫星',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,
