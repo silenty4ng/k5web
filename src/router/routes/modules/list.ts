@@ -71,6 +71,16 @@ const LIST: AppRouteRecordRaw = {
         requiresAuth: true,
         roles: ['*'],
       },
+    },
+    {
+      path: 'chat',
+      name: 'Chat',
+      component: () => import('@/views/list/chat/index.vue'),
+      meta: {
+        locale: 'chat',
+        requiresAuth: true,
+        roles: ['*'],
+      },
     }
   ],
 };

@@ -182,6 +182,7 @@ export default {
   'bl.bootloader': 'Bootloader Use',
   'sat.selfSatInfo': 'My satellite parameters',
   'sat.addSelfSat': 'Add my satellite',
+  'chat': 'Radio Chat',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

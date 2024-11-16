@@ -182,6 +182,7 @@ export default {
   'bl.bootloader': '引导程序占用区',
   'sat.selfSatInfo': '我的卫星参数',
   'sat.addSelfSat': '添加我的卫星',
+  'chat': '无线电聊天',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,
