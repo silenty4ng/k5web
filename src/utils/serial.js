@@ -749,10 +749,14 @@ const FONT_MAPPING_118_MAP = ['啊', '阿', '埃', '挨', '哎', '唉', '哀', '
 let globalWriteReader = null
 let globalReadReader = null
 
-function globalRelease(){
+function globalRelease(target = 'all'){
     try {
-        if(globalReadReader)globalReadReader.releaseLock()
-        if(globalWriteReader)globalWriteReader.releaseLock()
+        if(target != 'read'){
+            if(globalWriteReader)globalWriteReader.releaseLock()
+        }
+        if(target != 'write'){
+            if(globalReadReader)globalReadReader.releaseLock()
+        }
     } catch {}
 }
 
@@ -869,7 +873,7 @@ async function readPacket(port, expectedData, timeout = 1000) {
         return unpacketize(new Uint8Array(sessionStorage.getItem('webusb').split(',')));
     }
     // Create a reader to read data from the serial port
-    globalRelease()
+    globalRelease('read')
     const reader = port.readable.getReader();
     globalReadReader = reader;
     let buffer = new Uint8Array();
@@ -974,7 +978,7 @@ async function readPacket(port, expectedData, timeout = 1000) {
  */
 async function readPacketNoVerify(port, timeout = 1000) {
     // Create a reader to read data from the serial port
-    globalRelease()
+    globalRelease('read')
     const reader = port.readable.getReader();
     globalReadReader = reader;
     let buffer = new Uint8Array();
@@ -1063,7 +1067,7 @@ async function sendPacket(port, data) {
     }
     try {
         // create writer for port
-        globalRelease()
+        globalRelease('write')
         const writer = port.writable.getWriter();
         globalWriteReader = writer;
         // prepare packet
@@ -1514,12 +1518,11 @@ function unpackVersion(encoded_firmware) {
 
 async function sendSMSPacket(port, message){
     try {
-        globalRelease()
+        globalRelease('write')
         const writer = port.writable.getWriter();
         globalWriteReader = writer;
         const formattedMessage = `SMS:${message}\r\n`;
         const packet = new TextEncoder().encode(formattedMessage); 
-        console.log(packet)
         await writer.write(packet);
         writer.releaseLock();
     } catch (error) {
@@ -1530,7 +1533,7 @@ async function sendSMSPacket(port, message){
 }
 
 function readSMSPacket(port) {
-    globalRelease()
+    globalRelease('read')
     const reader = port.readable.getReader();
     globalReadReader = reader;
     return reader;

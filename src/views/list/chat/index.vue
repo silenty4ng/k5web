@@ -3,7 +3,7 @@
         <Breadcrumb :items="[$t('menu.list'), $t('menu.flash')]" />
         <a-card class="general-card">
             <template #title>
-                【开发中】无线电聊天（需使用<a-link @click="downloadFirmware">这个</a-link>固件）
+                【无法正常使用】【开发中！！！】无线电聊天（需使用<a-link @click="downloadFirmware">这个</a-link>固件）
             </template>
             <div style="display: flex; align-items: center; margin: 10px;">
                 <span>呼号：</span>
@@ -41,10 +41,12 @@
 import { computed, reactive, watch, nextTick, ref, onUnmounted } from 'vue';
 import { eeprom_init, sendSMSPacket, readSMSPacket } from '@/utils/serial.js';
 import { useAppStore } from '@/store';
+import { useRouter } from 'vue-router';
 import { Message, Modal } from '@arco-design/web-vue';
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
+const router = useRouter()
 const appStore = useAppStore();
 
 const msgList: any = ref(null)
@@ -90,7 +92,29 @@ const scrollIt = () => {
 }
 
 const downloadFirmware = () => {
-    Message.error('敬请期待')
+    router.push({
+      path: '/tool/flash',
+      query: {
+        url: "/sms_test.bin"
+      }
+    });
+}
+
+function stringToUtf8Hex(str: string) {
+    const encoder = new TextEncoder();
+    const utf8Bytes = encoder.encode(str);
+    let hex = '';
+    utf8Bytes.forEach(byte => {
+        hex += byte.toString(16).padStart(2, '0').toUpperCase();
+    });
+    return hex;
+}
+
+function hexToUtf8String(hex: string) {
+    // 将十六进制字符串转换为字节数组
+    const bytes = new Uint8Array(hex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+    const decoder = new TextDecoder();
+    return decoder.decode(bytes);
 }
 
 const sendMsg = async () => {
@@ -99,8 +123,7 @@ const sendMsg = async () => {
         Message.error('请输入正确的呼号')
         return
     }
-    console.log(state.callsign.trim() + ":" + state.devid + ":" + state.sendInput.trim())
-    sendSMSPacket(appStore.connectPort, state.callsign.trim() + ":" + state.devid + ":" + state.sendInput.trim())
+    sendSMSPacket(appStore.connectPort,"START:" + state.callsign.trim() + ":" + state.devid + ":" + stringToUtf8Hex(state.sendInput.trim()) + ":END")
     state.msgList.push({
         callsign: state.callsign.trim(),
         devid: state.devid,
@@ -128,6 +151,7 @@ const connectIt = async () => {
 const asyncMsg = async (reader: any) => {
     let buffer = '';
     const decoder = new TextDecoder();
+    const regex = /START:[A-Z0-9]+:[0-9]+:[A-F0-9]+:END/g;
     while (true) {
         try {
             const { value, done } = await reader.read();
@@ -138,7 +162,26 @@ const asyncMsg = async (reader: any) => {
             message = message.trim();
             buffer += message;
             console.log(buffer)
+            const matches = buffer.match(regex);
+            if (matches && matches.length > 0) {
+                buffer = ''
+                try {
+                    const content = matches[matches.length - 1].split(':');
+                    state.msgList.push({
+                        callsign: content[1],
+                        devid: content[2],
+                        content: hexToUtf8String(content[3])
+                    })
+                    scrollIt()
+                } catch {
+                    console.log('ERROR')
+                }
+            }
         } catch (error) {
+            console.log('已断开')
+            state.connect = false
+            state.reader.releaseLock();
+            state.startChat = '开始聊天'
             break;
         }
     }
