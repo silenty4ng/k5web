@@ -500,7 +500,20 @@ const writeIt = async () => {
   setLoading(false)
 }
 
-const addSelfSat = () => {
+const isValidURL = (url: string) => {
+    const pattern = new RegExp('^(https?:\\/\\/)?' + // 协议 (http 或 https)
+        '((([a-zA-Z\\d]([a-zA-Z\\d-]*[a-zA-Z\\d])*)\\.)+[a-zA-Z]{2,}|' + // 域名
+        '((\\d{1,3}\\.){3}\\d{1,3}))' + // 或者 IP 地址 (IPv4)
+        '(\\:\\d+)?(\\/[-a-zA-Z\\d%_.~+]*)*' + // 端口号和路径
+        '(\\?[;&a-zA-Z\\d%_.~+=-]*)?' + // 查询字符串
+        '(\\#[-a-zA-Z\\d_]*)?$', 'i'); // 锚点
+    return !!pattern.test(url);
+}
+
+const addSelfSat = async () => {
+  if(isValidURL(state.selfSatInfo)){
+    state.selfSatInfo = await (await fetch(state.selfSatInfo)).text()
+  }
   const lines = (state.selfSatInfo + "\n").split(/\r?\n/);
   const sat = [];
   let _sat: any = {};
