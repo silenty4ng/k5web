@@ -183,6 +183,8 @@ export default {
   'sat.selfSatInfo': '我的卫星参数',
   'sat.addSelfSat': '添加我的卫星',
   'chat': '无线电聊天',
+  'menu.cps.writeNoticeTitle': '确认',
+  'menu.cps.writeNoticeContent': '确认将网页显示的信道写入设备吗？（将覆盖设备当前信道配置）',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

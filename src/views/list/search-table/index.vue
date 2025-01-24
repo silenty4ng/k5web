@@ -1,5 +1,13 @@
 <template>
   <div class="container">
+    <a-modal v-model:visible="istate.showNotice" @ok="writeChannel" @cancel="istate.showNotice = false">
+      <template #title>
+        {{ $t('menu.cps.writeNoticeTitle') }}
+      </template>
+      <div>
+        {{ $t('menu.cps.writeNoticeContent') }}
+      </div>
+    </a-modal>
     <Breadcrumb :items="[$t('menu.dashboard'), $t('menu.cps.channel')]" />
     <a-card class="general-card">
       <template #title>
@@ -14,7 +22,7 @@
               </template>
               {{ $t('cps.onDeviceRead') }}
             </a-button>
-            <a-button @click="writeChannel">
+            <a-button @click="istate.showNotice = true">
               <template #icon>
                 <icon-plus />
               </template>
@@ -158,7 +166,8 @@
   })
 
   const istate = reactive({
-    showHide: 0
+    showHide: 0,
+    showNotice: false
   })
 
   const onDragSort = (params: any) => {

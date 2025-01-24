@@ -183,6 +183,8 @@ export default {
   'sat.selfSatInfo': 'My satellite parameters',
   'sat.addSelfSat': 'Add my satellite',
   'chat': 'Radio Chat',
+  'menu.cps.writeNoticeTitle': 'Confirm',
+  'menu.cps.writeNoticeContent': "Confirmation to write the channel shown on the web page to the device? (will override the device's current channel configuration)",
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,
