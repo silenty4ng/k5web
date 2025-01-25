@@ -21,7 +21,8 @@
       <a-typography-text>◆ K5Web 官扩刷中文教程（BG3ODZ）：<t-link theme="primary" href="https://www.bilibili.com/video/BV1Ab421p7rN" target="_blank">https://www.bilibili.com/video/BV1Ab421p7rN</t-link> 。</a-typography-text><br>
       <a-typography-text>◆ K5Web 自扩刷中文教程（BG3ODZ）：<t-link theme="primary" href="https://www.bilibili.com/video/BV1Qk2BYDErN" target="_blank">https://www.bilibili.com/video/BV1Qk2BYDErN</t-link> 。</a-typography-text><br>
       <a-typography-text>◆ K5Web 使用视频教程（BG3ODZ）：<t-link theme="primary" href="https://www.bilibili.com/video/BV1Q4421D75x" target="_blank">https://www.bilibili.com/video/BV1Q4421D75x</t-link> 。</a-typography-text><br>
-      <a-typography-text>◆ K5Web 使用视频教程（BG7QJV）：<t-link theme="primary" href="https://www.douyin.com/video/7378314511419313458" target="_blank">https://www.douyin.com/video/7378314511419313458</t-link> 。</a-typography-text>
+      <a-typography-text>◆ K5Web 使用视频教程（BG7QJV）：<t-link theme="primary" href="https://www.douyin.com/video/7378314511419313458" target="_blank">https://www.douyin.com/video/7378314511419313458</t-link> 。</a-typography-text><br>
+      <a-typography-text>◆ 感谢<t-link theme="primary" href="/#/chirp/thanks">各位</t-link>对 K5Web 的支持，本站将至少维护至 2026年11月21日 23:59:59。</a-typography-text>
     </div>
     <div style="margin-top: 50px;">&nbsp;</div>
     <div>

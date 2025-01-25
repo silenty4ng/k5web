@@ -219,7 +219,7 @@
   
   <script lang="ts">
     export default {
-      name: 'Radio',
+      name: 'Mdc',
     };
   </script>
   

@@ -247,7 +247,7 @@ const changeThreshold = () => {
 
 <script lang="ts">
   export default {
-    name: 'Backup',
+    name: 'Image',
   };
 </script>
 

@@ -71,6 +71,17 @@ const DASHBOARD: AppRouteRecordRaw = {
         requiresAuth: true,
         roles: ['*'],
       },
+    },
+    {
+      path: 'thanks',
+      name: 'Thanks',
+      component: () => import('@/views/thanks/index.vue'),
+      meta: {
+        hideInMenu: true,
+        locale: '感谢列表',
+        requiresAuth: true,
+        roles: ['*'],
+      },
     }
   ],
 };

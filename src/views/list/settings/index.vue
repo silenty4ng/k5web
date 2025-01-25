@@ -183,7 +183,7 @@ const writeChannel = async() => {
 
 <script lang="ts">
   export default {
-    name: 'Chi',
+    name: 'Settings',
   };
 </script>
 
