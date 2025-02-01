@@ -185,6 +185,7 @@ export default {
   'chat': 'Radio Chat',
   'menu.cps.writeNoticeTitle': 'Confirm',
   'menu.cps.writeNoticeContent': "Confirmation to write the channel shown on the web page to the device? (will override the device's current channel configuration)",
+  'menu.satellite2': 'Satcom 2.0',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

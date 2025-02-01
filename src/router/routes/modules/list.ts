@@ -63,6 +63,16 @@ const LIST: AppRouteRecordRaw = {
       },
     },
     {
+      path: 'sat2',
+      name: 'Sat2',
+      component: () => import('@/views/list/sat2/index.vue'),
+      meta: {
+        locale: 'menu.satellite2',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
+    {
       path: 'bl',
       name: 'BL',
       component: () => import('@/views/list/bl/index.vue'),

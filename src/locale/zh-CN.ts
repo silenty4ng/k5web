@@ -185,6 +185,7 @@ export default {
   'chat': '无线电聊天',
   'menu.cps.writeNoticeTitle': '确认',
   'menu.cps.writeNoticeContent': '确认将网页显示的信道写入设备吗？（将覆盖设备当前信道配置）',
+  'menu.satellite2': '星历写入 2.0',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,
