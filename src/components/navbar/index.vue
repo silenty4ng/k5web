@@ -229,6 +229,7 @@
     "L_BL[0-9][0-9][0-9]": "losehubl.json",
     "LOSEHU.*P.*K"       : "ltsk.json",
     "LOSEHU.*P.*"        : "lts.json",
+    "LOSEHU.*D"          : "losehud.json",
     "LOSEHU13[0-9].*HS"   : "losehu124h.json",
     "LOSEHU13[0-9].*H"   : "losehu124h.json",
     "LOSEHU13[0-9].*KS"   : "losehu120k.json",
@@ -298,6 +299,7 @@
         "H": false,
         "localmdc": false,
         "sat": false,
+        "sat2": false,
         "newpinyin": false,
         'fm30': false
       }

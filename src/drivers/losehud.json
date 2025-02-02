@@ -1,0 +1,9 @@
+{
+    "name": "LoseHu Doppler",
+    "uart": "losehu",
+    "charset": "gb2312",
+    "H": true,
+    "sat": true,
+    "sat2": true,
+    "newpinyin": true
+}

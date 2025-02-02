@@ -433,6 +433,10 @@ const restoreRange = async (start: any = 0, uint8Array: any) => {
 
 const writeIt = async () => {
   if (appStore.connectState != true) { alert(sessionStorage.getItem('noticeConnectK5')); return; };
+  if(appStore.configuration?.sat2 != true){
+    alert(sessionStorage.getItem('noticeVersionNoSupport'));
+    return;
+  }
   setLoading(true)
   await eeprom_init(appStore.connectPort);
   // console.log(state.satsData)
