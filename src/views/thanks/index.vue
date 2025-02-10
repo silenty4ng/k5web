@@ -64,7 +64,10 @@ onMounted(() => {
         { "name": "BG4IWE", "channel": "QQ", "time": "2024-06-07", "money": "2.00" },
         { "name": "BA7IPG", "channel": "QQ", "time": "2024-06-16", "money": "5.00" },
         { "name": "BA3QT", "channel": "QQ", "time": "2024-11-18", "money": "6.00" },
-        { "name": "BI4ACB", "channel": "微信", "time": "2025-01-29", "money": "66.00"}
+        { "name": "BI4ACB", "channel": "微信", "time": "2025-01-29", "money": "66.00"},
+        { "name": "*波", "channel": "支付宝", "time": "2024-09-11", "money": "100.00" },
+        { "name": "*权", "channel": "支付宝", "time": "2025-02-10", "money": "20.00" },
+        { "name": "**忠", "channel": "支付宝", "time": "2025-02-10", "money": "10.00" },
     ];
     data.sort((a, b) => {
         if (parseFloat(b.money) - parseFloat(a.money) === 0){
