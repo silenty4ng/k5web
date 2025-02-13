@@ -15,14 +15,6 @@ const router = createRouter({
       path: '/',
       redirect: 'chirp/base',
     },
-    {
-      path: '/login',
-      name: 'login',
-      component: () => import('@/views/login/index.vue'),
-      meta: {
-        requiresAuth: false,
-      },
-    },
     ...appRoutes,
     REDIRECT_MAIN,
     SATLOC,
