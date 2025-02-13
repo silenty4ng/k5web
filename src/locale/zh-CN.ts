@@ -1,5 +1,3 @@
-import localeMessageBox from '@/components/message-box/locale/zh-CN';
-
 import localeWorkplace from '@/views/dashboard/workplace/locale/zh-CN';
 
 import localeSearchTable from '@/views/list/search-table/locale/zh-CN';
@@ -166,7 +164,6 @@ export default {
   'menu.cps.writeNoticeContent': '确认将网页显示的信道写入设备吗？（将覆盖设备当前信道配置）',
   'menu.satellite2': '星历写入 2.0',
   ...localeSettings,
-  ...localeMessageBox,
   ...localeWorkplace,
 
   ...localeSearchTable,

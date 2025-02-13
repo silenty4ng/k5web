@@ -167,7 +167,7 @@
   import { Message } from '@arco-design/web-vue';
   import { useRoute } from 'vue-router';
   import { useDark, useToggle, useFullscreen } from '@vueuse/core';
-  import { useAppStore, useUserStore } from '@/store';
+  import { useAppStore } from '@/store';
   import { LOCALE_OPTIONS } from '@/locale';
   import useLocale from '@/hooks/locale';
   import useUser from '@/hooks/user';
@@ -178,7 +178,6 @@
   const drivers = import.meta.glob('@/drivers/*.json', { eager: true });
 
   const appStore = useAppStore();
-  const userStore = useUserStore();
   const route = useRoute();
 
   const { logout } = useUser();

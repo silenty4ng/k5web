@@ -1,5 +1,3 @@
-import localeMessageBox from '@/components/message-box/locale/en-US';
-
 import localeWorkplace from '@/views/dashboard/workplace/locale/en-US';
 
 import localeSearchTable from '@/views/list/search-table/locale/en-US';
@@ -166,7 +164,6 @@ export default {
   'menu.cps.writeNoticeContent': "Confirmation to write the channel shown on the web page to the device? (will override the device's current channel configuration)",
   'menu.satellite2': 'Satcom 2.0',
   ...localeSettings,
-  ...localeMessageBox,
   ...localeWorkplace,
 
   ...localeSearchTable,
