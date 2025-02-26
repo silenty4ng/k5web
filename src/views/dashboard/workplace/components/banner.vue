@@ -62,6 +62,7 @@
                 <div
                 >
                   <img
+                    loading="lazy"
                     :style="{ width: '100%' }"
                     alt="ads"
                     src="/jjgg.jpg"
@@ -74,11 +75,11 @@
           </a-space>
         </a-collapse-item>
         <a-collapse-item header="腾讯公益" :key="2">
-          <img class="tencent" style="margin-bottom: 10px;" width="200px" src="/gy.png" />
+          <img loading="lazy" class="tencent" style="margin-bottom: 10px;" width="200px" src="/gy.png" />
         </a-collapse-item>
         <a-collapse-item header="饿饿饭饭" :key="3">
-          <img width="300" src="/mm_facetoface_collect_qrcode_1714392837792.png" >
-          <img width="300" src="/1722745910257.jpg" >
+          <img loading="lazy" width="300" src="/mm_facetoface_collect_qrcode_1714392837792.png" >
+          <img loading="lazy" width="300" src="/1722745910257.jpg" >
           <br><br>
           TRON / TRX：TPaSnHJ2cRCQjjv7TyAFJDamb3mZSSz1At
         </a-collapse-item>
