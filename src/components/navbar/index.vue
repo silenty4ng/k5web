@@ -85,6 +85,7 @@
         </li>
         <li>
           <a-button v-show="route.path !== '/tool/flash' && route.path !== '/idea/firmware'" type="primary" @click="connectIt">{{ appStore.connectState ? $t('navbar.disconnect') : $t('navbar.connect') }}</a-button>
+          <a-button disabled="disabled" title="刷机模式无需连接" v-show="route.path == '/tool/flash' || route.path == '/idea/firmware'" type="primary" @click="connectIt">{{ appStore.connectState ? $t('navbar.disconnect') : $t('navbar.connect') }}</a-button>
         </li>
         <li>
           <a-tooltip :content="$t('settings.language')">
