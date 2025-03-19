@@ -603,8 +603,8 @@
     await eeprom_init(appStore.connectPort);
     setLoading(true)
     let rawEEPROM  = new Uint8Array(0x0C80);
-    for (let i = 0; i < 0x0C80; i += 0x80) {
-      const _data = await eeprom_read(appStore.connectPort, i, 0x80, appStore.configuration?.uart)
+    for (let i = 0; i < 0x0C80; i += 0x40) {
+      const _data = await eeprom_read(appStore.connectPort, i, 0x40, appStore.configuration?.uart)
       rawEEPROM.set(_data, i)
     }
     let rawEEPROM2 = new Uint8Array(0x0C0);
@@ -613,8 +613,8 @@
       rawEEPROM2.set(_data, i - 0x0D60)
     }
     let rawEEPROM3 = new Uint8Array(0x0C80);
-    for (let i = 0x0F50; i < 0x1BD0; i += 0x80) {
-      const _data = await eeprom_read(appStore.connectPort, i, 0x80, appStore.configuration?.uart)
+    for (let i = 0x0F50; i < 0x1BD0; i += 0x40) {
+      const _data = await eeprom_read(appStore.connectPort, i, 0x40, appStore.configuration?.uart)
       rawEEPROM3.set(_data, i - 0x0F50)
     }
     let x = 0;
@@ -757,12 +757,12 @@
       }
       i += 0x10
     })
-    for (let i = 0; i < 0x0C80; i += 0x80) {
-      await eeprom_write(appStore.connectPort, i, rawEEPROM.slice(i, i + 0x80), 0x80, appStore.configuration?.uart);
+    for (let i = 0; i < 0x0C80; i += 0x40) {
+      await eeprom_write(appStore.connectPort, i, rawEEPROM.slice(i, i + 0x40), 0x40, appStore.configuration?.uart);
     }
     await eeprom_write(appStore.connectPort, 0x0D60, rawEEPROM2, 0x0C8);
-    for (let i = 0x0F50; i < 0x1BD0; i += 0x80) {
-      await eeprom_write(appStore.connectPort, i, rawEEPROM3.slice(i - 0x0F50, i - 0x0F50 + 0x80), 0x80, appStore.configuration?.uart);
+    for (let i = 0x0F50; i < 0x1BD0; i += 0x40) {
+      await eeprom_write(appStore.connectPort, i, rawEEPROM3.slice(i - 0x0F50, i - 0x0F50 + 0x40), 0x40, appStore.configuration?.uart);
     }
     await eeprom_reboot(appStore.connectPort);
     setLoading(false)

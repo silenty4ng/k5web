@@ -105,9 +105,9 @@ const checkEeprom = async () => {
 const clearEEPROM = async () => {
   if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
   const eepromSize = await check_eeprom(appStore.connectPort, appStore.configuration?.uart);
-  let rawEEPROM = new Uint8Array(0x80).fill(0xff);
-  for (let i = 0; i < eepromSize; i += 0x80) {
-    await eeprom_write(appStore.connectPort, i, rawEEPROM, 0x80, appStore.configuration?.uart);
+  let rawEEPROM = new Uint8Array(0x40).fill(0xff);
+  for (let i = 0; i < eepromSize; i += 0x40) {
+    await eeprom_write(appStore.connectPort, i, rawEEPROM, 0x40, appStore.configuration?.uart);
     state.status = state.status + "清空进度：" + (((i - 0) / eepromSize) * 100).toFixed(1) + "%<br/>";
     nextTick(()=>{
       const textarea = document?.getElementById('statusArea');
@@ -120,8 +120,8 @@ const clearEEPROM = async () => {
 const backupRange = async (start: any, end: any, name: any = new Date() + '_backup.bin') =>{
   await eeprom_init(appStore.connectPort);
   let rawEEPROM = new Uint8Array(end - start);
-  for (let i = start; i < end; i += 0x80) {
-    const data = await eeprom_read(appStore.connectPort, i, 0x80, appStore.configuration?.uart);
+  for (let i = start; i < end; i += 0x40) {
+    const data = await eeprom_read(appStore.connectPort, i, 0x40, appStore.configuration?.uart);
     rawEEPROM.set(data, i - start);
     state.status = state.status + "备份进度：" + (((i - start) / rawEEPROM.length) * 100).toFixed(1) + "%<br/>";
     nextTick(()=>{
@@ -154,8 +154,8 @@ const restoreRange = async (start: any = 0) => {
   input.onchange = async() => {
     const blob = new Blob([input.files[0]], {type: 'application/octet-stream' });
     const rawEEPROM = new Uint8Array(await blob.arrayBuffer());
-    for (let i = start; i < input.files[0].size + start; i += 0x80) {
-      await eeprom_write(appStore.connectPort, i, rawEEPROM.slice(i - start, i - start + 0x80), rawEEPROM.slice(i - start, i - start + 0x80).length, appStore.configuration?.uart);
+    for (let i = start; i < input.files[0].size + start; i += 0x40) {
+      await eeprom_write(appStore.connectPort, i, rawEEPROM.slice(i - start, i - start + 0x40), rawEEPROM.slice(i - start, i - start + 0x40).length, appStore.configuration?.uart);
       state.status = state.status + "恢复进度：" + (((i - start) / input.files[0].size) * 100).toFixed(1) + "%<br/>";
       nextTick(()=>{
         const textarea = document?.getElementById('statusArea');

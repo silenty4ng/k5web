@@ -106,12 +106,12 @@
   }
 
   const writeRange = async (start: any = 0, uint8Array: any, remark: string = '') => {
-    for (let i = start; i < uint8Array.length + start; i += 0x80) {
-      await eeprom_write(appStore.connectPort, i, uint8Array.slice(i - start, i - start + 0x80), uint8Array.slice(i - start, i - start + 0x80).length, appStore.configuration?.uart);
-      const checkData = await eeprom_read(appStore.connectPort, i, uint8Array.slice(i - start, i - start + 0x80).length, appStore.configuration?.uart)
-      if(!isEqual(uint8Array.slice(i - start, i - start + 0x80), checkData)) {
+    for (let i = start; i < uint8Array.length + start; i += 0x40) {
+      await eeprom_write(appStore.connectPort, i, uint8Array.slice(i - start, i - start + 0x40), uint8Array.slice(i - start, i - start + 0x40).length, appStore.configuration?.uart);
+      const checkData = await eeprom_read(appStore.connectPort, i, uint8Array.slice(i - start, i - start + 0x40).length, appStore.configuration?.uart)
+      if(!isEqual(uint8Array.slice(i - start, i - start + 0x40), checkData)) {
         state.status = state.status + remark +  "检测到写入错误！！！" + "<br/>";
-        i -= 0x80;
+        i -= 0x40;
         continue
       }
 

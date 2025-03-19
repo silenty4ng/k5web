@@ -215,8 +215,8 @@ const flashIt = async () => {
   if(appStore.configuration?.charset == "gb2312")position = 0x2080;
   await eeprom_init(appStore.connectPort);
   const rawEEPROM = state.binaryFile;
-  for (let i = position; i < rawEEPROM.length + position; i += 0x80) {
-    await eeprom_write(appStore.connectPort, i, rawEEPROM.slice(i - position, i - position + 0x80), rawEEPROM.slice(i - position, i - position + 0x80).length, appStore.configuration?.uart);
+  for (let i = position; i < rawEEPROM.length + position; i += 0x40) {
+    await eeprom_write(appStore.connectPort, i, rawEEPROM.slice(i - position, i - position + 0x40), rawEEPROM.slice(i - position, i - position + 0x40).length, appStore.configuration?.uart);
   }
   await eeprom_reboot(appStore.connectPort);
   state.loading = false
