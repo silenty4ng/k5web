@@ -108,10 +108,12 @@
   const writeRange = async (start: any = 0, uint8Array: any, remark: string = '') => {
     for (let i = start; i < uint8Array.length + start; i += 0x80) {
       await eeprom_write(appStore.connectPort, i, uint8Array.slice(i - start, i - start + 0x80), uint8Array.slice(i - start, i - start + 0x80).length, appStore.configuration?.uart);
-      // const checkData = await eeprom_read(appStore.connectPort, i, uint8Array.slice(i - start, i - start + 0x80).length, appStore.configuration?.uart)
-      // if(!isEqual(uint8Array.slice(i - start, i - start + 0x80), checkData)) {
-      //   console.log("写入错误！！！")
-      // }
+      const checkData = await eeprom_read(appStore.connectPort, i, uint8Array.slice(i - start, i - start + 0x80).length, appStore.configuration?.uart)
+      if(!isEqual(uint8Array.slice(i - start, i - start + 0x80), checkData)) {
+        state.status = state.status + remark +  "检测到写入错误！！！" + "<br/>";
+        i -= 0x80;
+        continue
+      }
 
       state.status = state.status + remark +  "写入进度：" + (((i - start) / uint8Array.length) * 100).toFixed(1) + "%<br/>";
       nextTick(()=>{
@@ -182,7 +184,7 @@
     for(let i = 256; i < 4096; i++){
       if(state.calendar[i] >= 0){
         console.log(i);
-        const newBinaryFile = new Uint8Array(Math.ceil(state.rom[state.calendar[i]].binaryFile.length / 0x40) * 0x40);
+        const newBinaryFile = new Uint8Array(Math.ceil(state.rom[state.calendar[i]].binaryFile.length / 0x40) * 0x40).fill(0xff);
         newBinaryFile.set(state.rom[state.calendar[i]].binaryFile, 0)
         state.rom[state.calendar[i]].binaryFile = newBinaryFile
         firmware.push({
