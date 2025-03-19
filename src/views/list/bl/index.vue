@@ -97,9 +97,22 @@
     return rawEEPROM;
   }
 
+  const isEqual = (arr1: Uint8Array, arr2: Uint8Array): boolean => {
+    if (arr1.length !== arr2.length) {
+        return false
+    }
+
+    return arr1.every((value, index) => value === arr2[index])
+  }
+
   const writeRange = async (start: any = 0, uint8Array: any, remark: string = '') => {
-    for (let i = start; i < uint8Array.length + start; i += 0xC0) {
-      await eeprom_write(appStore.connectPort, i, uint8Array.slice(i - start, i - start + 0xC0), uint8Array.slice(i - start, i - start + 0xC0).length, appStore.configuration?.uart);
+    for (let i = start; i < uint8Array.length + start; i += 0x80) {
+      await eeprom_write(appStore.connectPort, i, uint8Array.slice(i - start, i - start + 0x80), uint8Array.slice(i - start, i - start + 0x80).length, appStore.configuration?.uart);
+      // const checkData = await eeprom_read(appStore.connectPort, i, uint8Array.slice(i - start, i - start + 0x80).length, appStore.configuration?.uart)
+      // if(!isEqual(uint8Array.slice(i - start, i - start + 0x80), checkData)) {
+      //   console.log("写入错误！！！")
+      // }
+
       state.status = state.status + remark +  "写入进度：" + (((i - start) / uint8Array.length) * 100).toFixed(1) + "%<br/>";
       nextTick(()=>{
         const textarea = document?.getElementById('statusArea');
