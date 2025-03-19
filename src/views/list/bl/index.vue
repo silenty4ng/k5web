@@ -169,6 +169,9 @@
     for(let i = 256; i < 4096; i++){
       if(state.calendar[i] >= 0){
         console.log(i);
+        const newBinaryFile = new Uint8Array(Math.ceil(state.rom[state.calendar[i]].binaryFile.length / 0x40) * 0x40).fill(0xff);
+        newBinaryFile.set(state.rom[state.calendar[i]].binaryFile, 0)
+        state.rom[state.calendar[i]].binaryFile = newBinaryFile
         firmware.push({
           ...state.rom[state.calendar[i]],
           start: 0x40000 + i * 0x40,
