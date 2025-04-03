@@ -39,7 +39,7 @@ export default {
   'menu.image': 'Startup Image',
   'menu.font': 'Set Patch',
   'menu.satellite': 'Satcom',
-  'global.onStart': ' (Put the UV-K5 into normral mode)',
+  'global.onStart': ' (Put the UV-K5 into normal mode)',
   'global.onBoot': ' (Put the UV-K5 into programming mode)',
   'cps.onDeviceRead': 'Read from device',
   'cps.onDeviceWrite': 'Write to device',
