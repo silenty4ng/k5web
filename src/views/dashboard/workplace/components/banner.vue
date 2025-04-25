@@ -86,7 +86,8 @@
       </a-collapse>
     </div>
     <br>
-    <div class="halloween">
+    Happy Chinese Amateur Radio Festival
+    <!-- <div class="halloween">
       <div class="head">
         <div class="skull">
           <div class="eyes">
@@ -97,7 +98,7 @@
       </div>
       <div class="body"></div>
       <div class="legs"></div>
-    </div>
+    </div> -->
     <br>
     <br>
   </a-col>
