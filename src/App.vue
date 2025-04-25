@@ -73,7 +73,7 @@
     return lang;
   });
 
-  if(location.hostname === 'k5.vicicode.com'){
+  if(location.hostname === 'k5.vicicode.com' && new Date().getTime() > parseInt(localStorage.getItem('cnNotice') || "0") + 86400 * 1000 * 7){
     fetch('/cdn-cgi/trace').then(e=>e.text()).then(e=>{
       if(e.indexOf('loc=CN') !== -1){
         DialogPlugin.confirm({
