@@ -766,12 +766,23 @@ async function connect() {
         return null;
     }
 
-    try {
-        const port = await navigator.serial.requestPort();
-        await port.open({ baudRate: 38400 });
+    let port = undefined
 
+    try {
+        port = await navigator.serial.requestPort();
+    } catch(error) {
+        console.log('!!! ' + error)
+        return null;
+    }
+
+    try {
+        await port.open({ baudRate: 38400 });
+        await port.open({ baudRate: 38400 });
         return port;
     } catch (error) {
+        if(port.connected && port.readable && port.writable && !port.readable.locked && !port.writable.locked){
+            return port;
+        }
         console.error('Error connecting to the serial port:', error);
         return null;
     }
@@ -868,10 +879,6 @@ function unpacketize(packet) {
  * @returns {Promise<Uint8Array>} - A promise that resolves with the received packet or gets rejected on timeout.
  */
 async function readPacket(port, expectedData, timeout = 1000) {
-    if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
-        await new Promise(resolve => setTimeout(resolve, timeout))
-        return unpacketize(new Uint8Array(sessionStorage.getItem('webusb').split(',')));
-    }
     // Create a reader to read data from the serial port
     globalRelease('read')
     const reader = port.readable.getReader();
@@ -1061,10 +1068,6 @@ function chunkUint8Array(inputArray, chunkSize) {
  * @throws {Error} - If the packet could not be sent.
  */
 async function sendPacket(port, data) {
-    if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
-        await port.send(packetize(data));
-        return
-    }
     try {
         // create writer for port
         globalRelease('write')

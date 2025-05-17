@@ -257,14 +257,6 @@
       let _connect;
       if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
         alert('手机写频开发中，无法正常使用，请使用电脑连接电台写频！！！In the development of mobile, it cannot be used normally. Please use a computer to connect!!!')
-        await serial.requestPort().then(selectedPort => {
-          _connect = selectedPort;
-        });
-        if(_connect){
-          await _connect.connect().then().catch((e)=>{
-            alert('请尝试刷新网页重新插拔写频线')
-          })
-        }
       }else{
         _connect = await connect();
       }
