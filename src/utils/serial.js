@@ -777,7 +777,6 @@ async function connect() {
 
     try {
         await port.open({ baudRate: 38400 });
-        await port.open({ baudRate: 38400 });
         return port;
     } catch (error) {
         if(port.connected && port.readable && port.writable && !port.readable.locked && !port.writable.locked){
