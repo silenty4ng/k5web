@@ -43,7 +43,7 @@ export default {
   'global.onBoot': '（手台应在刷机模式下）',
   'cps.onDeviceRead': '从设备读取',
   'cps.onDeviceWrite': '写入设备',
-  'cps.downloadImportTemplate': '下载导入模板',
+  'cps.downloadImportTemplate': '下载导入模版',
   'cps.import': '导入',
   'cps.export': '导出',
   'cps.save': '保存',
