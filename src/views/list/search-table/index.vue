@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <t-message v-if="progress > 0" theme="loading" class="midMessage">正在执行中({{progress}}%)</t-message>
     <a-modal v-model:visible="istate.showNotice" @ok="writeChannel" @cancel="istate.showNotice = false">
       <template #title>
         {{ $t('menu.cps.writeNoticeTitle') }}
@@ -125,6 +126,8 @@
   const appStore = useAppStore();
 
   const { loading, setLoading } = useLoading(false);
+  const progress = ref(0);
+
   const state = {
     bandwidthOption: {'0': '25KHz', '1': '12.5KHz'},
     modeOption: {'0': 'FM', '1': 'AM', '2': 'USB'},
@@ -602,8 +605,10 @@
     if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
     await eeprom_init(appStore.connectPort);
     setLoading(true)
+    progress.value = 0
     let rawEEPROM  = new Uint8Array(0x0C80);
     for (let i = 0; i < 0x0C80; i += 0x40) {
+      progress.value += 1
       const _data = await eeprom_read(appStore.connectPort, i, 0x40, appStore.configuration?.uart)
       rawEEPROM.set(_data, i)
     }
@@ -614,6 +619,7 @@
     }
     let rawEEPROM3 = new Uint8Array(0x0C80);
     for (let i = 0x0F50; i < 0x1BD0; i += 0x40) {
+      progress.value += 1
       const _data = await eeprom_read(appStore.connectPort, i, 0x40, appStore.configuration?.uart)
       rawEEPROM3.set(_data, i - 0x0F50)
     }
@@ -671,11 +677,13 @@
     }
     cstate.renderData = _renderData;
     setLoading(false)
+    progress.value = 0
   }
   const writeChannel = async() =>{
     if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
     await eeprom_init(appStore.connectPort);
     setLoading(true)
+    progress.value = 0
     let rawEEPROM  = new Uint8Array(0x0C80);
     let rawEEPROM2 = new Uint8Array(0x0C8);
     let rawEEPROM3 = new Uint8Array(0x0C80);
@@ -758,14 +766,17 @@
       i += 0x10
     })
     for (let i = 0; i < 0x0C80; i += 0x40) {
+      progress.value += 1
       await eeprom_write(appStore.connectPort, i, rawEEPROM.slice(i, i + 0x40), 0x40, appStore.configuration?.uart);
     }
     await eeprom_write(appStore.connectPort, 0x0D60, rawEEPROM2, 0x0C8);
     for (let i = 0x0F50; i < 0x1BD0; i += 0x40) {
+      progress.value += 1
       await eeprom_write(appStore.connectPort, i, rawEEPROM3.slice(i - 0x0F50, i - 0x0F50 + 0x40), 0x40, appStore.configuration?.uart);
     }
     await eeprom_reboot(appStore.connectPort);
     setLoading(false)
+    progress.value = 0
   }
   const clearRow = async (row: any) =>{
     const newData = [...cstate.renderData];
@@ -1033,5 +1044,11 @@
     :deep(.t-table__content){
       scrollbar-width: auto !important;
     }
+  }
+  .midMessage {
+    position: absolute;
+    top: 200px;
+    z-index: 99;
+    left: 50%;
   }
 </style>
