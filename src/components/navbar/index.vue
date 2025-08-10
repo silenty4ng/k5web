@@ -6,7 +6,14 @@
           :style="{ margin: 0, fontSize: '18px' }"
           :heading="5"
         >
-          {{ !topMenu && appStore.device === 'mobile' ? '' : 'K5Web' }}
+          <div>
+            {{ !topMenu && appStore.device === 'mobile' ? '' : 'K5Web' }}
+            &nbsp;
+            <a-radio-group type="button" size="mini" v-model="HwVersion" title="硬件版本（HwVersion）">
+              <a-radio value="V1">V1</a-radio>
+              <a-radio @click="ComingSoon" value="V2">V2</a-radio>
+            </a-radio-group>
+          </div>
         </a-typography-title>
         <icon-menu-fold
           v-if="!topMenu && appStore.device === 'mobile'"
@@ -164,7 +171,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref, inject } from 'vue';
+  import { computed, ref, inject, nextTick } from 'vue';
   import { Message } from '@arco-design/web-vue';
   import { useRoute } from 'vue-router';
   import { useDark, useToggle, useFullscreen } from '@vueuse/core';
@@ -247,6 +254,14 @@
     "LOSEHU11[2-7].*K"   : "losehu117k.json",
     "LOSEHU11[2-7].*"    : "losehu117.json",
     ".*"                 : "todo.json"
+  }
+
+  const HwVersion = ref('V1');
+  const ComingSoon = () => {
+    Message.info('敬请期待 ComingSoon');
+    setTimeout(() => {
+      HwVersion.value = 'V1'
+    }, 100);
   }
 
   const connectIt = async () => {
