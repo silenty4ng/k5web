@@ -79,7 +79,8 @@
         </a-collapse-item>
         <a-collapse-item header="饿饿饭饭" :key="3">
           <img loading="lazy" width="300" src="/mm_facetoface_collect_qrcode_1714392837792.png" >
-          <img loading="lazy" width="300" src="/1722745910257.jpg" >
+          <img loading="lazy" width="263" src="/1722745910257.jpg" >
+          <img loading="lazy" width="272.1" src="/20250815183238_4.jpg" >
           <br><br>
           TRON / TRX：TPaSnHJ2cRCQjjv7TyAFJDamb3mZSSz1At
         </a-collapse-item>
