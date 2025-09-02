@@ -40,7 +40,7 @@ export default {
   'menu.font': '字库写入',
   'menu.satellite': '星历写入',
   'global.onStart': '（手台应在开机状态下）',
-  'global.onBoot': '（手台应在刷机模式下）',
+  'global.onBoot': '（手台应在升级模式下）',
   'cps.onDeviceRead': '从设备读取',
   'cps.onDeviceWrite': '写入设备',
   'cps.downloadImportTemplate': '下载导入模版',

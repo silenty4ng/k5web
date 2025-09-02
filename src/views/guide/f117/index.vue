@@ -65,7 +65,7 @@
                   <div style="text-align: left;">
                     <p>视频教程链接：
                       <a href="https://www.bilibili.com/video/BV1ib4y137Ah" target="_blank" rel="noopener noreferrer">https://www.bilibili.com/video/BV1ib4y137Ah</a>
-                      <span style="color: #ff0000;">（硬件拆解及焊接部分可参照本视频，软件刷机部分请务必以本指南为准。）</span>
+                      <span style="color: #ff0000;">（硬件拆解及焊接部分可参照本视频，软件升级部分请务必以本指南为准。）</span>
                     </p>
                     <div>
                       ①拆掉电池、天线和旋钮盖。<br>
@@ -86,7 +86,7 @@
                     <img :src="cj3">
                     <div>
                       ②将主板装回背板。（背板上 3x5mm 导热硅胶垫若脱落，请务必装回对应凸起位置；电池触点部分过背板孔时当心压弯。）<br>
-                      ③装入电池，按住 PTT 键开机，进入刷机模式（此时手电筒常亮、屏幕无显示）。如无法进入刷机模式，检查电池接触片是否错位、焊点及周边元件是否完好。
+                      ③装入电池，按住 PTT 键开机，进入升级模式（此时手电筒常亮、屏幕无显示）。如无法进入升级模式，检查电池接触片是否错位、焊点及周边元件是否完好。
                     </div>
                     <div style="color: #ff0000; font-weight: bold;">
                       此时先不要完全组装手台，待后续工作全部完成后再行组装，以便故障返工。此阶段如尝试正常开机后显示异常、电量异常、接收异常等均为正常情况，不用担心。后续操作后会恢复正常。
@@ -98,7 +98,7 @@
                 </a-collapse-item>
                 <a-collapse-item header="刷入固件" key="three">
                   <div style="text-align: left;">
-                    <p>断开写频线，按住 PTT 键开机，进入刷机模式（此时手电筒常亮、屏幕无显示），手电筒常亮后插回写频线。</p>
+                    <p>断开写频线，按住 PTT 键开机，进入升级模式（此时手电筒常亮、屏幕无显示），手电筒常亮后插回写频线。</p>
                     <p>
                       <a-space>
                         <a-button type="primary" :disabled="state.flashIt" @click="iFlashIt">刷入固件</a-button>

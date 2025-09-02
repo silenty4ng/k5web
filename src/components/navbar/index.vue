@@ -6,8 +6,8 @@
           :style="{ margin: 0, fontSize: '18px' }"
           :heading="5"
         >
-          <div>
-            {{ !topMenu && appStore.device === 'mobile' ? '' : 'K5Web' }}
+          <div v-if="!(!topMenu && appStore.device === 'mobile')">
+            K5Web
             &nbsp;
             <a-radio-group type="button" size="mini" v-model="HwVersion" title="硬件版本（HwVersion）">
               <a-radio value="V1">V1</a-radio>
@@ -92,7 +92,7 @@
         </li>
         <li>
           <a-button v-show="route.path !== '/tool/flash' && route.path !== '/idea/firmware'" type="primary" @click="connectIt">{{ appStore.connectState ? $t('navbar.disconnect') : $t('navbar.connect') }}</a-button>
-          <a-button disabled="disabled" title="刷机模式无需连接" v-show="route.path == '/tool/flash' || route.path == '/idea/firmware'" type="primary" @click="connectIt">{{ appStore.connectState ? $t('navbar.disconnect') : $t('navbar.connect') }}</a-button>
+          <a-button disabled="disabled" title="升级模式无需连接" v-show="route.path == '/tool/flash' || route.path == '/idea/firmware'" type="primary" @click="connectIt">{{ appStore.connectState ? $t('navbar.disconnect') : $t('navbar.connect') }}</a-button>
         </li>
         <li>
           <a-tooltip :content="$t('settings.language')">
