@@ -72,6 +72,7 @@ import { eeprom_write, eeprom_reboot, eeprom_init, hexReverseStringToUint8Array,
 import useLoading from '@/hooks/loading';
 import QRCode from 'qrcode';
 import { Input, Select } from 'tdesign-vue-next';
+import { Message } from '@arco-design/web-vue';
 
 const { loading, setLoading } = useLoading(true);
 
@@ -431,6 +432,22 @@ const restoreRange = async (start: any = 0, uint8Array: any) => {
   state.status = state.status + "写入进度：100.0%<br/>";
 }
 
+const calculateChecksum = (line: string) => {
+  const chars = line.replace(/\d$/, ''); // 移除末位校验和
+  let sum = 0;
+  for (const char of chars) {
+    if (char === '-') sum += 1;
+    else sum += parseInt(char, 10) || 0;
+  }
+  return sum % 10;
+}
+
+const validateChecksum = (line: string) => {
+  const expected = parseInt(line[68], 10);
+  const actual = calculateChecksum(line);
+  return expected === actual;
+}
+
 const writeIt = async () => {
   if (appStore.connectState != true) { alert(sessionStorage.getItem('noticeConnectK5')); return; };
   if(appStore.configuration?.sat2 != true){
@@ -441,6 +458,7 @@ const writeIt = async () => {
   await eeprom_init(appStore.connectPort);
   // console.log(state.satsData)
   let payload = new Uint8Array(160 * 45)
+  let errs = ""
   for(let i = 0; i < state.satsData.length; i++){
     const sat = state.satsData[i]
     //0x1E200~0x20000每160B是一个卫星的TLE
@@ -449,8 +467,10 @@ const writeIt = async () => {
     payload.set(stringToUint8Array(sat.satName).subarray(0,9), i * 160)
     // 第一行
     payload.set(stringToUint8Array(sat.line[0]).subarray(0,69), i * 160 + 9)
+    if(!validateChecksum(sat.line[0]))errs += `第 ${i + 1} 行卫星星历第一行数据错误；`
     // 第二行
     payload.set(stringToUint8Array(sat.line[1]).subarray(0,69), i * 160 + 9 + 69)
+    if(!validateChecksum(sat.line[1]))errs += `第 ${i + 1} 行卫星星历第二行数据错误；`
     // 上行亚音
     const _txTone = new Uint8Array(2)
     if (sat.txTone && sat.txTone > 0) {
@@ -467,10 +487,19 @@ const writeIt = async () => {
     const _tx = new Uint8Array(4)
     _tx.set(hexReverseStringToUint8Array(parseInt(((sat.txFreq * 1000000) / 10).toFixed(0)).toString(16)))
     payload.set(_tx, i * 160 + 9 + 69 + 69 + 2 + 2)
+    if(parseInt(((sat.txFreq * 1000000) / 10).toFixed(0)) == 0)errs += `第 ${i + 1} 行卫星缺少上行频率；`
     // 下行频率
     const _rx = new Uint8Array(4)
     _rx.set(hexReverseStringToUint8Array(parseInt(((sat.rxFreq * 1000000) / 10).toFixed(0)).toString(16)))
     payload.set(_rx, i * 160 + 9 + 69 + 69 + 2 + 2 + 4)
+    if(parseInt(((sat.rxFreq * 1000000) / 10).toFixed(0)) == 0)errs += `第 ${i + 1} 行卫星缺少下行频率；`
+  }
+  if(errs != ""){
+    setLoading(false)
+    return Message.error({
+      content: errs,
+      duration: 10 * 1000,
+    });
   }
   await restoreRange(0x1E200, payload)
   await syncTime()
