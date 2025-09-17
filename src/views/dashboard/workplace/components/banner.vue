@@ -15,7 +15,7 @@
     </a-space>
     <div>
       <a-typography-title :heading="5">说明：</a-typography-title>
-      <a-typography-text>◆ 泉盛 K5/K6 当前存在两个硬件版本，如使用第三方固件请先与商家确认可以升级到第三方固件。</a-typography-text><br>
+      <a-typography-text>◆ 泉盛 K5/K6 当前在售两个硬件版本，如使用第三方固件请先与商家确认可以升级到第三方固件。</a-typography-text><br>
       <a-typography-text>◆ 使用应第一时间<t-link theme="primary" href="/#/tool/backup">备份</t-link>配置及校准数据。</a-typography-text><br>
       <a-typography-text>◆ 除“固件升级”功能手台应处于升级模式点击更新按钮选择设备更新，其余功能手台均需要在正常模式连接。</a-typography-text><br>
       <a-typography-text>◆ 萝卜（LOSEHU）固件相关问题请移步：<t-link theme="primary" href="https://github.com/losehu/uv-k5-firmware-custom" target="_blank">https://github.com/losehu/uv-k5-firmware-custom</t-link> 。</a-typography-text><br>
