@@ -69,14 +69,17 @@ onMounted(async ()=>{
     }
   }
   const confirmDialog = DialogPlugin.confirm({
-    header: '⚠️提示',
+    theme: 'danger',
+    header: '提示',
     body: '泉盛 K5/K6 当前在售两个硬件版本，如使用第三方固件请先与商家确认可以升级到第三方固件。',
     className: 't-dialog-new-class1 t-dialog-new-class2',
     style: 'color: rgba(0, 0, 0, 0.6)',
     confirmBtn: '我知道了',
     cancelBtn: null,
     closeBtn: false,
-    onConfirm: () => { confirmDialog.destroy() }
+    onConfirm: () => { confirmDialog.destroy() },
+    closeOnEscKeydown: false,
+    closeOnOverlayClick: false
   })
 })
 
