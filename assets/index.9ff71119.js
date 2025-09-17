@@ -1,1 +1,0 @@
-import"./vue.daf89c07.js";import{b as o,u as r}from"./vue-router.391082ef.js";import{d as a,a as s,o as n}from"./@vue.1cdd4af7.js";import"./@intlify.d4358f23.js";const l=a({__name:"index",setup(p){const t=o(),e=r().params.path;return t.replace({path:e}),(u,m)=>(n(),s("div"))}});export{l as default};
