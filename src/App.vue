@@ -22,7 +22,6 @@
   import tdesignEnUS from 'tdesign-vue-next/esm/locale/en_US';
   import GlobalSetting from '@/components/global-setting/index.vue';
   import useLocale from '@/hooks/locale';
-  import Aegis from 'aegis-web-sdk';
   import { encodingIndexes } from "@zxing/text-encoding/es2015/encoding-indexes";
   import { TextEncoder, TextDecoder } from "@zxing/text-encoding";
   import { useRoute } from 'vue-router';
@@ -34,17 +33,6 @@
   window.TextEncoder = TextEncoder;
   window.TextDecoder = TextDecoder;
 
-  // 遥测
-  if(import.meta.env.VITE_METER_SITE.split(',').indexOf(location.hostname) !== -1){
-    const aegis = new Aegis({
-        id: 'yr5DeslJkz3Qn20jg0', // 上报 id
-        reportApiSpeed: true, // 接口测速
-        reportAssetSpeed: true, // 静态资源测速
-        spa: true, // spa 应用页面跳转的时候开启 pv 计算
-        hostUrl: 'https://rumt-zh.com'
-    });
-  }
-  
   const { currentLocale } = useLocale();
 
   const reloadLang = ref(true);
