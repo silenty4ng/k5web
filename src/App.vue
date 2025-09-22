@@ -26,12 +26,19 @@
   import { TextEncoder, TextDecoder } from "@zxing/text-encoding";
   import { useRoute } from 'vue-router';
   import { DialogPlugin } from 'tdesign-vue-next';
+  import Clarity from '@microsoft/clarity';
 
   const route = useRoute();
 
   window.TextEncodingIndexes = { encodingIndexes: encodingIndexes };
   window.TextEncoder = TextEncoder;
   window.TextDecoder = TextDecoder;
+
+  // 新遥测
+  if(import.meta.env.VITE_METER_SITE.split(',').indexOf(location.hostname) !== -1){
+    const projectId = "tep1u7ykdt"
+    Clarity.init(projectId);
+  }
 
   const { currentLocale } = useLocale();
 
