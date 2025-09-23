@@ -14,7 +14,7 @@
             <div>
               <a-radio-group type="button" size="mini" v-model="state.protocol">
                 <a-radio value="Official">Official</a-radio>
-                <!-- <a-radio value="Losehu">Losehu</a-radio> -->
+                <a-radio value="V2">V2</a-radio>
               </a-radio-group>
             </div>
           </div>
@@ -96,6 +96,10 @@ const selectFile = () => {
 }
 
 const flashIt = async () => {
+  if(state.protocol == 'V2'){
+    alert('暂未支持 Coming Soon');
+    return;
+  }
   if(!state.binaryFile){
     alert('请选择文件');
     return;
