@@ -1,10 +1,12 @@
 const { app, BrowserWindow, dialog } = require('electron/main');
+if (require('electron-squirrel-startup')) app.quit();
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 1280,
     height: 760,
-    autoHideMenuBar: true
+    autoHideMenuBar: true,
+    icon: 'icon.ico',
   });
 
   mainWindow.webContents.session.on('select-serial-port', async (event, portList, webContents, callback) => {

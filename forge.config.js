@@ -1,12 +1,18 @@
 module.exports = {
   packagerConfig: {
+    name: 'K5Web',
     asar: true,
+    icon: 'icon.ico'
   },
   rebuildConfig: {},
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
-      config: {},
+      config: {
+		    "setupIcon": __dirname + "/icon.ico",
+		    "iconUrl": __dirname + "/icon.ico",
+        "appCopyright": "Copyright © 2025 Silent YANG. All rights reserved."
+      },
     },
     {
       name: '@electron-forge/maker-zip',
