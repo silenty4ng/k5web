@@ -60,7 +60,9 @@
       </a-collapse>
     </div>
     <br>
-    Happy Chinese Amateur Radio Festival
+    <a href="https://apps.microsoft.com/detail/9pb0w69f5dp6?referrer=appbadge&mode=direct" target="_blank">
+      <img :src="`https://get.microsoft.com/images/${getLang()}%20dark.svg`" width="200"/>
+    </a>
     <!-- <div class="halloween">
       <div class="head">
         <div class="skull">
@@ -86,6 +88,10 @@
   const { t } = useI18n();
 
   const appStore = useAppStore();
+
+  const getLang = () => {
+    return navigator.language;
+  }
 
   const state = reactive({
     eepromSize: t('workplace.clickCheck'),
