@@ -2,7 +2,8 @@ module.exports = {
   packagerConfig: {
     name: 'K5Web',
     asar: true,
-    icon: 'icon.ico'
+    icon: 'icon.ico',
+    appCopyright: "Copyright (c) 2025 Silent YANG. All rights reserved."
   },
   rebuildConfig: {},
   makers: [
@@ -11,7 +12,6 @@ module.exports = {
       config: {
 		    "setupIcon": __dirname + "/icon.ico",
 		    "iconUrl": __dirname + "/icon.ico",
-        "appCopyright": "Copyright © 2025 Silent YANG. All rights reserved."
       },
     },
     {
