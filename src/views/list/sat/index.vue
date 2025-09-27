@@ -318,7 +318,11 @@ getLocation()
 const scanLocation = async () => {
   state.visible = true
   state.uuid = crypto.randomUUID()
-  state.qrcode = await QRCode.toDataURL(location.origin + '/#/satloc?uuid=' + state.uuid, { width: 250 })
+  let origin = location.origin
+  if(origin == 'file://'){
+    origin = 'https://k5.vicicode.cn'
+  }
+  state.qrcode = await QRCode.toDataURL(origin + '/#/satloc?uuid=' + state.uuid, { width: 250 })
   console.log(state.uuid)
 }
 

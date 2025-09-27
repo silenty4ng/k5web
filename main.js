@@ -1,4 +1,6 @@
-const { app, BrowserWindow, dialog } = require('electron/main');
+const { app, BrowserWindow, dialog, shell } = require('electron/main');
+const path = require('path')
+
 if (require('electron-squirrel-startup')) app.quit();
 
 function createWindow() {
@@ -61,6 +63,19 @@ function createWindow() {
 
     return false;
   });
+
+  mainWindow.webContents.on('will-navigate', (e) => {
+    if(e.url.split('file://').length > 1 && e.url.split('/#/').length > 1){
+      e.preventDefault();
+      mainWindow.loadFile('./dist/index.html', {
+        hash: e.url.split('/#/')[1]
+      });
+    }
+  });
+
+  mainWindow.webContents.setWindowOpenHandler((e)=>{
+    shell.openExternal(e.url)
+  })
 
   mainWindow.loadFile('./dist/index.html');
 
