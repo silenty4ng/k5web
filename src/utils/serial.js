@@ -1080,7 +1080,7 @@ async function sendPacket(port, data) {
         const chunkedPacket = chunkUint8Array(packet, 64);
         for(let i = 0; i < chunkedPacket.length; i++){
             await writer.write(chunkedPacket[i]);
-            await sleep(1); // magic 
+            await sleep(1); // 解决部分浏览器更新固件出现异常的问题 
         }
 
         // close writer
@@ -1410,6 +1410,29 @@ function flash_generateCommand(data, address, totalSize) {
     return new Uint8Array([0x19, 0x5, 0xc, 0x1, 0x8a, 0x8d, 0x9f, 0x1d, address_msb, address_lsb, address_final_msb, address_final_lsb, length_msb, length_lsb, 0x0, 0x0, ...data]);
 }
 
+function flash_generateK1Command(data, address, totalSize) {
+    if (data.length < 0x100) {
+        const padding = new Uint8Array(0x100 - data.length);
+        data = new Uint8Array([...data, ...padding]);
+    }
+    if (data.length != 0x100) throw new Error('Tell matt that he is an idiot');
+
+    // the address is a 16 bit integer, so we need to split it into two bytes
+    const address_msb = (address & 0xff00) >> 8;
+    const address_lsb = (address & 0xff0000) >> 16;
+
+    const address_final = (totalSize + 0xff) & ~0xff; // add 0xff to totalSize and then round down to the next multiple of 0x100 by stripping the last byte
+    // if (address_final > 0xf000) throw new Error('Total size is too large');
+    const address_final_msb = (address_final & 0xff00) >> 8;
+    const address_final_lsb = 0x1; // since address_final can only be a multiple of 0x100, address_final_lsb is always 0x0
+
+    // the length is fixed to 0x100 bytes
+    const length_msb = 0x00;
+    const length_lsb = 0x01;
+
+    return new Uint8Array([0x19, 0x5, 0xc, 0x1, 0xce, 0x66, 0x04, 0x58, address_msb, address_lsb, address_final_msb, address_final_lsb, length_msb, length_lsb, 0x0, 0x0, ...data]);
+}
+
 async function flash_flashFirmware(port, firmware) {
     // for loop to flash the firmware in 0x100 byte blocks
     // this loop is safe as long as the firmware file is smaller than 0xf000 bytes
@@ -1558,6 +1581,7 @@ export {
     eeprom_write,
     flash_flashFirmware,
     flash_generateCommand,
+    flash_generateK1Command,
     unpackVersion,
     unpack,
     readPacketNoVerify,
