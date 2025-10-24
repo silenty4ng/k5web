@@ -143,7 +143,7 @@ const flashIt = async () => {
           if(state.protocol == 'Official'){
             await readPacket(_connect, 0x1a);
           }else{
-            await readPacketNoVerify(_connect);
+            await readPacketNoVerify(_connect, 10 * 1000);
           }
       } catch (e) {
           console.log('Flash command rejected. Aborting.');

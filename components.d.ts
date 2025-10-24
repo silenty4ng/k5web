@@ -33,6 +33,7 @@ declare module 'vue' {
     TLink: typeof import('tdesign-vue-next')['Link']
     TList: typeof import('tdesign-vue-next')['List']
     TListItem: typeof import('tdesign-vue-next')['ListItem']
+    TMessage: typeof import('tdesign-vue-next')['Message']
     TPagination: typeof import('tdesign-vue-next')['Pagination']
     TRow: typeof import('tdesign-vue-next')['Row']
     TSlider: typeof import('tdesign-vue-next')['Slider']
