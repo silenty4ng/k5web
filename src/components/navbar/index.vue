@@ -228,27 +228,28 @@
   const toggleDrawerMenu = inject('toggleDrawerMenu') as () => void;
 
   const configuration_list : any = {
-    "L_BL[0-9][0-9][0-9]": "losehubl.json",
-    "LOSEHU.*P.*K"       : "ltsk.json",
-    "LOSEHU.*P.*"        : "lts.json",
-    "LOSEHU.*D"          : "losehud.json",
+    "L_BL[0-9][0-9][0-9]" : "losehubl.json",
+    "LOSEHU.*P.*K"        : "ltsk.json",
+    "LOSEHU.*P.*"         : "lts.json",
+    "LOSEHU.*D"           : "losehud.json",
     "LOSEHU13[0-9].*HS"   : "losehu124h.json",
-    "LOSEHU13[0-9].*H"   : "losehu124h.json",
+    "LOSEHU13[0-9].*H"    : "losehu124h.json",
     "LOSEHU13[0-9].*KS"   : "losehu120k.json",
-    "LOSEHU13[0-9].*K"   : "losehu120k.json",
-    "LOSEHU13[0-9].*"    : "losehu118.json",
+    "LOSEHU13[0-9].*K"    : "losehu120k.json",
+    "LOSEHU13[0-9].*"     : "losehu118.json",
     "LOSEHU12[4-9].*HS"   : "losehu124h.json",
-    "LOSEHU12[4-9].*H"   : "losehu124h.json",
-    "LOSEHU12[0-3].*H"   : "losehu118h.json",
+    "LOSEHU12[4-9].*H"    : "losehu124h.json",
+    "LOSEHU12[0-3].*H"    : "losehu118h.json",
     "LOSEHU12[0-9].*KS"   : "losehu120k.json",
-    "LOSEHU12[0-9].*K"   : "losehu120k.json",
-    "LOSEHU12[0-9].*"    : "losehu118.json",
-    "LOSEHU11[8-9].*H"   : "losehu118h.json",
-    "LOSEHU11[8-9].*K"   : "losehu118k.json",
-    "LOSEHU11[8-9].*"    : "losehu118.json",
-    "LOSEHU11[2-7].*K"   : "losehu117k.json",
-    "LOSEHU11[2-7].*"    : "losehu117.json",
-    ".*"                 : "todo.json"
+    "LOSEHU12[0-9].*K"    : "losehu120k.json",
+    "LOSEHU12[0-9].*"     : "losehu118.json",
+    "LOSEHU11[8-9].*H"    : "losehu118h.json",
+    "LOSEHU11[8-9].*K"    : "losehu118k.json",
+    "LOSEHU11[8-9].*"     : "losehu118.json",
+    "LOSEHU11[2-7].*K"    : "losehu117k.json",
+    "LOSEHU11[2-7].*"     : "losehu117.json",
+    "7\..*"               : "k1.json",
+    ".*"                  : "todo.json"
   }
 
   const connectIt = async () => {
