@@ -236,7 +236,7 @@
   
   <script lang="ts">
     export default {
-      name: 'dtmfContact',
+      name: 'Dtmf',
     };
   </script>
   

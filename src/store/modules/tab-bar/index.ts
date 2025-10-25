@@ -4,6 +4,7 @@ import {
   DEFAULT_ROUTE,
   DEFAULT_ROUTE_NAME,
   REDIRECT_ROUTE_NAME,
+  I_CACHE_LIST
 } from '@/router/constants';
 import { isString } from '@/utils/is';
 import { TabBarState, TagProps } from './types';
@@ -23,7 +24,7 @@ const BAN_LIST = [REDIRECT_ROUTE_NAME];
 
 const useAppStore = defineStore('tabBar', {
   state: (): TabBarState => ({
-    cacheTabList: new Set([DEFAULT_ROUTE_NAME]),
+    cacheTabList: new Set(I_CACHE_LIST),
     tagList: [DEFAULT_ROUTE],
   }),
 
@@ -66,7 +67,7 @@ const useAppStore = defineStore('tabBar', {
     resetTabList() {
       this.tagList = [DEFAULT_ROUTE];
       this.cacheTabList.clear();
-      this.cacheTabList.add(DEFAULT_ROUTE_NAME);
+      I_CACHE_LIST.map((e)=>this.cacheTabList.add(e));
     },
   },
 });

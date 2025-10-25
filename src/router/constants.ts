@@ -16,3 +16,5 @@ export const DEFAULT_ROUTE = {
   name: DEFAULT_ROUTE_NAME,
   fullPath: '/chirp/base',
 };
+
+export const I_CACHE_LIST = ['Workplace', 'Channel', 'Radio', 'Mdc', 'Dtmf', 'Settings'];
