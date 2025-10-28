@@ -74,6 +74,18 @@ onMounted(() => {
         { "name": "**俊", "channel": "支付宝", "time": "2025-07-05", "money": "80.00" },
         { "name": "**臻", "channel": "支付宝", "time": "2025-07-13", "money": "50.00" },
         { "name": "l*t", "channel": "微信", "time": "2025-07-17", "money": "100.00" },
+        { "name": "*儿", "channel": "微信", "time": "2025-07-27", "money": "0.10" },
+        { "name": "BI4APF", "channel": "微信", "time": "2025-07-28", "money": "8.80" },
+        { "name": "H*O", "channel": "微信", "time": "2025-08-06", "money": "10.00" },
+        { "name": "*宁", "channel": "微信", "time": "2025-08-17", "money": "1.00" },
+        { "name": "*波", "channel": "微信", "time": "2025-08-18", "money": "10.00" },
+        { "name": "*豪", "channel": "微信", "time": "2025-09-06", "money": "1.50" },
+        { "name": "*生", "channel": "微信", "time": "2025-09-11", "money": "10.00" },
+        { "name": "*稳", "channel": "微信", "time": "2025-09-30", "money": "0.01" },
+        { "name": "*H", "channel": "微信", "time": "2025-10-02", "money": "10.00" },
+        { "name": "*心", "channel": "微信", "time": "2025-10-10", "money": "50.00" },
+        { "name": "C*e", "channel": "微信", "time": "2025-10-13", "money": "20.00" },
+        { "name": "*望", "channel": "微信", "time": "2025-10-27", "money": "16.00" },
     ];
     data.sort((a, b) => {
         if (parseFloat(b.money) - parseFloat(a.money) === 0){
