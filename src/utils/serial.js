@@ -1241,6 +1241,14 @@ async function check_eeprom(port, protocol = "official") {
         eepromSize = 0x2000
       }
       await eeprom_write(port, 0, bk1, 0x08, protocol);
+
+      const bk2 = await eeprom_read(port, 0xFFF8, 0x08, protocol);
+      await eeprom_write(port, 0xFFF8, rawEEPROM, 0x08, protocol);
+      const check2 = await eeprom_read(port, 0xFFF8, 0x08, protocol);
+      if(rawEEPROM.toString() == check2.toString()){
+        eepromSize = 0x10000
+      }
+      await eeprom_write(port, 0xFFF8, bk2, 0x08, protocol);
     }else{
       const bk1 = await eeprom_read(port, 0, 0x08, protocol);
       await eeprom_write(port, 0, rawEEPROM, 0x08, protocol);

@@ -33,7 +33,7 @@
 import { reactive, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAppStore } from '@/store';
-import { eeprom_write, eeprom_reboot, eeprom_init } from '@/utils/serial.js';
+import { eeprom_write, eeprom_reboot, eeprom_init, disconnect } from '@/utils/serial.js';
 
 const appStore = useAppStore();
 
@@ -203,7 +203,22 @@ const flashIt = async () => {
     state.binaryFile = outputArray;
   if(appStore.connectState != true){alert(sessionStorage.getItem('noticeConnectK5')); return;};
   if(appStore.configuration?.uart == "official"){
-    alert(sessionStorage.getItem('noticeVersionNoSupport'));
+    if(appStore.configuration?.charset != "gb2312"){
+      alert(sessionStorage.getItem('noticeVersionNoSupport'));
+      return;
+    }
+    state.loading = true
+    let position = 0x3000;
+    await eeprom_init(appStore.connectPort);
+    let rawEEPROM = state.binaryFile;
+    rawEEPROM = [0x5A, 0x5A, 0xBC, 0x9A, 0x00, 0x04, 0xFF, 0xFF, ...rawEEPROM];
+    for (let i = position; i < rawEEPROM.length + position; i += 0x40) {
+      await eeprom_write(appStore.connectPort, i, rawEEPROM.slice(i - position, i - position + 0x40), rawEEPROM.slice(i - position, i - position + 0x40).length, appStore.configuration?.uart);
+    }
+    await eeprom_reboot(appStore.connectPort);
+    state.loading = false
+    await disconnect(appStore.connectPort);
+    appStore.updateSettings({ connectState: false, connectPort: null, firmwareVersion: "" });
     return;
   }
   if(appStore.configuration?.charset != "losehu" && appStore.configuration?.charset != "gb2312"){

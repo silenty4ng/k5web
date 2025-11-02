@@ -115,7 +115,7 @@
   import { useRoute } from 'vue-router';
   import { Input, Select } from 'tdesign-vue-next';
   import useLoading from '@/hooks/loading';
-  import { eeprom_read, uint8ArrayToHexReverseString, uint8ArrayToString, hexReverseStringToUint8Array, stringToUint8Array, eeprom_write, eeprom_reboot, eeprom_init } from '@/utils/serial.js';
+  import { eeprom_read, uint8ArrayToHexReverseString, uint8ArrayToString, hexReverseStringToUint8Array, stringToUint8Array, eeprom_write, eeprom_reboot, eeprom_init, disconnect } from '@/utils/serial.js';
   import { useAppStore } from '@/store';
   import { MoveIcon } from 'tdesign-icons-vue-next';
   import Chinese from 'chinese-s2t';
@@ -777,6 +777,10 @@
     await eeprom_reboot(appStore.connectPort);
     setLoading(false)
     progress.value = 0
+    if(appStore.configuration?.uart == "official" && appStore.configuration?.charset == "gb2312"){
+      await disconnect(appStore.connectPort);
+      appStore.updateSettings({ connectState: false, connectPort: null, firmwareVersion: "" });
+    }
   }
   const clearRow = async (row: any) =>{
     const newData = [...cstate.renderData];

@@ -23,6 +23,7 @@
                 <a-button @click="restore">{{ $t('tool.restore') }}</a-button>
                 <a-select v-model="state.eepromType" :style="{width:'320px'}" :placeholder="$t('tool.selectSize')">
                   <a-option value="1">{{ $t('global.8kb') }}</a-option>
+                  <a-option value="5">{{ $t('global.64kb') }}</a-option>
                   <a-option value="2">{{ $t('global.128kb') }}</a-option>
                   <a-option value="3">{{ $t('global.256kb') }}</a-option>
                   <a-option value="4">{{ $t('global.512kb') }}</a-option>
@@ -87,6 +88,9 @@ const checkEeprom = async () => {
   switch(eepromSize){
     case 0x2000:
       state.eepromType = "1";
+      break;
+    case 0x10000:
+      state.eepromType = "5";
       break;
     case 0x20000:
       state.eepromType = "2";
@@ -201,6 +205,9 @@ const backup = async() => {
       break;
     case "4":
       _max = 0x80000;
+      break;
+    case '5':
+      _max = 0x10000;
       break;
     default:
       _max = 0x2000;
