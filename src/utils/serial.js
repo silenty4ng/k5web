@@ -1248,6 +1248,10 @@ async function check_eeprom(port, protocol = "official") {
       if(rawEEPROM.toString() == check2.toString()){
         eepromSize = 0x10000
       }
+      const recheck = await eeprom_read(port, 0x1FF8, 0x08, protocol);
+      if(rawEEPROM.toString() == recheck.toString()){
+        eepromSize = 0x2000
+      }
       await eeprom_write(port, 0xFFF8, bk2, 0x08, protocol);
     }else{
       const bk1 = await eeprom_read(port, 0, 0x08, protocol);
