@@ -70,7 +70,7 @@
 
   if(location.hostname === 'k5.vicicode.com' && new Date().getTime() > parseInt(localStorage.getItem('cnNotice') || "0") + 86400 * 1000 * 7){
     fetch('/cdn-cgi/trace').then(e=>e.text()).then(e=>{
-      if(e.indexOf('loc=CN') !== -1){
+      if(e.indexOf('China') !== -1){
         DialogPlugin.confirm({
           header: '提示',
           body: '🚀 国内用户推荐访问国内镜像以获得极速体验～',
