@@ -28,6 +28,9 @@
     <div style="margin-top: 50px;">&nbsp;</div>
     <div>
       <a-collapse :default-active-key="state.activeKey" accordion @change="changeMainActive">
+        <a-collapse-item header="帮我完成问卷！谢谢！" :key="0">
+          <img loading="lazy" class="tencent" style="margin-bottom: 10px;" width="300px" src="/poster.png" />
+        </a-collapse-item>
         <a-collapse-item header="广告区" :key="1">
           <a-space>
             <a-card hoverable :style="{ width: '500px' }">
@@ -95,7 +98,7 @@
 
   const state = reactive({
     eepromSize: t('workplace.clickCheck'),
-    activeKey: JSON.parse(localStorage.getItem('mainActiveKey') ?? "[2]")
+    activeKey: JSON.parse(localStorage.getItem('mainActiveKey') ?? "[0]")
   })
 
   const changeMainActive = (e: any) => {
