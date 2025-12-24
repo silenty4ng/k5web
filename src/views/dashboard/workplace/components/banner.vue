@@ -29,7 +29,10 @@
     <div>
       <a-collapse :default-active-key="state.activeKey" accordion @change="changeMainActive">
         <a-collapse-item header="帮我完成问卷！谢谢！" :key="0">
-          <img loading="lazy" class="tencent" style="margin-bottom: 10px;" width="300px" src="/poster.png" />
+          <a-space direction="vertical">
+            <t-link theme="primary" href="https://wj.qq.com/s2/25291398/27c9/" target="_blank">https://wj.qq.com/s2/25291398/27c9/</t-link>
+            <img loading="lazy" class="tencent" style="margin-bottom: 10px;" width="300px" src="/poster.png" />
+          </a-space>
         </a-collapse-item>
         <a-collapse-item header="广告区" :key="1">
           <a-space>
