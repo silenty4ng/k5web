@@ -9,3 +9,13 @@ dist
 dist-ssr
 *.local
 out
+
+.vscode
+
+# yarn2
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
