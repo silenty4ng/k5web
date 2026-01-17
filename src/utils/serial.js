@@ -755,7 +755,12 @@ function globalRelease(target = 'all'){
             if(globalWriteReader)globalWriteReader.releaseLock()
         }
         if(target != 'write'){
-            if(globalReadReader)globalReadReader.releaseLock()
+            // If a previous read is still pending, releaseLock() may throw.
+            // Best-effort cancel first to ensure the stream unlocks.
+            if (globalReadReader) {
+                try { globalReadReader.cancel(); } catch {}
+                try { globalReadReader.releaseLock(); } catch {}
+            }
         }
     } catch {}
 }
@@ -775,8 +780,10 @@ async function connect() {
         return null;
     }
 
+    const baudRate = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 38400;
+
     try {
-        await port.open({ baudRate: 38400 });
+        await port.open({ baudRate });
         return port;
     } catch (error) {
         if(port.connected && port.readable && port.writable && !port.readable.locked && !port.writable.locked){
@@ -800,6 +807,233 @@ async function disconnect(port) {
     } catch (error) {
         console.error('Error closing the serial port:', error);
     }
+}
+const CRC32_TABLE = (() => {
+    const table = new Uint32Array(256);
+    for (let i = 0; i < 256; i++) {
+        let c = i;
+        for (let j = 0; j < 8; j++) {
+            c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+        }
+        table[i] = c >>> 0;
+    }
+    return table;
+})();
+
+function crc32(data) {
+    let crc = 0xFFFFFFFF;
+    for (let i = 0; i < data.length; i++) {
+        crc = CRC32_TABLE[(crc ^ data[i]) & 0xFF] ^ (crc >>> 8);
+    }
+    return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+async function rawWrite(port, bytes) {
+    if (!port || !port.writable) {
+        throw new Error('Serial port not writable');
+    }
+    globalRelease('write');
+    const writer = port.writable.getWriter();
+    globalWriteReader = writer;
+    try {
+        const CHUNK = 256;
+        for (let offset = 0; offset < bytes.length; offset += CHUNK) {
+            await writer.write(bytes.slice(offset, offset + CHUNK));
+        }
+    } finally {
+        try { writer.releaseLock(); } catch {}
+    }
+}
+
+async function rawReadOnce(port, timeoutMs) {
+    if (!port || !port.readable) {
+        throw new Error('Serial port not readable');
+    }
+    globalRelease('read');
+    const reader = port.readable.getReader();
+    globalReadReader = reader;
+    let timeoutId;
+
+    try {
+        const result = await Promise.race([
+            reader.read(),
+            new Promise((resolve) => {
+                timeoutId = setTimeout(async () => {
+                    // Do not await cancel(): it may hang when the device/USB stack is in a bad state.
+                    try { reader.cancel(); } catch {}
+                    resolve({ value: undefined, done: false, timeout: true });
+                }, timeoutMs);
+            })
+        ]);
+        if (result && result.done) {
+            throw new Error('Serial stream closed');
+        }
+        return result?.value;
+    } finally {
+        clearTimeout(timeoutId);
+        try { reader.releaseLock(); } catch {}
+    }
+}
+
+async function waitForText(port, needle, timeoutMs, onChunk) {
+    const decoder = new TextDecoder();
+    let buffer = '';
+    const deadline = Date.now() + timeoutMs;
+    const needles = Array.isArray(needle) ? needle : [needle];
+
+    while (Date.now() < deadline) {
+        const remaining = Math.max(1, deadline - Date.now());
+        const chunk = await rawReadOnce(port, Math.min(500, remaining));
+        if (!chunk || chunk.length === 0) {
+            continue;
+        }
+        const text = decoder.decode(chunk);
+        if (onChunk) onChunk(text);
+        buffer += text;
+        if (needles.some((n) => buffer.includes(n))) {
+            return true;
+        }
+        if (buffer.length > 4096) {
+            buffer = buffer.slice(-4096);
+        }
+    }
+    throw new Error(`Timeout waiting for ${needles.join(' | ')}`);
+}
+
+async function readAck(port, timeoutMs) {
+    const deadline = Date.now() + timeoutMs;
+    while (Date.now() < deadline) {
+        const remaining = Math.max(1, deadline - Date.now());
+        const chunk = await rawReadOnce(port, Math.min(500, remaining));
+        if (!chunk || chunk.length === 0) continue;
+
+        for (let i = 0; i < chunk.length; i++) {
+            const b = chunk[i];
+            if (b === 0x41) {
+                return { ok: true };
+            }
+            if (b === 0x45) {
+                let code;
+                if (i + 1 < chunk.length) {
+                    code = chunk[i + 1];
+                } else {
+                    const extra = await rawReadOnce(port, 200);
+                    if (extra && extra.length) code = extra[0];
+                }
+                return { ok: false, code };
+            }
+        }
+    }
+    return { ok: false, timeout: true };
+}
+
+async function uve5_flashFirmware(port, firmware, options = {}) {
+    const {
+        chunkSize = 2048,
+        readyTimeoutMs = 30000,
+        startTimeoutMs = 60000,
+        ackTimeoutMs = 15000,
+        retries = 30,
+        onLog,
+        onProgress
+    } = options;
+
+    const log = (msg) => {
+        if (onLog) onLog(msg);
+    };
+
+    const reportProgress = (sent) => {
+        if (onProgress) onProgress(sent, firmware.length);
+    };
+
+    if (!firmware || firmware.length === 0) {
+        throw new Error('Empty firmware');
+    }
+    if (chunkSize <= 0 || chunkSize > 0xFFFF) {
+        throw new Error('Invalid chunkSize');
+    }
+
+    const MAGIC = 0x32445055;
+    const header = new Uint8Array(10);
+    const headerDv = new DataView(header.buffer);
+    headerDv.setUint32(0, MAGIC >>> 0, true);
+    headerDv.setUint32(4, firmware.length >>> 0, true);
+    headerDv.setUint16(8, chunkSize & 0xFFFF, true);
+
+    // Handshake can be flaky on some browsers/USB-UARTs; retry the READY→GO→header→START phase.
+    const handshakeRetries = 3;
+    let handshakeOk = false;
+    for (let hs = 1; hs <= handshakeRetries; hs += 1) {
+        log(`UVE5: 等待设备 READY... (${hs}/${handshakeRetries})`);
+        await waitForText(port, 'READY', readyTimeoutMs);
+
+        log('UVE5: 发送 GO...');
+        await rawWrite(port, new TextEncoder().encode('GO\n'));
+        // Give bootloader a moment to switch from READY spam into header parser.
+        await sleep(50);
+
+        log('UVE5: 发送头信息...');
+        await rawWrite(port, header);
+        // Some devices need a tiny gap after header before responding START.
+        await sleep(20);
+
+        log('UVE5: 等待设备 START...');
+        try {
+            // 新版 bootloader 会发 STRT（避免包含 'A' 导致误判 ACK）。
+            // 兼容旧版仍可能发 START。
+            await waitForText(port, ['STRT', 'START'], startTimeoutMs);
+            handshakeOk = true;
+            break;
+        } catch (e) {
+            if (hs >= handshakeRetries) throw e;
+            log('UVE5: 等待 START 超时，重试握手...');
+            await sleep(200);
+        }
+    }
+    if (!handshakeOk) {
+        throw new Error('UVE5: 握手失败');
+    }
+
+    let seq = 0;
+    let offset = 0;
+    reportProgress(0);
+
+    while (offset < firmware.length) {
+        const len = Math.min(chunkSize, firmware.length - offset);
+        const data = firmware.slice(offset, offset + len);
+        const crc = crc32(data);
+
+        const frame = new Uint8Array(4 + 2 + len + 4);
+        const dv = new DataView(frame.buffer);
+        dv.setUint32(0, seq >>> 0, true);
+        dv.setUint16(4, len & 0xFFFF, true);
+        frame.set(data, 6);
+        dv.setUint32(6 + len, crc >>> 0, true);
+
+        let attempt = 0;
+        while (true) {
+            await rawWrite(port, frame);
+            const perChunkTimeout = seq === 0 ? Math.max(ackTimeoutMs, 15000) : ackTimeoutMs;
+            const ack = await readAck(port, perChunkTimeout);
+            if (ack.ok) break;
+            attempt += 1;
+            const code = ack.code !== undefined ? ack.code : '?';
+            log(`UVE5: 块${seq} NAK(E${code})，重试 ${attempt}/${retries}`);
+            if (attempt >= retries) {
+                throw new Error(`UVE5: 块${seq} 连续失败(E${code})，已放弃`);
+            }
+            // If device is still waiting for the previous frame to finish timing out,
+            // a tiny delay helps prevent piling up bytes.
+            await sleep(50);
+        }
+
+        offset += len;
+        seq += 1;
+        reportProgress(offset);
+    }
+
+    log('UVE5: 数据发送完成');
+    reportProgress(firmware.length);
 }
 
 
@@ -1637,6 +1871,7 @@ export {
     unpackVersion,
     unpack,
     readPacketNoVerify,
+    uve5_flashFirmware,
     sendSMSPacket,
     readSMSPacket
 }
