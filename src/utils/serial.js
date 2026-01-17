@@ -1175,6 +1175,44 @@ async function eeprom_read(port, address, size = 0x80, protocol = "official") {
     }
 }
 
+// Shared flash read/write (ESP32 shared partition window)
+// Command format is intentionally the same as the losehu extended EEPROM commands,
+// but with command IDs 0x142B / 0x1438.
+// Note: address here is the shared-partition offset (0x0000..0x0FFF), NOT the 0x02000-mapped logical EEPROM address.
+async function shared_read(port, address, size = 0x80) {
+    sessionStorage.removeItem('webusb')
+
+    const address_msb = (address & 0xff00) >> 8;
+    const address_lsb = address & 0xff;
+
+    const address_msb_h = (address & 0xff000000) >> 24;
+    const address_lsb_h = (address & 0xff0000) >> 16;
+
+    const packet = new Uint8Array([0x2b, 0x14, 0x08, 0x00, address_lsb_h, address_msb_h, size, 0x00, 0xff, 0xff, 0xff, 0xff, address_lsb, address_msb]);
+    await sendPacket(port, packet);
+
+    const response = await readPacket(port, 0x1c);
+    const data = new Uint8Array(response.slice(8));
+    return data;
+}
+
+async function shared_write(port, address, input, size = 0x80) {
+    const address_msb = (address & 0xff00) >> 8;
+    const address_lsb = address & 0xff;
+
+    const address_msb_h = (address & 0xff000000) >> 24;
+    const address_lsb_h = (address & 0xff0000) >> 16;
+
+    const packet = new Uint8Array([0x38, 0x14, 0x1c, 0x00, address_lsb_h, address_msb_h, size + 2, 0x00, 0xff, 0xff, 0xff, 0xff, address_lsb, address_msb]);
+    const mergedArray = new Uint8Array(packet.length + input.length);
+    mergedArray.set(packet);
+    mergedArray.set(input, packet.length);
+
+    await sendPacket(port, mergedArray);
+    await readPacket(port, 0x1e);
+    return true;
+}
+
 async function eeprom_write(port, address, input, size = 0x80, protocol = "official") {
     if (protocol == "official") {
         // packet format: uint16 ID, uint16 length, uint16 address, uint8 size, uint8 padding, uint32 timestamp
@@ -1591,6 +1629,8 @@ export {
     eeprom_reboot,
     check_eeprom,
     eeprom_write,
+    shared_read,
+    shared_write,
     flash_flashFirmware,
     flash_generateCommand,
     flash_generateK1Command,
