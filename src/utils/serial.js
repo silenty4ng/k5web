@@ -1412,9 +1412,26 @@ async function eeprom_read(port, address, size = 0x80, protocol = "official") {
 // Shared flash read/write (ESP32 shared partition window)
 // Command format is intentionally the same as the losehu extended EEPROM commands,
 // but with command IDs 0x142B / 0x1438.
-// Note: address here is the shared-partition offset (0x0000..0x0FFF), NOT the 0x02000-mapped logical EEPROM address.
+// Note: address here is the shared-partition offset (NOT the 0x02000-mapped logical EEPROM address).
+// UVE5 default partition table uses a 512KiB shared partition: 0x00000..0x7FFFF.
+const SHARED_PARTITION_SIZE = 0x80000;
+
+function assertSharedRange(address, size) {
+    if (!Number.isFinite(address) || address < 0) {
+        throw new Error('shared address must be a non-negative number');
+    }
+    if (!Number.isFinite(size) || size < 0) {
+        throw new Error('shared size must be a non-negative number');
+    }
+    const end = address + size;
+    if (end > SHARED_PARTITION_SIZE) {
+        throw new Error(`shared access out of range: 0x${address.toString(16)}..0x${(end - 1).toString(16)} (max 0x${(SHARED_PARTITION_SIZE - 1).toString(16)})`);
+    }
+}
 async function shared_read(port, address, size = 0x80) {
     sessionStorage.removeItem('webusb')
+
+    assertSharedRange(address, size);
 
     const address_msb = (address & 0xff00) >> 8;
     const address_lsb = address & 0xff;
@@ -1431,6 +1448,8 @@ async function shared_read(port, address, size = 0x80) {
 }
 
 async function shared_write(port, address, input, size = 0x80) {
+    assertSharedRange(address, size);
+
     const address_msb = (address & 0xff00) >> 8;
     const address_lsb = address & 0xff;
 
