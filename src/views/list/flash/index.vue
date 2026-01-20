@@ -7,18 +7,27 @@
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
               <a-space>
-                <a-button @click="selectFile">{{ state.binaryFile ? state.binaryName : $t('tool.selectFirmware') }}</a-button>
-                <a-button type="primary" :disabled="!state.binaryFile" @click="flashIt">{{ $t('tool.flash') }}</a-button>
+                <a-button :disabled="state.isFlashing" @click="selectFile">{{ state.binaryFile ? state.binaryName : $t('tool.selectFirmware') }}</a-button>
+                <a-button type="primary" :disabled="!state.binaryFile || state.isFlashing" @click="flashIt">{{ $t('tool.flash') }}</a-button>
               </a-space>
             </div>
             <div>
               <a-radio-group type="button" size="mini" v-model="state.protocol">
                 <a-radio value="Official">Official</a-radio>
                 <a-radio value="K1">K1</a-radio>
+                <a-radio value="UVE5">UVE5</a-radio>
               </a-radio-group>
             </div>
           </div>
           <a-divider />
+          <div style="margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <div style="color: var(--color-text-2);">进度条</div>
+              <div style="color: var(--color-text-1); font-weight: bold;">{{ state.progress.toFixed(1) }}%</div>
+            </div>
+            <a-progress :percent="state.progress / 100" :show-text="false" />
+            <div style="margin-top: 6px; color: var(--color-text-3);">{{ state.phase }}</div>
+          </div>
           <div id="statusArea" style="height: 20em; background-color: var(--color-bg-3); color: var(--color-text-3); overflow: auto; padding: 20px"
             v-html="state.status"></div>
         </a-card>
@@ -31,7 +40,7 @@
 import { reactive, nextTick, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAppStore } from '@/store';
-import { disconnect, connect, readPacket, sendPacket, unpackVersion, unpack, flash_generateCommand, readPacketNoVerify, flash_generateK1Command } from '@/utils/serial.js';
+import { disconnect, connect, readPacket, sendPacket, unpackVersion, unpack, flash_generateCommand, readPacketNoVerify, flash_generateK1Command, uve5_flashFirmware } from '@/utils/serial.js';
 import { DialogPlugin } from 'tdesign-vue-next';
 
 const appStore = useAppStore();
@@ -40,12 +49,18 @@ const state : {
   status: any,
   binaryName: any,
   binaryFile: any,
-  protocol: string
+  protocol: string,
+  progress: number,
+  phase: string,
+  isFlashing: boolean
 } = reactive({
   status: "点击更新按钮更新固件到设备<br/><br/>",
   binaryFile: undefined,
   binaryName: '',
-  protocol: 'Official'
+  protocol: 'Official',
+  progress: 0,
+  phase: '',
+  isFlashing: false
 })
 
 const route = useRoute();
@@ -100,10 +115,77 @@ const flashIt = async () => {
     alert('请选择文件');
     return;
   }
+
+  // Throttle status DOM updates to avoid UI stalls during high-frequency logs.
+  const statusMaxChars = 200_000;
+  let statusPending: string[] = [];
+  let statusFlushTimer: number | null = null;
+  const flushStatus = () => {
+    statusFlushTimer = null;
+    if (!statusPending.length) return;
+    state.status = state.status + statusPending.join('<br/>') + '<br/>';
+    statusPending = [];
+    if (typeof state.status === 'string' && state.status.length > statusMaxChars) {
+      state.status = state.status.slice(-Math.floor(statusMaxChars * 0.75));
+    }
+    nextTick(()=>{
+      const textarea = document?.getElementById('statusArea');
+      if(textarea)textarea.scrollTop = textarea?.scrollHeight;
+    })
+  }
+  const appendStatus = (line: string) => {
+    statusPending.push(line);
+    if (statusFlushTimer === null) {
+      statusFlushTimer = window.setTimeout(flushStatus, 50);
+    }
+  }
+
+  if (state.isFlashing) return;
+  state.isFlashing = true;
+  state.progress = 0;
+  state.phase = '';
+
   if(appStore.connectPort){
     await disconnect(appStore.connectPort);
   }
-  let _connect = await connect();
+
+  const baudRate = state.protocol === 'UVE5' ? 115200 : 38400;
+  let _connect: any = null;
+  try {
+    _connect = await connect(baudRate);
+    if(!_connect){
+      appendStatus('串口连接失败');
+      return;
+    }
+
+    if(state.protocol === 'UVE5'){
+      state.phase = '刷写中...';
+      appendStatus('UVE5：开始刷写（115200bps）');
+      let lastLoggedPctInt = -1;
+      await uve5_flashFirmware(_connect, state.binaryFile, {
+        onLog: (msg: string) => {
+          appendStatus(msg);
+        },
+        onProgress: (sent: number, total: number) => {
+          const pct = total > 0 ? (sent / total) * 100 : 0;
+          const pctFixed = Math.min(100, Math.max(0, Number(pct.toFixed(1))));
+          state.progress = pctFixed;
+          state.phase = `刷写中... ${pctFixed.toFixed(1)}%`;
+
+          // 避免刷屏：只在整数百分比变化时输出一次（以及 0%/100%）
+          const pctInt = Math.floor(pctFixed);
+          if (pctInt !== lastLoggedPctInt || pctInt === 0 || pctInt === 100) {
+            lastLoggedPctInt = pctInt;
+            appendStatus(`更新进度 ${pctFixed.toFixed(1)}%`);
+          }
+        }
+      })
+      state.progress = 100;
+      state.phase = '完成';
+      appendStatus('UVE5：固件刷写完成');
+      return;
+    }
+
   if(state.protocol == 'Official'){
     await readPacket(_connect, 0x18, 1000);
   }
@@ -150,20 +232,26 @@ const flashIt = async () => {
           return Promise.reject(e);
       }
 
-      state.status = state.status + `更新进度 ${((i / firmware.length) * 100).toFixed(1)}%<br/>`
-      nextTick(()=>{
-        const textarea = document?.getElementById('statusArea');
-        if(textarea)textarea.scrollTop = textarea?.scrollHeight;
-      })
+      appendStatus(`更新进度 ${((i / firmware.length) * 100).toFixed(1)}%`)
+      state.progress = Math.min(100, Math.max(0, Number((((i / firmware.length) * 100)).toFixed(1))));
   }
-  state.status = state.status + "更新进度 100.0%<br/>";
-  state.status = state.status + "固件更新成功";
-  nextTick(()=>{
-    const textarea = document?.getElementById('statusArea');
-    if(textarea)textarea.scrollTop = textarea?.scrollHeight;
-  })
-  disconnect(_connect);
-  appStore.updateSettings({ connectState: false });
+  appendStatus("更新进度 100.0%");
+  state.progress = 100;
+  appendStatus("固件更新成功");
+  flushStatus();
+  }
+  catch(e: any){
+    state.phase = '失败';
+    appendStatus(`${state.protocol}：失败 - ${e?.message ?? e}`);
+    flushStatus();
+  }
+  finally {
+    try {
+      if (_connect) await disconnect(_connect);
+    } catch {}
+    appStore.updateSettings({ connectState: false });
+    state.isFlashing = false;
+  }
 }
 </script>
 

@@ -52,7 +52,7 @@
 import { reactive, nextTick } from 'vue';
 import useLoading from '@/hooks/loading';
 import { useAppStore } from '@/store';
-import { eeprom_write, eeprom_reboot, eeprom_init, eeprom_read, uint8ArrayToString, stringToUint8Array } from '@/utils/serial.js';
+import { eeprom_write, eeprom_reboot, eeprom_init, eeprom_read, shared_read, shared_write, uint8ArrayToString, stringToUint8Array } from '@/utils/serial.js';
 
 const appStore = useAppStore();
 const { loading, setLoading } = useLoading(false);
@@ -118,7 +118,11 @@ const readChannel = async() => {
     state.logo_line2 = uint8ArrayToString(logo.subarray(0x13, 0x26), appStore.configuration?.charset)
   }else if(appStore.configuration?.charset == "gb2312"){
     let logo = new Uint8Array(0x024);
-    logo.set(await eeprom_read(appStore.connectPort, 0x02000, 0x024, appStore.configuration?.uart), 0)
+    if(appStore.firmwareVersion?.startsWith('UVE')){
+      logo.set(await shared_read(appStore.connectPort, 0x0000, 0x024), 0)
+    }else{
+      logo.set(await eeprom_read(appStore.connectPort, 0x02000, 0x024, appStore.configuration?.uart), 0)
+    }
     state.logo_line1 = uint8ArrayToString(logo.subarray(0, 0x12), appStore.configuration?.charset)
     state.logo_line2 = uint8ArrayToString(logo.subarray(0x12, 0x024), appStore.configuration?.charset)
   }else{
@@ -160,8 +164,13 @@ const writeChannel = async() => {
     let logo = new Uint8Array(0x24);
     logo.set(stringToUint8Array(state.logo_line1, appStore.configuration?.charset).subarray(0, 0x12), 0);
     logo.set(stringToUint8Array(state.logo_line2, appStore.configuration?.charset).subarray(0, 0x12), 0x12);
-    await eeprom_write(appStore.connectPort, 0x02024, [18, 18], 0x02, appStore.configuration?.uart);
-    await eeprom_write(appStore.connectPort, 0x02000, logo, 0x24, appStore.configuration?.uart);
+    if(appStore.firmwareVersion?.startsWith('UVE')){
+      await shared_write(appStore.connectPort, 0x0024, [18, 18], 0x02);
+      await shared_write(appStore.connectPort, 0x0000, logo, 0x24);
+    }else{
+      await eeprom_write(appStore.connectPort, 0x02024, [18, 18], 0x02, appStore.configuration?.uart);
+      await eeprom_write(appStore.connectPort, 0x02000, logo, 0x24, appStore.configuration?.uart);
+    }
   }else{
     let logo = new Uint8Array(0x020);
     logo.set(stringToUint8Array(state.logo_line1, appStore.configuration?.charset).subarray(0, 0x10), 0);

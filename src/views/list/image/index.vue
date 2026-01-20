@@ -33,7 +33,7 @@
 import { reactive, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAppStore } from '@/store';
-import { eeprom_write, eeprom_reboot, eeprom_init, disconnect } from '@/utils/serial.js';
+import { eeprom_write, eeprom_reboot, eeprom_init, shared_write, disconnect } from '@/utils/serial.js';
 
 const appStore = useAppStore();
 
@@ -226,12 +226,18 @@ const flashIt = async () => {
     return;
   }
   state.loading = true
+  const isUveGb = appStore.firmwareVersion?.startsWith('UVE') && appStore.configuration?.charset == "gb2312";
   let position = 0x1E350;
-  if(appStore.configuration?.charset == "gb2312")position = 0x2080;
+  if(appStore.configuration?.charset == "gb2312")position = isUveGb ? 0x0080 : 0x2080;
   await eeprom_init(appStore.connectPort);
   const rawEEPROM = state.binaryFile;
   for (let i = position; i < rawEEPROM.length + position; i += 0x40) {
-    await eeprom_write(appStore.connectPort, i, rawEEPROM.slice(i - position, i - position + 0x40), rawEEPROM.slice(i - position, i - position + 0x40).length, appStore.configuration?.uart);
+    const chunk = rawEEPROM.slice(i - position, i - position + 0x40);
+    if(isUveGb){
+      await shared_write(appStore.connectPort, i, chunk, chunk.length);
+    }else{
+      await eeprom_write(appStore.connectPort, i, chunk, chunk.length, appStore.configuration?.uart);
+    }
   }
   await eeprom_reboot(appStore.connectPort);
   state.loading = false

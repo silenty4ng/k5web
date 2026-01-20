@@ -232,6 +232,7 @@
     "LOSEHU.*P.*K"        : "ltsk.json",
     "LOSEHU.*P.*"         : "lts.json",
     "LOSEHU.*D"           : "losehud.json",
+    "UVE.*"               : "losehu124h.json",
     "LOSEHU13[0-9].*HS"   : "losehu124h.json",
     "LOSEHU13[0-9].*H"    : "losehu124h.json",
     "LOSEHU13[0-9].*KS"   : "losehu120k.json",
