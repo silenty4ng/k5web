@@ -175,7 +175,7 @@
   import useLocale from '@/hooks/locale';
   import useUser from '@/hooks/user';
   import Menu from '@/components/menu/index.vue';
-  import { connect, disconnect, eeprom_init } from '@/utils/serial.js';
+  import { connect, disconnect, eeprom_init, rtc_sync_beijing } from '@/utils/serial.js';
   import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
   const drivers = import.meta.glob('@/drivers/*.json', { eager: true });
@@ -307,6 +307,12 @@
           return true
         }
       })
+
+      // Auto sync device RTC to current Beijing time on connect (best effort).
+      // Only do this for UVE builds to avoid slowing down other firmwares.
+      if (/^UVE/i.test(version)) {
+        try { await rtc_sync_beijing(_connect); } catch {}
+      }
 
       appStore.updateSettings({ connectState: true, firmwareVersion: version, configuration: _configuration });
     }else{

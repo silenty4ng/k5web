@@ -1368,6 +1368,64 @@ async function eeprom_init(port) {
     return decoder.decode(version.slice(0, version.indexOf(0)));
 }
 
+function getBeijingDateParts(date = new Date()) {
+    const dtf = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Shanghai',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+    });
+    const parts = dtf.formatToParts(date);
+    const map = {};
+    for (const p of parts) {
+        if (p.type !== 'literal') map[p.type] = p.value;
+    }
+    return {
+        year: Number(map.year),
+        month: Number(map.month),
+        day: Number(map.day),
+        hour: Number(map.hour),
+        minute: Number(map.minute),
+        second: Number(map.second),
+    };
+}
+
+// Sync RTC on connect: send current Beijing time to device.
+// Firmware command:
+//   0x0610 (len=8): uint16 year, uint8 month,day,hour,minute,second, uint8 flags
+// Reply:
+//   0x0611 (len=1): uint8 status (0=OK)
+async function rtc_sync_beijing(port, { timeout = 600 } = {}) {
+    sessionStorage.removeItem('webusb')
+    const { year, month, day, hour, minute, second } = getBeijingDateParts();
+    const year_l = year & 0xff;
+    const year_h = (year >> 8) & 0xff;
+    const flags = 0x01;
+    const packet = new Uint8Array([
+        0x10, 0x06, // ID 0x0610
+        0x08, 0x00, // len=8
+        year_l, year_h,
+        month & 0xff,
+        day & 0xff,
+        hour & 0xff,
+        minute & 0xff,
+        second & 0xff,
+        flags,
+    ]);
+    await sendPacket(port, packet);
+    try {
+        const resp = await readPacket(port, 0x11, timeout);
+        return resp && resp.length >= 5 ? resp[4] : 0xff;
+    } catch (e) {
+        console.warn('rtc_sync_beijing: no reply (ignored)', e);
+        return null;
+    }
+}
+
 async function eeprom_read(port, address, size = 0x80, protocol = "official") {
     sessionStorage.removeItem('webusb')
     if (protocol == "official") {
@@ -1892,5 +1950,6 @@ export {
     readPacketNoVerify,
     uve5_flashFirmware,
     sendSMSPacket,
-    readSMSPacket
+    readSMSPacket,
+    rtc_sync_beijing
 }
