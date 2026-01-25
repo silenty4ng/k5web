@@ -16,6 +16,9 @@ const useAppStore = defineStore('app', {
     appDevice(state: AppState) {
       return state.device;
     },
+    isUve5(state: AppState): boolean {
+      return typeof state.firmwareVersion === 'string' && state.firmwareVersion.startsWith('UVE');
+    },
     appAsyncMenus(state: AppState): RouteRecordNormalized[] {
       return state.serverMenu as unknown as RouteRecordNormalized[];
     },
