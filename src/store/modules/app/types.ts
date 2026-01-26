@@ -16,5 +16,12 @@ export interface AppState {
   tabBar: boolean;
   menuFromServer: boolean;
   serverMenu: RouteRecordNormalized[];
+
+  // Device connection/runtime info (set on successful handshake in navbar connect)
+  connectState?: boolean;
+  connectPort?: unknown;
+  firmwareVersion?: string;
+  configuration?: unknown;
+
   [key: string]: unknown;
 }

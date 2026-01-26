@@ -68,11 +68,15 @@
 <script lang="ts" setup>
 import { ref, reactive, nextTick, onMounted, onUnmounted, computed } from 'vue';
 import { useAppStore } from '@/store';
-import { eeprom_write, eeprom_reboot, eeprom_init, hexReverseStringToUint8Array, stringToUint8Array } from '@/utils/serial.js';
+import { eeprom_write, eeprom_reboot, eeprom_init, hexReverseStringToUint8Array, stringToUint8Array, shared_read, shared_write } from '@/utils/serial.js';
 import useLoading from '@/hooks/loading';
 import QRCode from 'qrcode';
 import { Input, Select } from 'tdesign-vue-next';
 import { Message } from '@arco-design/web-vue';
+
+// Must match ESP32 mapping in src/app/driver/eeprom.cpp
+// EEPROM 0x1E200..0x20000 -> shared offset 0x10000..
+const UVE5_SHARED_TLE_BASE = 0x10000;
 
 const { loading, setLoading } = useLoading(true);
 
@@ -141,6 +145,48 @@ const state: {
   selfSatInfo: '',
   satsData: []
 })
+
+// Auto-detect UVE5 shared-partition mode.
+// For UVE5 we always store TLE in the ESP32 shared partition (mapped from logical EEPROM 0x1E200..0x20000).
+// This is derived from the handshake firmware version at connect time.
+const isUveDevice = computed(() => appStore.isUve5);
+
+const uint8ToAscii = (bytes: Uint8Array) => {
+  // Keep it simple: the payload is ASCII. Replace NUL with spaces for readability.
+  const text = new TextDecoder('utf-8', { fatal: false }).decode(bytes);
+  return text.replace(/\u0000/g, ' ');
+}
+
+const readSharedBytes = async (start: number, length: number) => {
+  const out = new Uint8Array(length);
+  for (let i = 0; i < length; i += 0x80) {
+    const chunkLen = Math.min(0x80, length - i);
+    const chunk = await shared_read(appStore.connectPort, start + i, chunkLen);
+    out.set(chunk.subarray(0, chunkLen), i);
+  }
+  return out;
+}
+
+const validateTleRecordBytes = (record: Uint8Array) => {
+  if (!record || record.length < 160) return { ok: false, reason: 'readback too short' };
+  const nameBytes = record.subarray(0, 9);
+  const line1Bytes = record.subarray(9, 9 + 69);
+  const line2Bytes = record.subarray(9 + 69, 9 + 69 + 69);
+
+  const allSame = (bytes: Uint8Array, value: number) => bytes.every((b) => b === value);
+  if (allSame(record, 0x00) || allSame(record, 0xff)) return { ok: false, reason: 'all 0x00/0xFF' };
+
+  const name = uint8ToAscii(nameBytes).trim();
+  const line1 = uint8ToAscii(line1Bytes);
+  const line2 = uint8ToAscii(line2Bytes);
+
+  // Minimal structure check; firmware parser is stricter.
+  const looksLikeTle = line1.startsWith('1 ') && line2.startsWith('2 ');
+  if (!looksLikeTle) {
+    return { ok: false, reason: `unexpected TLE header (name='${name}')` };
+  }
+  return { ok: true, reason: '', name, line1, line2 };
+}
 
 const editableCellState = (cellParams) => {
   // 第一行不允许编辑
@@ -432,6 +478,20 @@ const restoreRange = async (start: any = 0, uint8Array: any) => {
   state.status = state.status + "写入进度：100.0%<br/>";
 }
 
+const restoreRangeShared = async (start: number, uint8Array: Uint8Array) => {
+  await eeprom_init(appStore.connectPort);
+  for (let i = 0; i < uint8Array.length; i += 0x40) {
+    const chunk = uint8Array.slice(i, i + 0x40);
+    await shared_write(appStore.connectPort, start + i, chunk, chunk.length);
+    state.status = state.status + "写入进度：" + ((i / uint8Array.length) * 100).toFixed(1) + "%<br/>";
+    nextTick(() => {
+      const textarea = document?.getElementById('statusArea');
+      if (textarea) textarea.scrollTop = textarea?.scrollHeight;
+    })
+  }
+  state.status = state.status + "写入进度：100.0%<br/>";
+}
+
 const calculateChecksum = (line: string) => {
   const chars = line.replace(/\d$/, ''); // 移除末位校验和
   let sum = 0;
@@ -450,7 +510,7 @@ const validateChecksum = (line: string) => {
 
 const writeIt = async () => {
   if (appStore.connectState != true) { alert(sessionStorage.getItem('noticeConnectK5')); return; };
-  if(appStore.configuration?.sat2 != true){
+  if (!isUveDevice.value && appStore.configuration?.sat2 != true) {
     alert(sessionStorage.getItem('noticeVersionNoSupport'));
     return;
   }
@@ -501,8 +561,33 @@ const writeIt = async () => {
       duration: 10 * 1000,
     });
   }
-  await restoreRange(0x1E200, payload)
-  await syncTime()
+  if (isUveDevice.value) {
+    state.status += `检测到 UVE 设备：将写入 shared@0x${UVE5_SHARED_TLE_BASE.toString(16)}<br/>`;
+    await restoreRangeShared(UVE5_SHARED_TLE_BASE, payload)
+
+    // Read-back verify first record so users immediately know whether the shared write actually landed.
+    try {
+      const first = await readSharedBytes(UVE5_SHARED_TLE_BASE, 160);
+      const chk = validateTleRecordBytes(first);
+      if (!chk.ok) {
+        setLoading(false)
+        return Message.error({
+          content: `写入完成但读回校验失败：${chk.reason}。这通常表示 shared 分区不可用（分区表没刷/label 不匹配）或固件未支持 shared 读写命令。\n\n如果你是用 app0_main 的快速上传刷机：请确保 partitions.bin 也被写入（本仓库 scripts/upload_app0.py 已改为同时刷 partitions.bin@0x8000）。或者完整刷一次 factory/分区表后再重试。`,
+          duration: 12 * 1000,
+        });
+      }
+      state.status += `读回校验通过：${chk.name}<br/>`;
+    } catch (e: any) {
+      setLoading(false)
+      return Message.error({
+        content: `写入完成但读回校验异常：${e?.message ?? e}。可能固件不支持 shared_read/shared_write。`,
+        duration: 12 * 1000,
+      });
+    }
+  } else {
+    state.status += `非 UVE 设备：将写入 EEPROM@0x1E200<br/>`;
+    await restoreRange(0x1E200, payload)
+  }
   await eeprom_reboot(appStore.connectPort);
   setLoading(false)
 }
