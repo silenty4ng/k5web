@@ -28,31 +28,6 @@
     <div style="margin-top: 50px;">&nbsp;</div>
     <div>
       <a-collapse :default-active-key="state.activeKey" accordion @change="changeMainActive">
-        <a-collapse-item header="帮我完成问卷！谢谢！" :key="0">
-          <a-space direction="vertical">
-            <t-link theme="primary" href="https://wj.qq.com/s2/25291398/27c9/" target="_blank">https://wj.qq.com/s2/25291398/27c9/</t-link>
-            <img loading="lazy" class="tencent" style="margin-bottom: 10px;" width="300px" src="/poster.png" />
-          </a-space>
-        </a-collapse-item>
-        <a-collapse-item header="广告区" :key="1">
-          <a-space>
-            <a-card hoverable :style="{ width: '500px' }">
-              <template #cover>
-                <div
-                >
-                  <img
-                    loading="lazy"
-                    :style="{ width: '100%' }"
-                    alt="ads"
-                    src="/jjgg.jpg"
-                  />
-                </div>
-              </template>
-              <a-card-meta title="BG4IWE 投放">
-              </a-card-meta>
-            </a-card>
-          </a-space>
-        </a-collapse-item>
         <a-collapse-item header="腾讯公益" :key="2">
           <img loading="lazy" class="tencent" style="margin-bottom: 10px;" width="200px" src="/gy.png" />
         </a-collapse-item>
