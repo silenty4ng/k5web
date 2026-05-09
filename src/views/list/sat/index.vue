@@ -280,7 +280,7 @@ const initSat = async () => {
   if(sessionStorage.getItem('satRst')){
     rst = sessionStorage.getItem('satRst') || ""
   }else{
-    rst = await (await fetch('https://celestrak.org/NORAD/elements/amateur.txt')).text()
+    rst = await (await fetch('https://celestrak.org/NORAD/elements/gp.php?GROUP=amateur&FORMAT=tle')).text()
     sessionStorage.setItem('satRst', rst)
   }
   const lines = rst.split(/\r?\n/);
