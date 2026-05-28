@@ -11,6 +11,29 @@ function createWindow() {
     icon: 'icon.ico',
   });
 
+  mainWindow.webContents.on('did-finish-load', async () => {
+    await mainWindow.webContents.executeJavaScript(`
+      (() => {
+        const rawFetch = window.fetch.bind(window)
+
+        const BASE_URL = 'https://k5.vicicode.cn'
+
+        window.fetch = async (input, init) => {
+          if (
+            typeof input === 'string' &&
+            input.startsWith('/') &&
+            !input.startsWith('//') &&
+            input.endsWith('.bin')
+          ) {
+            input = BASE_URL + input
+          }
+
+          return rawFetch(input, init)
+        }
+      })()
+    `)
+  });
+
   mainWindow.webContents.session.on('select-serial-port', async (event, portList, webContents, callback) => {
     // Add listeners to handle ports being added or removed before the callback for `select-serial-port` is called.
     mainWindow.webContents.session.on('serial-port-added', (event, port) => {
