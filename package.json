@@ -32,6 +32,7 @@
     "pinia": "^2.3.1",
     "qrcode": "^1.5.4",
     "query-string": "^8.2.0",
+    "satellite.js": "^7.0.1",
     "sortablejs": "^1.15.6",
     "tdesign-icons-vue-next": "^0.4.1",
     "tdesign-vue-next": "^1.16.1",

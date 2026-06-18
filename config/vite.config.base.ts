@@ -13,6 +13,14 @@ import { ArcoResolver } from 'unplugin-vue-components/resolvers';
 import htmlPlugin from "vite-plugin-html-config";
 
 export default defineConfig({
+  build: {
+    target: 'es2022', // you can also use 'es2020' here
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'es2022', // you can also use 'es2020' here
+    },
+  },
   base: './',
   plugins: [
     vue(),

@@ -5,9 +5,9 @@
         {{ $t("sat.selfSatInfo") }}
       </template>
       <div>
-        <a-textarea v-model="state.selfSatInfo" style="height: 120px;"placeholder="ISS (ZARYA)             
+        <a-textarea v-model="state.selfSatInfo" style="height: 120px;" placeholder="ISS (ZARYA)             
 1 25544U 98067A   24320.36274227  .00015569  00000+0  28188-3 0  9999
-2 25544  51.6413 286.4173 0007936 217.3657 298.3197 15.49809951481990"/>
+2 25544  51.6413 286.4173 0007936 217.3657 298.3197 15.49809951481990" />
       </div>
     </a-modal>
     <a-modal v-model:visible="state.visible" @ok="handleOk" :ok-text="$t('tool.scaned')">
@@ -24,27 +24,27 @@
       <a-col :span="24">
         <a-card class="general-card" :title="$t('menu.satellite') + $t('global.onStart')">
           <a-spin :loading="loading" style="width: 100%;" tip="正在处理 ...">
-            <a-form-item :label-col-style="{ width: '25%' }" field="dt" :label="$t('tool.brtime')" @click="()=>{state.showHide += 1}">
+            <a-form-item :label-col-style="{ width: '25%' }" field="dt" :label="$t('tool.brtime')"
+              @click="() => { state.showHide += 1 }">
               {{ state.dt }}
             </a-form-item>
-            <a-form-item v-show="state.showHide >= 5" :label-col-style="{ width: '25%' }" field="dtCustom" label="自定义时间">
+            <a-form-item v-show="state.showHide >= 5" :label-col-style="{ width: '25%' }" field="dtCustom"
+              label="自定义时间">
               <div>
-                <a-date-picker
-                style="width: 220px; margin: 0 24px 24px 0;"
-                show-time
-                :time-picker-props="{ defaultValue: '00:00:00' }"
-                format="YYYY-MM-DD HH:mm:ss"
-                v-model="state.dtCustom"
-              />
-              &nbsp;&nbsp;<t-button size="small" theme="success" @click="writeTime">写入时间到台站</t-button>
+                <a-date-picker style="width: 220px; margin: 0 24px 24px 0;" show-time
+                  :time-picker-props="{ defaultValue: '00:00:00' }" format="YYYY-MM-DD HH:mm:ss"
+                  v-model="state.dtCustom" />
+                &nbsp;&nbsp;<t-button size="small" theme="success" @click="writeTime">写入时间到台站</t-button>
               </div>
             </a-form-item>
             <a-form-item :label-col-style="{ width: '25%' }" field="sat" :label="$t('tool.selectSatellite')">
               <div style="width: 100%;">
-                <a-select v-model="state.sat" @change="changeSat" :placeholder="$t('tool.selectSatellite') + '...'" allow-search allow-clear>
+                <a-select v-model="state.sat" @change="changeSat" :placeholder="$t('tool.selectSatellite') + '...'"
+                  allow-search allow-clear>
                   <a-option v-for="item in state.satData" :key="item.name" :value="item.name">{{ item.name }}</a-option>
                 </a-select>
-                <a-link @click="()=>{state.selfSatModal = true}" style="margin-top: 10px;">{{ $t("sat.addSelfSat") }}</a-link>
+                <a-link @click="() => { state.selfSatModal = true }" style="margin-top: 10px;">{{ $t("sat.addSelfSat")
+                  }}</a-link>
               </div>
             </a-form-item>
             <a-form-item :label-col-style="{ width: '25%' }" field="lng" :label="$t('tool.longitude')">
@@ -69,14 +69,11 @@
                   :value="item[0] + '|' + item[1]">{{ item[0] + " - " + item[1] }}</a-option>
               </a-select>
             </a-form-item>
-            <a-form-item v-show="state.showHide >= 5" :label-col-style="{ width: '25%' }" field="passCustom" label="自定义过境时间">
-              <a-range-picker
-                style="width: 360px; margin: 0 24px 24px 0;"
-                show-time
-                :time-picker-props="{ defaultValue: ['00:00:00', '00:00:00'] }"
-                format="YYYY-MM-DD HH:mm:ss"
-                v-model="state.passCustom"
-              />
+            <a-form-item v-show="state.showHide >= 5" :label-col-style="{ width: '25%' }" field="passCustom"
+              label="自定义过境时间">
+              <a-range-picker style="width: 360px; margin: 0 24px 24px 0;" show-time
+                :time-picker-props="{ defaultValue: ['00:00:00', '00:00:00'] }" format="YYYY-MM-DD HH:mm:ss"
+                v-model="state.passCustom" />
             </a-form-item>
             <a-form-item :label-col-style="{ width: '25%' }" field="tx" :label="$t('tool.txFreq')">
               <a-input-number :precision="5" v-model="state.tx" />
@@ -116,14 +113,15 @@ import { useAppStore } from '@/store';
 import { eeprom_write, eeprom_reboot, eeprom_init, hexReverseStringToUint8Array, stringToUint8Array } from '@/utils/serial.js';
 import useLoading from '@/hooks/loading';
 import QRCode from 'qrcode';
+import { getPasses, getDopplerShifts } from '@/utils/satellite.js';
 
 const { loading, setLoading } = useLoading(true);
 
 const appStore = useAppStore();
 
-const lngRef : any = ref(null)
-const latRef : any = ref(null)
-const altRef : any = ref(null)
+const lngRef: any = ref(null)
+const latRef: any = ref(null)
+const altRef: any = ref(null)
 
 const state: {
   uuid: string,
@@ -183,17 +181,17 @@ const state: {
   selfSatInfo: '',
 })
 
-onMounted(async ()=>{
-  try{
-    if(sessionStorage.getItem('satFrequenciesRst')){
+onMounted(async () => {
+  try {
+    if (sessionStorage.getItem('satFrequenciesRst')) {
       state.freqDb = JSON.parse(sessionStorage.getItem('satFrequenciesRst') || "[]")
-    }else{
+    } else {
       const rst = await (await fetch('https://github.jobcher.com/gh/https://raw.githubusercontent.com/palewire/ham-satellite-database/main/data/amsat-active-frequencies.json')).text()
       state.freqDb = JSON.parse(rst)
       sessionStorage.setItem("satFrequenciesRst", rst)
     }
   }
-  catch{}
+  catch { }
 
   state.lng = parseFloat(localStorage.getItem('myLng') || '0')
   state.lat = parseFloat(localStorage.getItem('myLat') || '0')
@@ -206,7 +204,7 @@ onMounted(async ()=>{
   state.lat = parseFloat(latRef.value.inputRef.modelValue || '0')
   state.alt = parseFloat(altRef.value.inputRef.modelValue || '0')
 
-  state.timer = setInterval(()=>{
+  state.timer = setInterval(() => {
     state.dt = new Date().toLocaleString()
     localStorage.setItem('myLng', state.lng.toString());
     localStorage.setItem('myLat', state.lat.toString());
@@ -214,10 +212,10 @@ onMounted(async ()=>{
   }, 1000)
 })
 
-onUnmounted(()=>{
-  try{
+onUnmounted(() => {
+  try {
     clearInterval(state.timer)
-  }catch{}
+  } catch { }
 })
 
 const writeTime = async () => {
@@ -232,7 +230,7 @@ const writeTime = async () => {
 const syncTime = async () => {
   const date = state.dtCustom ? new Date(state.dtCustom) : new Date();
   const dateArray = [
-    ...hexReverseStringToUint8Array(parseInt(date.getFullYear().toString().substring(2,4)).toString(16)),
+    ...hexReverseStringToUint8Array(parseInt(date.getFullYear().toString().substring(2, 4)).toString(16)),
     ...hexReverseStringToUint8Array((date.getMonth() + 1).toString(16)),
     ...hexReverseStringToUint8Array(date.getDate().toString(16)),
     ...hexReverseStringToUint8Array(date.getHours().toString(16)),
@@ -250,18 +248,18 @@ const changeSat = async (sat: any) => {
       state.status += e + '<br/>'
     })
     let freqFlag = false
-    state.freqDb.map((e: any)=>{
-      if(data.path[1].split(" ")[1] == e.norad_id && e.mode.indexOf('FM') != -1){
+    state.freqDb.map((e: any) => {
+      if (data.path[1].split(" ")[1] == e.norad_id && e.mode.indexOf('FM') != -1) {
         console.log(e)
         freqFlag = true
         state.tx = e.uplink ? parseFloat(e.uplink.split('/')[0]) : 0
         state.rx = e.downlink ? parseFloat(e.downlink.split('/')[0]) : 0
-        state.txTone = parseFloat([0, ...state.CTCSSOption].reduce((_e: any, _n: any)=>{
+        state.txTone = parseFloat([0, ...state.CTCSSOption].reduce((_e: any, _n: any) => {
           return e.mode.indexOf(_n) != -1 ? _n : _e
         }))
       }
     })
-    if(!freqFlag){
+    if (!freqFlag) {
       state.tx = 0
       state.rx = 0
       state.txTone = 0
@@ -277,9 +275,9 @@ const changeSat = async (sat: any) => {
 const initSat = async () => {
   setLoading(true)
   let rst = ''
-  if(sessionStorage.getItem('satRst')){
+  if (sessionStorage.getItem('satRst')) {
     rst = sessionStorage.getItem('satRst') || ""
-  }else{
+  } else {
     rst = await (await fetch('https://celestrak.org/NORAD/elements/gp.php?GROUP=amateur&FORMAT=tle')).text()
     sessionStorage.setItem('satRst', rst)
   }
@@ -319,7 +317,7 @@ const scanLocation = async () => {
   state.visible = true
   state.uuid = crypto.randomUUID()
   let origin = location.origin
-  if(origin == 'file://'){
+  if (origin == 'file://') {
     origin = 'https://k5.vicicode.cn'
   }
   state.qrcode = await QRCode.toDataURL(origin + '/#/satloc?uuid=' + state.uuid, { width: 250 })
@@ -331,18 +329,18 @@ const handleOk = async () => {
     method: "POST",
     mode: "cors",
     headers: {
-    "Content-Type": "application/json",
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
-        func: 1,
-        uuid: state.uuid
+      func: 1,
+      uuid: state.uuid
     })
   })).json();
   const jsonLol = JSON.parse(lol.cache);
-  if(jsonLol.length >= 3){
+  if (jsonLol.length >= 3) {
     state.lng = jsonLol[0],
-    state.lat = jsonLol[1],
-    state.alt = jsonLol[2]
+      state.lat = jsonLol[1],
+      state.alt = jsonLol[2]
   }
 }
 
@@ -362,34 +360,32 @@ const restoreRange = async (start: any = 0, uint8Array: any) => {
 const getPass = async () => {
   if (!state.sat) { alert('请选择卫星！'); return; };
   setLoading(true)
-  const res = await (await fetch('https://k5.vicicode.cn/api/pass', {
-    method: "POST",
-    mode: "cors",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      sat: state.sat,
-      sat_line_1: state.satData.find(e => e.name == state.sat).path[0],
-      sat_line_2: state.satData.find(e => e.name == state.sat).path[1],
-      lat: state.lat,
-      lng: state.lng,
-      alt: state.alt,
-      tz: Intl.DateTimeFormat().resolvedOptions().timeZone
-    })
-  })).json()
+  // sv-SE（瑞典语）恰好使用：YYYY-MM-DD HH:mm:ss 格式。
+  const timeFormatter = new Intl.DateTimeFormat('sv-SE', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+
+  const res = getPasses(
+    {
+      tle1: state.satData.find(e => e.name == state.sat).path[0],
+      tle2: state.satData.find(e => e.name == state.sat).path[1],
+      latitude: state.lat,
+      longitude: state.lng,
+      heightKm: state.alt / 1000
+    }
+  )
+
   const passOption = []
-  for (let i = 0; i < res.pass_times.length; i++) {
-    try{
-      let _passOption = undefined
-      if((Date.parse(res.departure_times[i]) - Date.parse(res.pass_times[i])) > 0){
-        _passOption = [res.pass_times[i], res.departure_times[i]]
-      }else{
-        _passOption = [res.pass_times[i], res.departure_times[i + 1]]
-      }
-      passOption.push(_passOption)
-    }catch{}
-  }
+  res.map((e: any) => {
+    const _passOption = [timeFormatter.format(e.aos), timeFormatter.format(e.los)];
+    passOption.push(_passOption);
+  })
   if (passOption.length > 0) {
     state.pass = passOption[0][0] + "|" + passOption[0][1]
   } else {
@@ -411,27 +407,21 @@ const writeIt = async () => {
   }
   if (!state.pass) { alert('请选择过境时间！'); return; };
   setLoading(true)
-  const res = await (await fetch('https://k5.vicicode.cn/api/doppler', {
-    method: "POST",
-    mode: "cors",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      sat: state.sat,
-      sat_line_1: state.satData.find(e => e.name == state.sat).path[0],
-      sat_line_2: state.satData.find(e => e.name == state.sat).path[1],
-      lat: state.lat,
-      lng: state.lng,
-      alt: state.alt,
-      tx: state.tx,
-      rx: state.rx,
-      pass_time: state.pass.split('|')[0],
-      departure_time: state.pass.split('|')[1],
-      tz: Intl.DateTimeFormat().resolvedOptions().timeZone
+
+  const res = {
+    shift_array: getDopplerShifts({
+      tle1: state.satData.find(e => e.name == state.sat).path[0],
+      tle2: state.satData.find(e => e.name == state.sat).path[1],
+      latitude: state.lat,
+      longitude: state.lng,
+      heightKm: state.alt / 1000,
+      downlinkHz: state.rx,
+      uplinkHz: state.tx,
+      startTime: new Date(state.pass.split('|')[0].replace(' ', 'T')),
+      endTime: new Date(state.pass.split('|')[1].replace(' ', 'T')),
     })
-  })).json()
-  
+  }
+
   const sat = state.sat
   const pass = state.pass.split('|')[0]
   const pass_year = pass.split('-')[0].substring(2, 4)
@@ -449,7 +439,7 @@ const writeIt = async () => {
   const departure_sec = departure.split(' ')[1].split(':')[2]
   // console.log(sat.trim(), new Date(pass), pass_year, pass_month, pass_day, pass_hour, pass_min, pass_sec)
   // console.log(sat.trim(), new Date(departure), departure_year, departure_month, departure_day, departure_hour, departure_min, departure_sec)
-  
+
   await eeprom_init(appStore.connectPort);
   // 卫星名称
   let payload = new Uint8Array(10)
@@ -474,12 +464,12 @@ const writeIt = async () => {
   await eeprom_write(appStore.connectPort, 0x2BB6, payload, 0x02, appStore.configuration?.uart);
   // 手台的发射接收亚音
   payload = new Uint8Array(2)
-  if(state.txTone && state.txTone > 0){
+  if (state.txTone && state.txTone > 0) {
     payload.set(hexReverseStringToUint8Array(parseInt((state.txTone * 10).toFixed(0)).toString(16)).subarray(0, 0x02))
   }
   await eeprom_write(appStore.connectPort, 0x2BB8, payload, 0x02, appStore.configuration?.uart);
   payload = new Uint8Array(2)
-  if(state.rxTone && state.rxTone > 0){
+  if (state.rxTone && state.rxTone > 0) {
     payload.set(hexReverseStringToUint8Array(parseInt((state.rxTone * 10).toFixed(0)).toString(16)).subarray(0, 0x02))
   }
   await eeprom_write(appStore.connectPort, 0x2BBA, payload, 0x02, appStore.configuration?.uart);
@@ -489,7 +479,7 @@ const writeIt = async () => {
   await eeprom_write(appStore.connectPort, 0x2BBC, payload, 0x04, appStore.configuration?.uart);
 
   const shift_arr: any = []
-  res.shift_array.filter((num: any, index: any) => index % 2 === 0).map((e: any)=>{
+  res.shift_array.filter((num: any, index: any) => index % 2 === 0).map((e: any) => {
     const _tx = new Uint8Array(4)
     const _rx = new Uint8Array(4)
     _tx.set(hexReverseStringToUint8Array(parseInt(((state.tx * 1000000 + e[0]) / 10).toFixed(0)).toString(16)))
@@ -505,17 +495,17 @@ const writeIt = async () => {
 }
 
 const isValidURL = (url: string) => {
-    const pattern = new RegExp('^(https?:\\/\\/)?' + // 协议 (http 或 https)
-        '((([a-zA-Z\\d]([a-zA-Z\\d-]*[a-zA-Z\\d])*)\\.)+[a-zA-Z]{2,}|' + // 域名
-        '((\\d{1,3}\\.){3}\\d{1,3}))' + // 或者 IP 地址 (IPv4)
-        '(\\:\\d+)?(\\/[-a-zA-Z\\d%_.~+]*)*' + // 端口号和路径
-        '(\\?[;&a-zA-Z\\d%_.~+=-]*)?' + // 查询字符串
-        '(\\#[-a-zA-Z\\d_]*)?$', 'i'); // 锚点
-    return !!pattern.test(url);
+  const pattern = new RegExp('^(https?:\\/\\/)?' + // 协议 (http 或 https)
+    '((([a-zA-Z\\d]([a-zA-Z\\d-]*[a-zA-Z\\d])*)\\.)+[a-zA-Z]{2,}|' + // 域名
+    '((\\d{1,3}\\.){3}\\d{1,3}))' + // 或者 IP 地址 (IPv4)
+    '(\\:\\d+)?(\\/[-a-zA-Z\\d%_.~+]*)*' + // 端口号和路径
+    '(\\?[;&a-zA-Z\\d%_.~+=-]*)?' + // 查询字符串
+    '(\\#[-a-zA-Z\\d_]*)?$', 'i'); // 锚点
+  return !!pattern.test(url);
 }
 
 const addSelfSat = async () => {
-  if(isValidURL(state.selfSatInfo)){
+  if (isValidURL(state.selfSatInfo)) {
     state.selfSatInfo = await (await fetch(state.selfSatInfo)).text()
   }
   const lines = (state.selfSatInfo + "\n").split(/\r?\n/);
@@ -593,4 +583,5 @@ export default {
       }
     }
   }
-}</style>
+}
+</style>
