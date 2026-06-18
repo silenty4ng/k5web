@@ -14,6 +14,11 @@ export default mergeConfig(
     ],
     build: {
       rollupOptions: {
+        // externalize virtual wasm runtime imports used by satellite.js
+        // to avoid Rollup trying to resolve them during build.
+        external(id) {
+          return typeof id === 'string' && id.startsWith('#wasm');
+        },
         output: {
           manualChunks(id) {
             if (id.includes("node_modules")) {
