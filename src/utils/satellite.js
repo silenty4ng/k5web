@@ -100,6 +100,12 @@ export function getDopplerShift({
             receiveHz: rxFreq,
             shiftHz: rxFreq - downlinkHz
         };
+    }else{
+        result.downlink = {
+            nominalHz: 0,
+            receiveHz: 0,
+            shiftHz: 0
+        };
     }
 
     // 上行：地面 -> 卫星
@@ -111,6 +117,12 @@ export function getDopplerShift({
             nominalHz: uplinkHz,
             transmitHz: txFreq,
             shiftHz: txFreq - uplinkHz
+        };
+    }else{
+        result.uplink = {
+            nominalHz: 0,
+            transmitHz: 0,
+            shiftHz: 0
         };
     }
 
