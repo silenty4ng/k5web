@@ -9,3 +9,12 @@ dist
 dist-ssr
 *.local
 out
+
+
+# Node / Vite
+.node-v24.19.0-win-x64/
+node_modules/
+dist/
+*.local
+.npm-cache/
+.node-global/
