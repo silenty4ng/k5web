@@ -5,9 +5,7 @@
         {{ $t("sat.selfSatInfo") }}
       </template>
       <div>
-        <a-textarea v-model="state.selfSatInfo" style="height: 120px;" placeholder="ISS (ZARYA)             
-  1 25544U 98067A   24320.36274227  .00015569  00000+0  28188-3 0  9999
-  2 25544  51.6413 286.4173 0007936 217.3657 298.3197 15.49809951481990" />
+        <a-textarea v-model="state.selfSatInfo" style="height: 120px;" placeholder="支持 TLE 或 OMM JSON&#10;&#10;ISS (ZARYA)&#10;  1 25544U 98067A   24320.36274227  .00015569  00000+0  28188-3 0  9999&#10;  2 25544  51.6413 286.4173 0007936 217.3657 298.3197 15.49809951481990" />
       </div>
     </a-modal>
     <a-modal v-model:visible="state.visible" @ok="handleOk" :ok-text="$t('tool.scaned')">
@@ -73,6 +71,7 @@ import useLoading from '@/hooks/loading';
 import QRCode from 'qrcode';
 import { Input, Select } from 'tdesign-vue-next';
 import { Message } from '@arco-design/web-vue';
+import { parseGpJson, parseSelfSatInput, ommToTle } from '@/utils/satellite.js';
 
 // Must match ESP32 mapping in src/app/driver/eeprom.cpp
 // EEPROM 0x1E200..0x20000 -> shared offset 0x10000..
@@ -377,14 +376,37 @@ const syncTime = async () => {
 
 const changeSat = async (sat: any) => {
   const data = state.satData.find(e => e.name == sat);
-  if (data && data.path) {
+  if (!data) {
+    nextTick(() => {
+      const textarea = document?.getElementById('statusArea');
+      if (textarea) textarea.scrollTop = textarea?.scrollHeight;
+    })
+    return
+  }
+  // 设备固件按经典 69 字节 TLE 存星历；CelesTrak OMM 在写入前才还原
+  let line: string[] | undefined
+  if (data.omm) {
+    line = ommToTle(data.omm)
+  } else if (data.tle1 && data.tle2) {
+    line = [data.tle1, data.tle2]
+  } else if (data.path?.length >= 2) {
+    line = data.path
+  }
+  if (line) {
     state.status += '<br/>卫星参数：<br/>'
-    data.path.map((e: string) => {
+    line.map((e: string) => {
       state.status += e + '<br/>'
     })
+    const noradNum = data.omm ? Number(data.omm.NORAD_CAT_ID) : 0
+    if (noradNum >= 100000) {
+      state.status += `<span style="color: rgb(var(--orange-6))">注意：NORAD ${noradNum} 已超过经典 TLE 5 位编号，写入设备的编号为后 5 位（${String(noradNum).slice(-5)}）。轨道根数仍可用。</span><br/>`
+    }
     let freqFlag = false
+    const noradId = data.omm
+      ? String(data.omm.NORAD_CAT_ID)
+      : (line[1]?.split(' ')[1] || '').trim()
     state.freqDb.map((e: any) => {
-      if (data.path[1].split(" ")[1] == e.norad_id && e.mode.indexOf('FM') != -1) {
+      if (noradId && noradId == e.norad_id && e.mode.indexOf('FM') != -1) {
         console.log(e)
         freqFlag = true
         state.tx = e.uplink ? parseFloat(e.uplink.split('/')[0]) : 0
@@ -402,7 +424,7 @@ const changeSat = async (sat: any) => {
     }
     state.satsData.push({
       "satName": sat,
-      "line": data.path,
+      "line": line,
       "txFreq": state.tx,
       "txTone": state.txTone,
       "rxFreq": state.rx,
@@ -419,28 +441,17 @@ const changeSat = async (sat: any) => {
 const initSat = async () => {
   setLoading(true)
   let rst = ''
-  if (sessionStorage.getItem('satRst')) {
-    rst = sessionStorage.getItem('satRst') || ""
+  // 旧键 satRst 是 TLE；FORMAT=json 的 OMM 数组可直接给 json2satrec
+  if (sessionStorage.getItem('satGpJson')) {
+    rst = sessionStorage.getItem('satGpJson') || ""
   } else {
-    rst = await (await fetch('https://celestrak.org/NORAD/elements/gp.php?GROUP=amateur&FORMAT=tle')).text()
-    sessionStorage.setItem('satRst', rst)
+    rst = await (await fetch('https://celestrak.org/NORAD/elements/gp.php?GROUP=amateur&FORMAT=json')).text()
+    sessionStorage.setItem('satGpJson', rst)
   }
-  const lines = rst.split(/\r?\n/);
-  const sat = [];
-  let _sat: any = {};
-  for (let i = 0; i < lines.length; i++) {
-    if (Number.isNaN(parseInt(lines[i].substring(0, 1)))) {
-      if (_sat.name && _sat.name != '') {
-        sat.push(_sat)
-        _sat = {}
-      }
-      _sat.name = lines[i]
-    } else {
-      if (!_sat.path) { _sat.path = [] }
-      _sat.path.push(lines[i])
-    }
-  }
-  state.satData = sat
+  state.satData = parseGpJson(rst).map((omm: any) => ({
+    name: omm.OBJECT_NAME,
+    omm,
+  }))
   setLoading(false)
 }
 initSat()
@@ -606,20 +617,10 @@ const addSelfSat = async () => {
   if (isValidURL(state.selfSatInfo)) {
     state.selfSatInfo = await (await fetch(state.selfSatInfo)).text()
   }
-  const lines = (state.selfSatInfo + "\n").split(/\r?\n/);
-  const sat = [];
-  let _sat: any = {};
-  for (let i = 0; i < lines.length; i++) {
-    if (Number.isNaN(parseInt(lines[i].substring(0, 1)))) {
-      if (_sat.name && _sat.name != '') {
-        sat.push(_sat)
-        _sat = {}
-      }
-      _sat.name = lines[i]
-    } else {
-      if (!_sat.path) { _sat.path = [] }
-      _sat.path.push(lines[i])
-    }
+  const sat = parseSelfSatInput(state.selfSatInfo)
+  if (sat.length === 0) {
+    alert('未识别到卫星数据，请粘贴 TLE 或 OMM JSON')
+    return
   }
   state.satData = sat.concat(state.satData)
   state.selfSatInfo = ''
