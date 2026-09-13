@@ -95,12 +95,5 @@
   },
   "overrides": {
     "@electron/node-gyp": "10.2.0-electron.1"
-  },
-  "allowScripts": {
-    "electron@28.3.3": true,
-    "sharp@0.33.5": true,
-    "esbuild@0.15.18": true,
-    "vue-demi@0.14.10": true,
-    "electron-winstaller@5.4.0": true
   }
 }

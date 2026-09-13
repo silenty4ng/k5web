@@ -86,8 +86,8 @@ https://celestrak.org/NORAD/elements/gp.php?CATNR=25544&FORMAT=json
 
 TLE 例：
 ISS (ZARYA)
-  1 25544U 98067A   24320.36274227  .00015569  00000+0  28188-3 0  9999
-  2 25544  51.6413 286.4173 0007936 217.3657 298.3197 15.49809951481990
+1 25544U 98067A   24320.36274227  .00015569  00000+0  28188-3 0  9999
+2 25544  51.6413 286.4173 0007936 217.3657 298.3197 15.49809951481990
 
 OMM JSON 例：
 {"OBJECT_NAME":"ISS (ZARYA)","OBJECT_ID":"1998-067A","EPOCH":"2026-09-13T04:12:47.894976","MEAN_MOTION":15.49096932,"ECCENTRICITY":0.00049173,"INCLINATION":51.6307,"RA_OF_ASC_NODE":224.6171,"ARG_OF_PERICENTER":134.673,"MEAN_ANOMALY":225.4659,"EPHEMERIS_TYPE":0,"CLASSIFICATION_TYPE":"U","NORAD_CAT_ID":25544,"ELEMENT_SET_NO":999,"REV_AT_EPOCH":58539,"BSTAR":9.6694874e-5,"MEAN_MOTION_DOT":4.898e-5,"MEAN_MOTION_DDOT":0}`
@@ -453,19 +453,22 @@ const changeSat = async (sat: any) => {
 
 const initSat = async () => {
   setLoading(true)
-  let rst = ''
-  // 旧键 satRst 是 TLE；FORMAT=json 的 OMM 数组可直接给 json2satrec
-  if (sessionStorage.getItem('satGpJson')) {
-    rst = sessionStorage.getItem('satGpJson') || ""
-  } else {
-    rst = await (await fetch('https://celestrak.org/NORAD/elements/gp.php?GROUP=amateur&FORMAT=json')).text()
-    sessionStorage.setItem('satGpJson', rst)
+  try {
+    let rst = ''
+    // 旧键 satRst 是 TLE；FORMAT=json 的 OMM 数组可直接给 json2satrec
+    if (sessionStorage.getItem('satGpJson')) {
+      rst = sessionStorage.getItem('satGpJson') || ""
+    } else {
+      rst = await (await fetch('https://celestrak.org/NORAD/elements/gp.php?GROUP=amateur&FORMAT=json')).text()
+      sessionStorage.setItem('satGpJson', rst)
+    }
+    state.satData = parseGpJson(rst).map((omm: any) => ({
+      name: omm.OBJECT_NAME,
+      omm,
+    }))
+  } finally {
+    setLoading(false)
   }
-  state.satData = parseGpJson(rst).map((omm: any) => ({
-    name: omm.OBJECT_NAME,
-    omm,
-  }))
-  setLoading(false)
 }
 initSat()
 

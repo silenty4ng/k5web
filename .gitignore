@@ -3,18 +3,11 @@ node_modules
 dist
 dist-ssr
 *.local
-node_modules
-.DS_Store
-dist
-dist-ssr
-*.local
 out
 
-
-# Node / Vite
+# 本地 Node 环境（项目级，勿提交）
 .node-v24.19.0-win-x64/
-node_modules/
-dist/
-*.local
-.npm-cache/
 .node-global/
+.npm-cache/
+.node-corepack/
+.xdg-cache/
