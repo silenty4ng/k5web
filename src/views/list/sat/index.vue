@@ -97,7 +97,7 @@
             <a-divider />
             <div id="statusArea"
               style="height: 20em; background-color: var(--color-bg-3); color: var(--color-text-3); overflow: auto; padding: 20px; white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px;"
-              v-html="state.status"></div>
+              v-html="safeStatus"></div>
           </a-spin>
         </a-card>
       </a-col>
@@ -106,14 +106,21 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, nextTick, onMounted, onUnmounted } from 'vue';
+import { ref, reactive, nextTick, onMounted, onUnmounted, computed } from 'vue';
 import { useAppStore } from '@/store';
 import { eeprom_write, eeprom_reboot, eeprom_init, hexReverseStringToUint8Array, stringToUint8Array } from '@/utils/serial.js';
 import useLoading from '@/hooks/loading';
 import QRCode from 'qrcode';
+import DOMPurify from 'dompurify';
 import { getPasses, getDopplerShifts, parseGpJson, parseSelfSatInput, toSatrec } from '@/utils/satellite.js';
 
 const { loading, setLoading } = useLoading(true);
+
+// 用户可粘贴任意 OMM/TLE，状态区若用 v-html 必须先消毒，避免 XSS
+const safeStatus = computed(() => DOMPurify.sanitize(state.status, {
+  ALLOWED_TAGS: ['br'],
+  ALLOWED_ATTR: [],
+}))
 
 const selfSatPlaceholder = `粘贴 TLE / OMM JSON，或星历文件 URL
 

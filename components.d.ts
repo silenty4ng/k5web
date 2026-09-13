@@ -19,7 +19,6 @@ declare module 'vue' {
     TabBar: typeof import('./src/components/tab-bar/index.vue')['default']
     TabItem: typeof import('./src/components/tab-bar/tab-item.vue')['default']
     TButton: typeof import('tdesign-vue-next')['Button']
-    TCard: typeof import('tdesign-vue-next')['Card']
     TConfigProvider: typeof import('tdesign-vue-next')['ConfigProvider']
     TDialog: typeof import('tdesign-vue-next')['Dialog']
     TForm: typeof import('tdesign-vue-next')['Form']

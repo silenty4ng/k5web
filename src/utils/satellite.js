@@ -8,12 +8,31 @@ function parseGpNumber(v) {
     return Number.isFinite(n) ? n : 0;
 }
 
+// json2satrec / 轨道计算所需最小字段；仅有名称和历元不够
+const OMM_REQUIRED_KEYS = [
+    'EPOCH',
+    'MEAN_MOTION',
+    'ECCENTRICITY',
+    'INCLINATION',
+    'RA_OF_ASC_NODE',
+    'ARG_OF_PERICENTER',
+    'MEAN_ANOMALY',
+];
+
+export function isUsableOmm(omm) {
+    if (!omm || typeof omm !== 'object') return false;
+    return OMM_REQUIRED_KEYS.every((k) => {
+        const v = omm[k];
+        return v !== null && v !== undefined && v !== '';
+    });
+}
+
 export function parseGpJson(text) {
     // 接口被限流/返回 HTML 错误页、或缓存被写坏时不应抛出异常，否则调用方会卡在 loading
     try {
         const data = JSON.parse(text);
         if (!Array.isArray(data)) return [];
-        return data.filter(e => e && e.OBJECT_NAME && e.EPOCH);
+        return data.filter((e) => e && e.OBJECT_NAME && isUsableOmm(e));
     } catch {
         return [];
     }
@@ -33,7 +52,7 @@ export function parseSelfSatInput(text) {
             const data = JSON.parse(raw);
             const arr = Array.isArray(data) ? data : [data];
             return arr
-                .filter((e) => e && e.OBJECT_NAME && e.EPOCH)
+                .filter((e) => e && e.OBJECT_NAME && isUsableOmm(e))
                 .map((omm) => ({ name: String(omm.OBJECT_NAME).trim(), omm }));
         } catch {
             return [];
@@ -62,11 +81,27 @@ export function parseSelfSatInput(text) {
     return sat;
 }
 
-/** 由 OMM 或 TLE 生成 satrec，供过境/多普勒计算 */
+function isValidSatrec(satrec) {
+    return !!(satrec && Number.isFinite(satrec.no) && Number.isFinite(satrec.ecco) && Number.isFinite(satrec.inclo));
+}
+
+/** 由 OMM 或 TLE 生成 satrec，供过境/多普勒计算。失败返回 null，不抛异常。 */
 export function toSatrec(item) {
     if (!item) return null;
-    if (item.omm) return satellite.json2satrec(item.omm);
-    if (item.tle1 && item.tle2) return satellite.twoline2satrec(item.tle1, item.tle2);
+    try {
+        if (item.omm) {
+            if (!isUsableOmm(item.omm)) return null;
+            const satrec = satellite.json2satrec(item.omm);
+            return isValidSatrec(satrec) ? satrec : null;
+        }
+        if (item.tle1 && item.tle2) {
+            // twoline2satrec 对垃圾输入不抛错，而是返回含 NaN 的 satrec
+            const satrec = satellite.twoline2satrec(item.tle1, item.tle2);
+            return isValidSatrec(satrec) ? satrec : null;
+        }
+    } catch {
+        return null;
+    }
     return null;
 }
 
@@ -170,6 +205,7 @@ function toTleIntl(objectId) {
  * 轨道根数本身不受影响；完整编号请用 OMM 的 NORAD_CAT_ID。
  */
 export function ommToTle(omm) {
+    if (!isUsableOmm(omm)) return null;
     const norad = Number(omm.NORAD_CAT_ID ?? 0);
     const satnum = String(norad).padStart(5, '0').slice(-5);
     const cls = (omm.CLASSIFICATION_TYPE || 'U')[0];

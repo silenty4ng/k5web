@@ -55,7 +55,7 @@
             <a-divider />
             <div id="statusArea"
               style="height: 20em; background-color: var(--color-bg-3); color: var(--color-text-3); overflow: auto; padding: 20px; white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px;"
-              v-html="state.status"></div>
+              v-html="safeStatus"></div>
           </a-spin>
         </a-card>
       </a-col>
@@ -71,6 +71,7 @@ import useLoading from '@/hooks/loading';
 import QRCode from 'qrcode';
 import { Input, Select } from 'tdesign-vue-next';
 import { Message } from '@arco-design/web-vue';
+import DOMPurify from 'dompurify';
 import { parseGpJson, parseSelfSatInput, ommToTle } from '@/utils/satellite.js';
 
 // Must match ESP32 mapping in src/app/driver/eeprom.cpp
@@ -78,6 +79,12 @@ import { parseGpJson, parseSelfSatInput, ommToTle } from '@/utils/satellite.js';
 const UVE5_SHARED_TLE_BASE = 0x10000;
 
 const { loading, setLoading } = useLoading(true);
+
+// 用户可粘贴任意 OMM/TLE，状态区若用 v-html 必须先消毒，避免 XSS
+const safeStatus = computed(() => DOMPurify.sanitize(state.status, {
+  ALLOWED_TAGS: ['br', 'span'],
+  ALLOWED_ATTR: ['class'],
+}))
 
 const selfSatPlaceholder = `粘贴 TLE / OMM JSON，或星历文件 URL
 
@@ -399,11 +406,19 @@ const changeSat = async (sat: any) => {
   // 设备固件按经典 69 字节 TLE 存星历；CelesTrak OMM 在写入前才还原
   let line: string[] | undefined
   if (data.omm) {
-    line = ommToTle(data.omm)
+    line = ommToTle(data.omm) || undefined
   } else if (data.tle1 && data.tle2) {
     line = [data.tle1, data.tle2]
   } else if (data.path?.length >= 2) {
     line = data.path
+  }
+  if (!line) {
+    state.status += '<br/>该卫星星历不完整，无法还原为 TLE，请重新选择或粘贴完整 OMM/TLE<br/>'
+    nextTick(() => {
+      const textarea = document?.getElementById('statusArea');
+      if (textarea) textarea.scrollTop = textarea?.scrollHeight;
+    })
+    return
   }
   if (line) {
     state.status += '<br/>卫星参数：<br/>'
@@ -412,7 +427,7 @@ const changeSat = async (sat: any) => {
     })
     const noradNum = data.omm ? Number(data.omm.NORAD_CAT_ID) : 0
     if (noradNum >= 100000) {
-      state.status += `<span style="color: rgb(var(--orange-6))">注意：NORAD ${noradNum} 已超过经典 TLE 5 位编号，写入设备的编号为后 5 位（${String(noradNum).slice(-5)}）。轨道根数仍可用。</span><br/>`
+      state.status += `<span class="sat-warn">注意：NORAD ${noradNum} 已超过经典 TLE 5 位编号，写入设备的编号为后 5 位（${String(noradNum).slice(-5)}）。轨道根数仍可用。</span><br/>`
     }
     let freqFlag = false
     const noradId = data.omm
@@ -679,6 +694,10 @@ export default {
 
 :deep(.arco-list-item) {
   width: 33%;
+}
+
+#statusArea :deep(.sat-warn) {
+  color: rgb(var(--orange-6));
 }
 
 :deep(.block-title) {
