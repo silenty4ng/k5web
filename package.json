@@ -63,6 +63,7 @@
     "@vitejs/plugin-vue": "^3.2.0",
     "@vitejs/plugin-vue-jsx": "^2.1.1",
     "@vue/babel-plugin-jsx": "^1.5.0",
+    "baseline-browser-mapping": "^2.11.22",
     "consola": "^2.15.3",
     "cross-env": "^7.0.3",
     "electron": "^28.3.3",
@@ -91,5 +92,8 @@
     "bin-wrapper": "npm:bin-wrapper-china",
     "rollup": "^2.56.3",
     "gifsicle": "5.2.0"
+  },
+  "overrides": {
+    "@electron/node-gyp": "10.2.0-electron.1"
   }
 }
