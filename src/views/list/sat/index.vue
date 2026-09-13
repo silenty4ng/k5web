@@ -96,8 +96,7 @@
             </a-form-item>
             <a-divider />
             <div id="statusArea"
-              style="height: 20em; background-color: var(--color-bg-3); color: var(--color-text-3); overflow: auto; padding: 20px; white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px;"
-              v-html="safeStatus"></div>
+              style="height: 20em; background-color: var(--color-bg-3); color: var(--color-text-3); overflow: auto; padding: 20px; white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px;">{{ state.status }}<div v-for="(w, i) in state.warnings" :key="i" class="sat-warn">{{ w }}</div></div>
           </a-spin>
         </a-card>
       </a-col>
@@ -106,21 +105,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, nextTick, onMounted, onUnmounted, computed } from 'vue';
+import { ref, reactive, nextTick, onMounted, onUnmounted } from 'vue';
 import { useAppStore } from '@/store';
 import { eeprom_write, eeprom_reboot, eeprom_init, hexReverseStringToUint8Array, stringToUint8Array } from '@/utils/serial.js';
 import useLoading from '@/hooks/loading';
 import QRCode from 'qrcode';
-import DOMPurify from 'dompurify';
 import { getPasses, getDopplerShifts, parseGpJson, parseSelfSatInput, toSatrec } from '@/utils/satellite.js';
 
 const { loading, setLoading } = useLoading(true);
-
-// 用户可粘贴任意 OMM/TLE，状态区若用 v-html 必须先消毒，避免 XSS
-const safeStatus = computed(() => DOMPurify.sanitize(state.status, {
-  ALLOWED_TAGS: ['br'],
-  ALLOWED_ATTR: [],
-}))
 
 const selfSatPlaceholder = `粘贴 TLE / OMM JSON，或星历文件 URL
 
@@ -146,6 +138,7 @@ const state: {
   qrcode: string,
   showHide: number,
   status: string,
+  warnings: string[],
   sat: string,
   satData: any[],
   lng: number,
@@ -171,7 +164,8 @@ const state: {
   qrcode: '',
   visible: false,
   showHide: 0,
-  status: "点击写入按钮写入卫星数据到设备<br/><br/>",
+  status: "点击写入按钮写入卫星数据到设备\n\n",
+  warnings: [],
   sat: '',
   satData: [],
   lng: 0,
@@ -261,15 +255,15 @@ const syncTime = async () => {
 const changeSat = async (sat: any) => {
   const data = state.satData.find(e => e.name == sat);
   if (data && (data.omm || data.tle1)) {
-    state.status += '<br/>卫星参数：<br/>'
+    state.status += '\n卫星参数：\n'
     if (data.omm) {
-      state.status += `${data.omm.OBJECT_NAME} | NORAD ${data.omm.NORAD_CAT_ID}<br/>`
-      state.status += `历元 ${data.omm.EPOCH}<br/>`
-      state.status += `倾角 ${data.omm.INCLINATION}° | 偏心率 ${data.omm.ECCENTRICITY}<br/>`
-      state.status += `平均运动 ${data.omm.MEAN_MOTION} rev/day<br/>`
+      state.status += `${data.omm.OBJECT_NAME} | NORAD ${data.omm.NORAD_CAT_ID}\n`
+      state.status += `历元 ${data.omm.EPOCH}\n`
+      state.status += `倾角 ${data.omm.INCLINATION}° | 偏心率 ${data.omm.ECCENTRICITY}\n`
+      state.status += `平均运动 ${data.omm.MEAN_MOTION} rev/day\n`
     } else if (data.tle1) {
-      state.status += data.tle1 + '<br/>'
-      state.status += data.tle2 + '<br/>'
+      state.status += data.tle1 + '\n'
+      state.status += data.tle2 + '\n'
     }
     let freqFlag = false
     const noradId = data.omm
@@ -367,13 +361,13 @@ const restoreRange = async (start: any = 0, uint8Array: any) => {
   await eeprom_init(appStore.connectPort);
   for (let i = start; i < uint8Array.length + start; i += 0x40) {
     await eeprom_write(appStore.connectPort, i, uint8Array.slice(i - start, i - start + 0x40), 0x40, appStore.configuration?.uart);
-    state.status = state.status + "写入进度：" + (((i - start) / uint8Array.length) * 100).toFixed(1) + "%<br/>";
+    state.status = state.status + "写入进度：" + (((i - start) / uint8Array.length) * 100).toFixed(1) + "%\n";
     nextTick(() => {
       const textarea = document?.getElementById('statusArea');
       if (textarea) textarea.scrollTop = textarea?.scrollHeight;
     })
   }
-  state.status = state.status + "写入进度：100.0%<br/>";
+  state.status = state.status + "写入进度：100.0%\n";
 }
 
 const getPass = async () => {
