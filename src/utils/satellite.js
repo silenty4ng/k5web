@@ -9,9 +9,14 @@ function parseGpNumber(v) {
 }
 
 export function parseGpJson(text) {
-    const data = JSON.parse(text);
-    if (!Array.isArray(data)) return [];
-    return data.filter(e => e && e.OBJECT_NAME && e.EPOCH);
+    // 接口被限流/返回 HTML 错误页、或缓存被写坏时不应抛出异常，否则调用方会卡在 loading
+    try {
+        const data = JSON.parse(text);
+        if (!Array.isArray(data)) return [];
+        return data.filter(e => e && e.OBJECT_NAME && e.EPOCH);
+    } catch {
+        return [];
+    }
 }
 
 /**
@@ -43,9 +48,9 @@ export function parseSelfSatInput(text) {
         if (Number.isNaN(parseInt(lines[i].substring(0, 1)))) {
             if (_sat.name && _sat.name != '' && _sat.path?.length >= 2) {
                 sat.push({ name: _sat.name, tle1: _sat.path[0], tle2: _sat.path[1] });
-                _sat = {};
             }
-            _sat.name = lines[i];
+            // 无论上一颗是否完整都重置，避免残缺 TLE 与下一颗卫星的行串在一起
+            _sat = { name: lines[i] };
         } else {
             if (!_sat.path) { _sat.path = []; }
             _sat.path.push(lines[i]);
@@ -88,7 +93,7 @@ function isoToTleEpoch(iso) {
     // "2026-09-12T23:49:09.869376" -> "26255.99247534"
     const m = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(\.\d+)?/);
     if (!m) return '00001.00000000';
-    const year = +m[1];
+    let year = +m[1];
     const month = +m[2];
     const day = +m[3];
     const secOfDay = (+m[4]) * 3600 + (+m[5]) * 60 + parseFloat(m[6] + (m[7] || ''));
@@ -96,8 +101,16 @@ function isoToTleEpoch(iso) {
     let doy = day;
     for (let i = 0; i < month - 1; i++) doy += mdays[i];
     const frac = secOfDay / 86400;
-    const epochDay = (doy + frac).toFixed(8);
-    const [ip, fp] = epochDay.split('.');
+    const daysInYear = mdays.reduce((a, b) => a + b, 0);
+    let epochDay = doy + frac;
+    let epochStr = epochDay.toFixed(8);
+    // 年末最后一刻四舍五入可能进位成不存在的 366/367 日，需要归一化到次年 001 日
+    if (Number(epochStr) >= daysInYear + 1) {
+        epochDay -= daysInYear;
+        year += 1;
+        epochStr = epochDay.toFixed(8);
+    }
+    const [ip, fp] = epochStr.split('.');
     return String(year % 100).padStart(2, '0') + ip.padStart(3, '0') + '.' + fp;
 }
 

@@ -294,19 +294,22 @@ const changeSat = async (sat: any) => {
 
 const initSat = async () => {
   setLoading(true)
-  let rst = ''
-  // 旧键 satRst 是 TLE；FORMAT=json 的 OMM 数组可直接给 json2satrec
-  if (sessionStorage.getItem('satGpJson')) {
-    rst = sessionStorage.getItem('satGpJson') || ""
-  } else {
-    rst = await (await fetch('https://celestrak.org/NORAD/elements/gp.php?GROUP=amateur&FORMAT=json')).text()
-    sessionStorage.setItem('satGpJson', rst)
+  try {
+    let rst = ''
+    // 旧键 satRst 是 TLE；FORMAT=json 的 OMM 数组可直接给 json2satrec
+    if (sessionStorage.getItem('satGpJson')) {
+      rst = sessionStorage.getItem('satGpJson') || ""
+    } else {
+      rst = await (await fetch('https://celestrak.org/NORAD/elements/gp.php?GROUP=amateur&FORMAT=json')).text()
+      sessionStorage.setItem('satGpJson', rst)
+    }
+    state.satData = parseGpJson(rst).map((omm: any) => ({
+      name: omm.OBJECT_NAME,
+      omm,
+    }))
+  } finally {
+    setLoading(false)
   }
-  state.satData = parseGpJson(rst).map((omm: any) => ({
-    name: omm.OBJECT_NAME,
-    omm,
-  }))
-  setLoading(false)
 }
 initSat()
 const getLocation = async () => {
