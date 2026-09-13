@@ -54,8 +54,7 @@
             </a-form-item>
             <a-divider />
             <div id="statusArea"
-              style="height: 20em; background-color: var(--color-bg-3); color: var(--color-text-3); overflow: auto; padding: 20px; white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px;"
-              v-html="safeStatus"></div>
+              style="height: 20em; background-color: var(--color-bg-3); color: var(--color-text-3); overflow: auto; padding: 20px; white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px;">{{ state.status }}<div v-for="(w, i) in state.warnings" :key="i" class="sat-warn">{{ w }}</div></div>
           </a-spin>
         </a-card>
       </a-col>
@@ -71,7 +70,6 @@ import useLoading from '@/hooks/loading';
 import QRCode from 'qrcode';
 import { Input, Select } from 'tdesign-vue-next';
 import { Message } from '@arco-design/web-vue';
-import DOMPurify from 'dompurify';
 import { parseGpJson, parseSelfSatInput, ommToTle } from '@/utils/satellite.js';
 
 // Must match ESP32 mapping in src/app/driver/eeprom.cpp
@@ -79,12 +77,6 @@ import { parseGpJson, parseSelfSatInput, ommToTle } from '@/utils/satellite.js';
 const UVE5_SHARED_TLE_BASE = 0x10000;
 
 const { loading, setLoading } = useLoading(true);
-
-// 用户可粘贴任意 OMM/TLE，状态区若用 v-html 必须先消毒，避免 XSS
-const safeStatus = computed(() => DOMPurify.sanitize(state.status, {
-  ALLOWED_TAGS: ['br', 'span'],
-  ALLOWED_ATTR: ['class'],
-}))
 
 const selfSatPlaceholder = `粘贴 TLE / OMM JSON，或星历文件 URL
 
@@ -110,6 +102,7 @@ const state: {
   qrcode: string,
   showHide: number,
   status: string,
+  warnings: string[],
   sat: string,
   satData: any[],
   lng: number,
@@ -136,7 +129,8 @@ const state: {
   qrcode: '',
   visible: false,
   showHide: 0,
-  status: "点击写入按钮写入卫星数据到设备<br/><br/>",
+  status: "点击写入按钮写入卫星数据到设备\n\n",
+  warnings: [],
   sat: '',
   satData: [],
   lng: 0,
@@ -413,7 +407,7 @@ const changeSat = async (sat: any) => {
     line = data.path
   }
   if (!line) {
-    state.status += '<br/>该卫星星历不完整，无法还原为 TLE，请重新选择或粘贴完整 OMM/TLE<br/>'
+    state.status += '\n该卫星星历不完整，无法还原为 TLE，请重新选择或粘贴完整 OMM/TLE\n'
     nextTick(() => {
       const textarea = document?.getElementById('statusArea');
       if (textarea) textarea.scrollTop = textarea?.scrollHeight;
@@ -421,13 +415,13 @@ const changeSat = async (sat: any) => {
     return
   }
   if (line) {
-    state.status += '<br/>卫星参数：<br/>'
+    state.status += '\n卫星参数：\n'
     line.map((e: string) => {
-      state.status += e + '<br/>'
+      state.status += e + '\n'
     })
     const noradNum = data.omm ? Number(data.omm.NORAD_CAT_ID) : 0
     if (noradNum >= 100000) {
-      state.status += `<span class="sat-warn">注意：NORAD ${noradNum} 已超过经典 TLE 5 位编号，写入设备的编号为后 5 位（${String(noradNum).slice(-5)}）。轨道根数仍可用。</span><br/>`
+      state.warnings.push(`注意：NORAD ${noradNum} 已超过经典 TLE 5 位编号，写入设备的编号为后 5 位（${String(noradNum).slice(-5)}）。轨道根数仍可用。`)
     }
     let freqFlag = false
     const noradId = data.omm
@@ -511,13 +505,13 @@ const restoreRange = async (start: any = 0, uint8Array: any) => {
   await eeprom_init(appStore.connectPort);
   for (let i = start; i < uint8Array.length + start; i += 0x40) {
     await eeprom_write(appStore.connectPort, i, uint8Array.slice(i - start, i - start + 0x40), 0x40, appStore.configuration?.uart);
-    state.status = state.status + "写入进度：" + (((i - start) / uint8Array.length) * 100).toFixed(1) + "%<br/>";
+    state.status = state.status + "写入进度：" + (((i - start) / uint8Array.length) * 100).toFixed(1) + "%\n";
     nextTick(() => {
       const textarea = document?.getElementById('statusArea');
       if (textarea) textarea.scrollTop = textarea?.scrollHeight;
     })
   }
-  state.status = state.status + "写入进度：100.0%<br/>";
+  state.status = state.status + "写入进度：100.0%\n";
 }
 
 const restoreRangeShared = async (start: number, uint8Array: Uint8Array) => {
@@ -525,13 +519,13 @@ const restoreRangeShared = async (start: number, uint8Array: Uint8Array) => {
   for (let i = 0; i < uint8Array.length; i += 0x40) {
     const chunk = uint8Array.slice(i, i + 0x40);
     await shared_write(appStore.connectPort, start + i, chunk, chunk.length);
-    state.status = state.status + "写入进度：" + ((i / uint8Array.length) * 100).toFixed(1) + "%<br/>";
+    state.status = state.status + "写入进度：" + ((i / uint8Array.length) * 100).toFixed(1) + "%\n";
     nextTick(() => {
       const textarea = document?.getElementById('statusArea');
       if (textarea) textarea.scrollTop = textarea?.scrollHeight;
     })
   }
-  state.status = state.status + "写入进度：100.0%<br/>";
+  state.status = state.status + "写入进度：100.0%\n";
 }
 
 const calculateChecksum = (line: string) => {
@@ -604,7 +598,7 @@ const writeIt = async () => {
     });
   }
   if (isUveDevice.value) {
-    state.status += `检测到 UVE 设备：将写入 shared@0x${UVE5_SHARED_TLE_BASE.toString(16)}<br/>`;
+    state.status += `检测到 UVE 设备：将写入 shared@0x${UVE5_SHARED_TLE_BASE.toString(16)}\n`;
     await restoreRangeShared(UVE5_SHARED_TLE_BASE, payload)
 
     // Read-back verify first record so users immediately know whether the shared write actually landed.
@@ -618,7 +612,7 @@ const writeIt = async () => {
           duration: 12 * 1000,
         });
       }
-      state.status += `读回校验通过：${chk.name}<br/>`;
+      state.status += `读回校验通过：${chk.name}\n`;
     } catch (e: any) {
       setLoading(false)
       return Message.error({
@@ -627,7 +621,7 @@ const writeIt = async () => {
       });
     }
   } else {
-    state.status += `非 UVE 设备：将写入 EEPROM@0x1E200<br/>`;
+    state.status += `非 UVE 设备：将写入 EEPROM@0x1E200\n`;
     await restoreRange(0x1E200, payload)
   }
   await eeprom_reboot(appStore.connectPort);
@@ -696,7 +690,7 @@ export default {
   width: 33%;
 }
 
-#statusArea :deep(.sat-warn) {
+#statusArea .sat-warn {
   color: rgb(var(--orange-6));
 }
 
