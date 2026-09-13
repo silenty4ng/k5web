@@ -5,7 +5,7 @@
         {{ $t("sat.selfSatInfo") }}
       </template>
       <div>
-        <a-textarea v-model="state.selfSatInfo" style="height: 120px;" placeholder="支持 TLE 或 OMM JSON&#10;&#10;ISS (ZARYA)&#10;  1 25544U 98067A   24320.36274227  .00015569  00000+0  28188-3 0  9999&#10;  2 25544  51.6413 286.4173 0007936 217.3657 298.3197 15.49809951481990" />
+        <a-textarea v-model="state.selfSatInfo" style="height: 120px;" :placeholder="selfSatPlaceholder" />
       </div>
     </a-modal>
     <a-modal v-model:visible="state.visible" @ok="handleOk" :ok-text="$t('tool.scaned')">
@@ -78,6 +78,19 @@ import { parseGpJson, parseSelfSatInput, ommToTle } from '@/utils/satellite.js';
 const UVE5_SHARED_TLE_BASE = 0x10000;
 
 const { loading, setLoading } = useLoading(true);
+
+const selfSatPlaceholder = `粘贴 TLE / OMM JSON，或星历文件 URL
+
+URL 例：
+https://celestrak.org/NORAD/elements/gp.php?CATNR=25544&FORMAT=json
+
+TLE 例：
+ISS (ZARYA)
+  1 25544U 98067A   24320.36274227  .00015569  00000+0  28188-3 0  9999
+  2 25544  51.6413 286.4173 0007936 217.3657 298.3197 15.49809951481990
+
+OMM JSON 例：
+{"OBJECT_NAME":"ISS (ZARYA)","OBJECT_ID":"1998-067A","EPOCH":"2026-09-13T04:12:47.894976","MEAN_MOTION":15.49096932,"ECCENTRICITY":0.00049173,"INCLINATION":51.6307,"RA_OF_ASC_NODE":224.6171,"ARG_OF_PERICENTER":134.673,"MEAN_ANOMALY":225.4659,"EPHEMERIS_TYPE":0,"CLASSIFICATION_TYPE":"U","NORAD_CAT_ID":25544,"ELEMENT_SET_NO":999,"REV_AT_EPOCH":58539,"BSTAR":9.6694874e-5,"MEAN_MOTION_DOT":4.898e-5,"MEAN_MOTION_DDOT":0}`
 
 const appStore = useAppStore();
 
@@ -614,12 +627,20 @@ const isValidURL = (url: string) => {
 }
 
 const addSelfSat = async () => {
-  if (isValidURL(state.selfSatInfo)) {
-    state.selfSatInfo = await (await fetch(state.selfSatInfo)).text()
+  const input = (state.selfSatInfo || '').trim()
+  if (!input) return
+  let text = input
+  if (isValidURL(input)) {
+    try {
+      text = await (await fetch(input)).text()
+    } catch {
+      alert('拉取 URL 失败（可能是跨域或网络问题），可手动打开链接后复制内容粘贴')
+      return
+    }
   }
-  const sat = parseSelfSatInput(state.selfSatInfo)
+  const sat = parseSelfSatInput(text)
   if (sat.length === 0) {
-    alert('未识别到卫星数据，请粘贴 TLE 或 OMM JSON')
+    alert('未识别到卫星数据，请粘贴/URL 指向 TLE 或 OMM JSON')
     return
   }
   state.satData = sat.concat(state.satData)
