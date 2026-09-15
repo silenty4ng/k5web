@@ -389,6 +389,7 @@ const syncTime = async () => {
 }
 
 const changeSat = async (sat: any) => {
+  state.warnings = []
   const data = state.satData.find(e => e.name == sat);
   if (!data) {
     nextTick(() => {
@@ -465,13 +466,18 @@ const initSat = async () => {
   try {
     let rst = ''
     // 旧键 satRst 是 TLE；FORMAT=json 的 OMM 数组可直接给 json2satrec
-    if (sessionStorage.getItem('satGpJson')) {
-      rst = sessionStorage.getItem('satGpJson') || ""
+    const cached = sessionStorage.getItem('satGpJson')
+    if (cached) {
+      rst = cached
     } else {
       rst = await (await fetch('https://celestrak.org/NORAD/elements/gp.php?GROUP=amateur&FORMAT=json')).text()
+    }
+    const ommList = parseGpJson(rst)
+    // 仅在解析出有效数据时写入缓存，避免把限流/错误页缓存后整段会话无法恢复
+    if (!cached && ommList.length) {
       sessionStorage.setItem('satGpJson', rst)
     }
-    state.satData = parseGpJson(rst).map((omm: any) => ({
+    state.satData = ommList.map((omm: any) => ({
       name: omm.OBJECT_NAME,
       omm,
     }))
