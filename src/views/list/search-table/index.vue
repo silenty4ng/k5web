@@ -9,6 +9,16 @@
         {{ $t('menu.cps.writeNoticeContent') }}
       </div>
     </a-modal>
+    <a-modal v-model:visible="istate.showShareCode" :width="460" :footer="false" @cancel="istate.shareCode = ''">
+      <template #title>
+        UV CPS 分享码
+      </template>
+      <div style="margin-bottom: 16px;">把下方数字分享码发给对方，对方在 CPS 页面输入即可恢复对应的信道数据（频率、亚音、功率等）。</div>
+      <div class="share-code-box" @click="copyShareCode" title="点击复制">
+        <span class="share-code-text">{{ istate.shareCode }}</span>
+        <span class="share-code-hint">点击复制</span>
+      </div>
+    </a-modal>
     <Breadcrumb :items="[$t('menu.dashboard'), $t('menu.cps.channel')]" />
     <a-card class="general-card">
       <template #title>
@@ -55,6 +65,9 @@
             </a-button>
             <a-button @click="saveExcelChannel">
               {{ $t('cps.export') }}
+            </a-button>
+            <a-button type="primary" @click="generateShareCode" :loading="istate.shareCodeLoading" :disabled="istate.shareCodeLoading">
+              生成 UV CPS 分享码
             </a-button>
           </a-space>
         </a-col>
@@ -116,6 +129,7 @@
   import { Input, Select } from 'tdesign-vue-next';
   import useLoading from '@/hooks/loading';
   import { eeprom_read, uint8ArrayToHexReverseString, uint8ArrayToString, hexReverseStringToUint8Array, stringToUint8Array, eeprom_write, eeprom_reboot, eeprom_init, disconnect } from '@/utils/serial.js';
+  import { buildPayload, publish, type ChannelOptions } from '@/utils/channel-share';
   import { useAppStore } from '@/store';
   import { MoveIcon } from 'tdesign-icons-vue-next';
   import Chinese from 'chinese-s2t';
@@ -170,7 +184,10 @@
 
   const istate = reactive({
     showHide: 0,
-    showNotice: false
+    showNotice: false,
+    showShareCode: false,
+    shareCode: '',
+    shareCodeLoading: false
   })
 
   const onDragSort = (params: any) => {
@@ -787,6 +804,48 @@
     newData.splice(row, 1, {scanlist: []});
     cstate.renderData = newData;
   }
+  /** 把当前已填信道压成分享码并弹窗展示 */
+  const generateShareCode = async () => {
+    istate.shareCodeLoading = true
+    try {
+      const opts: ChannelOptions = {
+        CTCSSOption: state.CTCSSOption,
+        DCSOption: state.DCSOption,
+        stepOption: state.stepOption,
+        pttidOption: state.pttidOption
+      }
+      const { payload } = buildPayload(cstate.renderData, opts)
+      const res = await publish(payload)
+      if (res.pending) {
+        alert('分享数据已提交，正在异步审核中，请稍后再试')
+        return
+      }
+      istate.shareCode = res.code || ''
+      istate.showShareCode = true
+    } catch (e: any) {
+      alert(e?.message || '生成分享码失败')
+    } finally {
+      istate.shareCodeLoading = false
+    }
+  }
+  /** 复制分享码到剪贴板 */
+  const copyShareCode = async () => {
+    const code = istate.shareCode
+    if (!code) return
+    try {
+      await navigator.clipboard.writeText(code)
+      alert('分享码已复制到剪贴板')
+    } catch {
+      // 降级：用 execCommand
+      const ta = document.createElement('textarea')
+      ta.value = code
+      document.body.appendChild(ta)
+      ta.select()
+      try { document.execCommand('copy') } catch {}
+      document.body.removeChild(ta)
+      alert('分享码已复制到剪贴板')
+    }
+  }
   const saveChannel = () => {
     const _data = JSON.stringify(cstate.renderData);
     const _blob = new Blob([_data], { type: 'application/octet-stream' });
@@ -1031,6 +1090,33 @@
   .active {
     color: #0960bd;
     background-color: #e3f4fc;
+  }
+  .share-code-box {
+    border: 1px solid #e5e6eb;
+    border-radius: 4px;
+    padding: 16px 20px;
+    text-align: center;
+    cursor: pointer;
+    background: #f5f7fa;
+    transition: border-color .2s, background .2s;
+    &:hover {
+      border-color: #0960bd;
+      background: #e3f4fc;
+    }
+    .share-code-text {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: #1f2430;
+      word-break: break-all;
+    }
+    .share-code-hint {
+      display: block;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #86909c;
+    }
   }
   .setting {
     display: flex;

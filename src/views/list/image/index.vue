@@ -21,8 +21,20 @@
               <a-button :disabled="state.matrix.length < 64" @click="negativeIt">{{ $t('image.negative') }}</a-button>
               <a-button :disabled="state.matrix.length < 64" @click="saveIt">{{ $t('cps.save') }}</a-button>
               <a-button type="primary" :disabled="state.matrix.length < 64" @click="flashIt">{{ $t('tool.write') }}</a-button>
+              <a-button :disabled="state.matrix.length < 64 || state.shareCodeLoading" @click="generateShareCode">
+                {{ state.shareCodeLoading ? '上传中...' : '生成 UV CPS 分享码' }}
+              </a-button>
             </a-space>
           </a-card>
+        <a-modal v-model:visible="state.shareCodeVisible" :width="460" :footer="false" @cancel="state.shareCode = ''">
+          <template #title>
+            UV CPS 分享码
+          </template>
+          <div class="share-code-box" @click="copyShareCode" title="点击复制">
+            <span class="share-code-text">{{ state.shareCode }}</span>
+            <span class="share-code-hint">点击复制</span>
+          </div>
+        </a-modal>
         </a-spin>
       </a-col>
     </a-row>
@@ -34,6 +46,7 @@ import { reactive, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAppStore } from '@/store';
 import { eeprom_write, eeprom_reboot, eeprom_init, shared_write, disconnect } from '@/utils/serial.js';
+import { encodeImage, publish } from '@/utils/channel-share.js';
 
 const appStore = useAppStore();
 
@@ -43,14 +56,20 @@ const state : {
   matrix: any,
   mousedown: boolean,
   threshold: number,
-  cache: any
+  cache: any,
+  shareCode: string,
+  shareCodeVisible: boolean,
+  shareCodeLoading: boolean
 } = reactive({
   binaryFile: undefined,
   loading: false,
   matrix: [],
   mousedown: false,
   threshold: 128,
-  cache: undefined
+  cache: undefined,
+  shareCode: '',
+  shareCodeVisible: false,
+  shareCodeLoading: false
 })
 
 const route = useRoute();
@@ -243,6 +262,46 @@ const flashIt = async () => {
   state.loading = false
 }
 
+/** 生成 UV CPS 图片分享码（编码 → 上传 → 拿到数字分享码） */
+const generateShareCode = async () => {
+  if (state.matrix.length < 64) {
+    alert('请先选择或绘制图片')
+    return
+  }
+  state.shareCodeLoading = true
+  try {
+    const payload = encodeImage(state.threshold, state.matrix)
+    const res = await publish(payload)
+    if (res.pending) {
+      alert('分享数据已提交，正在异步审核中，请稍后再试')
+      return
+    }
+    state.shareCode = res.code || ''
+    state.shareCodeVisible = true
+  } catch (e: any) {
+    alert(e?.message || '生成分享码失败')
+  } finally {
+    state.shareCodeLoading = false
+  }
+}
+/** 复制分享码到剪贴板 */
+const copyShareCode = async () => {
+  const code = state.shareCode
+  if (!code) return
+  try {
+    await navigator.clipboard.writeText(code)
+    alert('分享码已复制到剪贴板')
+  } catch {
+    const ta = document.createElement('textarea')
+    ta.value = code
+    document.body.appendChild(ta)
+    ta.select()
+    try { document.execCommand('copy') } catch {}
+    document.body.removeChild(ta)
+    alert('分享码已复制到剪贴板')
+  }
+}
+
 const changeThreshold = () => {
       const imageData = state.cache;
       function getPixel(x: any, y: any) {
@@ -281,6 +340,33 @@ const changeThreshold = () => {
 
     :deep(.arco-card-meta-title) {
       font-size: 14px;
+    }
+  }
+  .share-code-box {
+    border: 1px solid #e5e6eb;
+    border-radius: 4px;
+    padding: 16px 20px;
+    text-align: center;
+    cursor: pointer;
+    background: #f5f7fa;
+    transition: border-color .2s, background .2s;
+    &:hover {
+      border-color: #0960bd;
+      background: #e3f4fc;
+    }
+    .share-code-text {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: #1f2430;
+      word-break: break-all;
+    }
+    .share-code-hint {
+      display: block;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #86909c;
     }
   }
   :deep(.arco-list-col) {
