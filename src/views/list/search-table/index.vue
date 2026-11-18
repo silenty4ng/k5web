@@ -13,7 +13,7 @@
       <template #title>
         UV CPS 分享码
       </template>
-      <div style="margin-bottom: 16px;">把下方数字分享码发给对方，对方在 CPS 页面输入即可恢复对应的信道数据（频率、亚音、功率等）。</div>
+      <div style="margin-bottom: 16px;">共 {{ istate.shareCount }} 条信道。把下方数字分享码发给对方，对方在 CPS 页面输入即可恢复对应的信道数据（频率、亚音、功率等）。</div>
       <div class="share-code-box" @click="copyShareCode" title="点击复制">
         <span class="share-code-text">{{ istate.shareCode }}</span>
         <span class="share-code-hint">点击复制</span>
@@ -187,6 +187,7 @@
     showNotice: false,
     showShareCode: false,
     shareCode: '',
+    shareCount: 0,
     shareCodeLoading: false
   })
 
@@ -814,13 +815,14 @@
         stepOption: state.stepOption,
         pttidOption: state.pttidOption
       }
-      const { payload } = buildPayload(cstate.renderData, opts)
+      const { payload, count } = buildPayload(cstate.renderData, opts)
       const res = await publish(payload)
       if (res.pending) {
         alert('分享数据已提交，正在异步审核中，请稍后再试')
         return
       }
       istate.shareCode = res.code || ''
+      istate.shareCount = count
       istate.showShareCode = true
     } catch (e: any) {
       alert(e?.message || '生成分享码失败')

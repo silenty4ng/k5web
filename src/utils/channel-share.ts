@@ -220,16 +220,28 @@ function k8StepIndex(val: any): number {
   return best
 }
 
-/** k5web pttid 标签 → K8 pttid 值。K8: 0=关闭 1=开始 2=结束 3=开始和结束 */
-function k8Pttid(label: any): number {
-  const s = String(label || '').trim()
-  if (s === '上线码' || s === '开始') return 1
-  if (s === '下线码' || s === '结束') return 2
-  if (s === '上线+下线码' || s === '开始和结束' || s === 'Quindar码') return 3
+/** k5web pttid 标签 → K8 pttid 值。K8: 0=关闭 1=开始 2=结束 3=开始和结束。
+ *  标签会随界面语言在中文/英文间切换，因此优先按 opts.pttidOption 查下标：
+ *  下标 0/1/2 即 上线码/下线码/上线+下线码，下标 3 的 Quindar 设备无独立项，归为双向。 */
+function k8Pttid(label: any, opts?: ChannelOptions): number {
+  const s = String(label == null ? '' : label).trim()
+  if (!s) return 0
+  const list = opts && Array.isArray(opts.pttidOption) ? opts.pttidOption : []
+  const idx = list.indexOf(s)
+  if (idx === 0) return 1
+  if (idx === 1) return 2
+  if (idx === 2 || idx === 3) return 3
+  // 选项表里没有时按标签字面兜底（老数据 / 未翻译的环境）
+  if (s === '上线码' || s === '开始' || s === 'UP CODE') return 1
+  if (s === '下线码' || s === '结束' || s === 'DOWW CODE') return 2
+  if (s === '上线+下线码' || s === '开始和结束' || s === 'Quindar码' || s === 'UP+DOWN Code' || s === 'APOLLO QUINDAR') return 3
   return 0
 }
-/** K8 pttid 值 → k5web pttid 标签 */
-function k5webPttid(v: number): string {
+/** K8 pttid 值 → k5web pttid 标签（有 opts 时用当前语言的选项表） */
+function k5webPttid(v: number, opts?: ChannelOptions): string {
+  const list = opts && Array.isArray(opts.pttidOption) ? opts.pttidOption : []
+  const i = v === 1 ? 0 : v === 2 ? 1 : v === 3 ? 2 : -1
+  if (i >= 0 && list[i] != null) return list[i]
   if (v === 1) return '上线码'
   if (v === 2) return '下线码'
   if (v === 3) return '上线+下线码'
@@ -346,7 +358,7 @@ export function packChannel(ch: any, opts: ChannelOptions): Uint8Array {
   out[17] = ch?.busy ? 1 : 0
   out[18] = ch?.reverse ? 1 : 0
   out[19] = ch?.dtmf ? 1 : 0
-  out[20] = k8Pttid(ch?.pttid)
+  out[20] = k8Pttid(ch?.pttid, opts)
   out[21] = k8Demode(ch?.mode)
   out[22] = k8Scanlist(ch?.scanlist)
   out[23] = 4  // 静噪固定为 4
@@ -394,7 +406,7 @@ export function unpackChannel(raw: Uint8Array, opts: ChannelOptions, index?: num
   ch.busy = !!b[17]
   ch.reverse = !!b[18]
   ch.dtmf = !!b[19]
-  ch.pttid = k5webPttid(b[20])
+  ch.pttid = k5webPttid(b[20], opts)
   ch.mode = k5webDemode(b[21])
   ch.scanlist = k5webScanlist(b[22])
   ch.squelch = b[23] || undefined
@@ -419,11 +431,28 @@ function k8StepIndexReverse(k8Idx: number, stepOption: number[]): number {
   return best
 }
 
-/** 从信道数组构造分享码（只保留有 name 的有效信道）。opts 用于枚举字段的编解码 */
+/** 判断一行信道是否完全空白（CPS 表默认会预生成 200 个空行，绝不能一起分享出去） */
+function isEmptyChannel(ch: any): boolean {
+  if (!ch || typeof ch !== 'object') return true
+  return !Object.keys(ch).some(key => {
+    const v = ch[key]
+    if (Array.isArray(v)) return v.length > 0
+    if (v == null) return false
+    if (typeof v === 'string') return v.trim() !== ''
+    if (typeof v === 'boolean') return v === true
+    return v !== 0 && v !== ''
+  })
+}
+
+/** 从信道数组构造分享码（保留所有有内容的信道，index 用原始行号）。
+ *  只要填了频率就算有效信道，不要求 name —— 很多用户不写名字。 */
 export function buildPayload(channels: any[], opts: ChannelOptions): { payload: string; items: ShareItem[]; count: number } {
-  const list = (channels || []).filter(c => c && typeof c === 'object' && c.name)
-  if (!list.length) throw new Error('没有可分享的信道')
-  const items = list.map((ch, idx) => ({ index: idx, raw: packChannel(ch, opts) }))
+  const items: ShareItem[] = []
+  ;(channels || []).forEach((ch, idx) => {
+    if (isEmptyChannel(ch)) return
+    items.push({ index: idx, raw: packChannel(ch, opts) })
+  })
+  if (!items.length) throw new Error('没有可分享的信道')
   return { payload: encode(items), items, count: items.length }
 }
 
